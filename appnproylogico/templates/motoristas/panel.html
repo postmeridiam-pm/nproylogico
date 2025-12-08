@@ -1,0 +1,220 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Motorista</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+  <link rel="stylesheet" href="{% static 'css/motorista.css' %}">
+</head>
+<body class="theme-light">
+  <nav class="navbar-custom">
+    <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center w-100">
+        <div class="d-flex align-items-center gap-3">
+          <a class="btn-nav" href="{% url 'home' %}"><i class="bi bi-house"></i> Inicio</a>
+          <div class="page-title"><i class="bi bi-person-badge"></i> Panel Motorista</div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <a class="btn-success-nav" href="{% url 'avisar_movimiento_motorista' %}"><i class="bi bi-chat-dots"></i> Avisar movimiento</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-3">
+    {% if messages %}{% for m in messages %}
+      <div class="alert alert-{{ m.tags }}">{{ m }}</div>
+    {% endfor %}{% endif %}
+
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="text-muted">Motorista</div>
+            <div class="fw-semibold">{{ motorista.usuario.nombre }} {{ motorista.usuario.apellido }}</div>
+          </div>
+          <div class="col-md-6">
+            <div class="text-muted">Moto asignada</div>
+            {% if asign_moto %}
+              <div class="fw-semibold">{{ asign_moto.moto.patente }} · {% if asign_moto.activa %}<span class="badge bg-success">Activa</span>{% else %}<span class="badge bg-secondary">Inactiva</span>{% endif %}</div>
+            {% else %}
+              <div class="fw-semibold">-</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">Mis envíos</div>
+      <div class="card-body">
+        {% if despachos %}
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Origen</th>
+                <th>Destino</th>
+                <th>Tipo</th>
+                <th>Estado</th>
+                <th>Progreso</th>
+                <th>En ruta (min)</th>
+                <th>Receta</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for d in despachos %}
+              <tr>
+                <td>{{ d.codigo_despacho }}</td>
+                <td>
+                  {% if d.origen %}
+                    {{ d.origen.local_nombre }}<br>
+                    <small class="text-muted">{{ d.origen.local_direccion }}</small>
+                  {% else %}
+                    {{ d.farmacia_origen_local_id }}
+                  {% endif %}
+                </td>
+                <td>{{ d.destino_direccion|default:'-' }}</td>
+                <td>{{ d.tipo_despacho }}</td>
+                <td>{{ d.estado }}</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2" style="min-width:200px">
+                    {% with e=d.estado %}
+                      <div class="flex-fill progress" style="height:8px;">
+                        <div class="progress-bar bg-info" role="progressbar" style="width:25%" aria-label="Mapa" title="Mapa" data-bs-toggle="tooltip"></div>
+                        <div class="progress-bar {% if e == 'EN_CAMINO' or e == 'ENTREGADO' or e == 'FALLIDO' %}bg-warning{% else %}bg-light{% endif %}" role="progressbar" style="width:25%" aria-label="En camino" title="En camino" data-bs-toggle="tooltip"></div>
+                        <div class="progress-bar {% if e == 'ENTREGADO' %}bg-success{% else %}bg-light{% endif %}" role="progressbar" style="width:25%" aria-label="Entregado" title="Entregado" data-bs-toggle="tooltip"></div>
+                        <div class="progress-bar {% if e == 'FALLIDO' %}bg-danger{% else %}bg-light{% endif %}" role="progressbar" style="width:25%" aria-label="Fallido" title="Fallido" data-bs-toggle="tooltip"></div>
+                      </div>
+                    {% endwith %}
+                  </div>
+                </td>
+                <td>{% if d.min_en_ruta %}{{ d.min_en_ruta }}{% else %}-{% endif %}</td>
+                <td>{% if d.tiene_receta_retenida %}<span class="badge bg-danger">Retenida</span>{% else %}<span class="badge bg-success">No</span>{% endif %}</td>
+                <td>
+                  {% if d.origen and d.destino_lat and d.destino_lng and d.origen.local_lat and d.origen.local_lng %}
+                    <a class="btn btn-primary btn-sm mb-1 d-block" target="_blank" href="https://www.google.com/maps/dir/?api=1&origin={{ d.origen.local_lat }},{{ d.origen.local_lng }}&destination={{ d.destino_lat }},{{ d.destino_lng }}" title="Abrir mapa" data-bs-toggle="tooltip"><i class="bi bi-geo-alt"></i> Mapa</a>
+                  {% else %}
+                    <a class="btn btn-primary btn-sm mb-1 d-block" target="_blank" href="https://www.google.com/maps/dir/?api=1&origin={{ d.origen.local_direccion|default:d.farmacia_origen_local_id|urlencode }}&destination={{ d.destino_direccion|urlencode }}" title="Abrir mapa" data-bs-toggle="tooltip"><i class="bi bi-geo-alt"></i> Mapa</a>
+                  {% endif %}
+
+                  {% if d.estado == 'ASIGNADO' or d.estado == 'PREPARADO' %}
+                    <form method="post" action="{% url 'motorista_despacho_estado' d.id %}" class="d-inline ms-1 estado-form" data-id="{{ d.id }}">
+                      {% csrf_token %}
+                      <input type="hidden" name="estado" value="EN_CAMINO" />
+                      <button class="btn btn-warning btn-sm" type="submit" title="Iniciar ruta" data-bs-toggle="tooltip"><i class="bi bi-arrow-right"></i> En Camino</button>
+                    </form>
+                  {% endif %}
+
+                  {% if d.estado == 'EN_CAMINO' %}
+                    <form method="post" action="{% url 'motorista_despacho_estado' d.id %}" class="d-inline ms-1 estado-form" data-id="{{ d.id }}">
+                      {% csrf_token %}
+                      <input type="hidden" name="estado" value="ENTREGADO" />
+                      <button class="btn btn-success btn-sm" type="submit" title="Marcar entregado" data-bs-toggle="tooltip"><i class="bi bi-check2"></i> Entregado</button>
+                    </form>
+                    <button class="btn btn-danger btn-sm ms-1" type="button" data-bs-toggle="modal" data-bs-target="#incModal" data-id="{{ d.id }}" title="Registrar fallido" data-bs-toggle="tooltip"><i class="bi bi-x-lg"></i> Fallido</button>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <!-- MODAL MANTENIDO EXACTAMENTE IGUAL -->
+          <div class="modal fade" id="incModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Registrar incidencia</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <form method="post" id="incForm">
+                  {% csrf_token %}
+                  <div class="modal-body">
+                    <input type="hidden" name="estado" value="FALLIDO" />
+                    <div class="mb-3">
+                      <label class="form-label">Tipo incidencia</label>
+                      <select class="form-select" name="tipo_incidencia" required>
+                        <option value="CLIENTE_AUSENTE">Cliente ausente</option>
+                        <option value="DIRECCION_INCORRECTA">Dirección incorrecta</option>
+                        <option value="RECETA_NO_DEVUELTA">Receta no devuelta</option>
+                        <option value="OTRA">Otra</option>
+                      </select>
+                      <input class="form-control mt-2" name="incidencia_nota" placeholder="Detalle (opcional)" />
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-outline-warning">Registrar fallido</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <div class="text-muted">Sin envíos asignados</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+  (function(){
+    var modal = document.getElementById('incModal');
+    var form = document.getElementById('incForm');
+    if(modal && form){
+      modal.addEventListener('show.bs.modal', function(ev){
+        var btn = ev.relatedTarget;
+        var id = btn && btn.getAttribute('data-id');
+        if(id){
+          form.setAttribute('action', '{% url 'motorista_despacho_estado' 0 %}'.replace('/0/', '/' + id + '/'));
+        }
+      });
+    }
+    if (window.bootstrap) {
+      document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el){
+        new bootstrap.Tooltip(el);
+      });
+    }
+    function updateRow(id, estado, minRuta){
+      var rows = document.querySelectorAll('tbody tr');
+      rows.forEach(function(r){
+        var codeCell = r.children[0];
+        if (!codeCell) return;
+        if ((codeCell.textContent||'').trim() === '') return;
+      });
+      // fallback simple: refresh page
+      if (!id) return location.reload();
+      location.reload();
+    }
+    document.querySelectorAll('form.estado-form').forEach(function(f){
+      f.addEventListener('submit', function(ev){
+        ev.preventDefault();
+        var action = this.getAttribute('action');
+        var fd = new FormData(this);
+        fetch(action, {
+          method: 'POST',
+          headers: { 'X-Requested-With': 'XMLHttpRequest' },
+          body: fd
+        })
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+          if (data && data.ok){
+            updateRow(data.id, data.estado, data.min_en_ruta);
+          } else {
+            location.reload();
+          }
+        })
+        .catch(function(){ location.reload(); });
+      });
+    });
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,674 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reporte Mensual - LOGICO</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+  <style>
+    :root {
+      --primary-color: #2ecc71;
+      --secondary-color: #27ae60;
+      --success-color: #00c853;
+      --warning-color: #ffa726;
+      --danger-color: #ef5350;
+      --info-color: #29b6f6;
+      --dark-bg: #1a1d29;
+      --dark-surface: #252837;
+      --dark-card: #2d3142;
+      --dark-border: #3a3f5c;
+      --dark-text: #e8eaed;
+      --dark-text-secondary: #9aa0b3;
+      --light-bg: #f5f7fa;
+      --light-surface: #ffffff;
+      --light-card: #ffffff;
+      --light-border: #e1e4e8;
+      --light-text: #1a1d29;
+      --light-text-secondary: #586069;
+    }
+
+    * {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .theme-light {
+      --bg-primary: var(--light-bg);
+      --bg-surface: var(--light-surface);
+      --bg-card: var(--light-card);
+      --border-color: var(--light-border);
+      --text-primary: var(--light-text);
+      --text-secondary: var(--light-text-secondary);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .theme-dark {
+      --bg-primary: var(--dark-bg);
+      --bg-surface: var(--dark-surface);
+      --bg-card: var(--dark-card);
+      --border-color: var(--dark-border);
+      --text-primary: var(--dark-text);
+      --text-secondary: var(--dark-text-secondary);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      min-height: 100vh;
+    }
+
+    .navbar-custom {
+      background-color: #212529;
+      padding: 0.75rem 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+    }
+
+    .navbar-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .navbar-custom .navbar-brand {
+      color: white;
+      font-weight: 600;
+      font-size: 1.25rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .navbar-custom .btn-nav {
+      background-color: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .navbar-custom .btn-nav:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+      color: white;
+    }
+
+    .report-toggle {
+      display: inline-flex;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .report-toggle .btn-toggle {
+      background-color: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.7);
+      padding: 0.5rem 1.25rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      font-size: 0.9rem;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .report-toggle .btn-toggle:last-child {
+      border-right: none;
+    }
+
+    .report-toggle .btn-toggle:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+      color: white;
+    }
+
+    .report-toggle .btn-toggle.active {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .export-dropdown {
+      position: relative;
+    }
+
+    .export-dropdown .btn-export {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
+    }
+
+    .export-dropdown .btn-export:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .filter-toolbar {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 0.75rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .filter-toolbar .form-label {
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 500;
+      font-size: 0.85rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .filter-toolbar .form-control,
+    .filter-toolbar .form-select {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.9rem;
+    }
+
+    .filter-toolbar .form-control:focus,
+    .filter-toolbar .form-select:focus {
+      background-color: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+
+    .filter-toolbar .form-select option {
+      background-color: #212529;
+      color: white;
+    }
+
+    .filter-toolbar .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
+    }
+
+    .filter-toolbar .btn-primary:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(46, 204, 113, 0.3);
+    }
+
+    .filter-toolbar .btn-outline-secondary {
+      background-color: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
+    }
+
+    .filter-toolbar .btn-outline-secondary:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+      color: white;
+    }
+
+    .help-banner {
+      background: linear-gradient(135deg, rgba(46, 204, 113, 0.1), rgba(39, 174, 96, 0.1));
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      color: var(--text-primary);
+    }
+
+    .breadcrumb {
+      background-color: transparent;
+      padding: 0;
+      margin-bottom: 1.5rem;
+    }
+
+    .breadcrumb-item a {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .breadcrumb-item a:hover {
+      text-decoration: underline;
+    }
+
+    .breadcrumb-item.active {
+      color: var(--text-secondary);
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+      color: var(--text-secondary);
+    }
+
+    .card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+      background-color: var(--bg-surface);
+      border-bottom: 2px solid var(--border-color);
+      padding: 1rem 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    .card-footer {
+      background-color: var(--bg-surface);
+      border-top: 1px solid var(--border-color);
+      padding: 1rem 1.5rem;
+    }
+
+    .table-responsive {
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .table {
+      color: var(--text-primary);
+      margin-bottom: 0;
+    }
+
+    .table thead {
+      background-color: var(--bg-surface);
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .table thead th {
+      color: var(--text-primary);
+      font-weight: 600;
+      padding: 1rem;
+      border: none;
+      white-space: nowrap;
+      font-size: 0.85rem;
+    }
+
+    .table tbody tr {
+      border-bottom: 1px solid var(--border-color);
+      transition: background-color 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+      background-color: var(--bg-surface);
+    }
+
+    .table tbody td {
+      padding: 0.75rem;
+      vertical-align: middle;
+      border: none;
+      font-size: 0.9rem;
+    }
+
+    .table-sm td, .table-sm th {
+      padding: 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    .badge {
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    .badge.bg-success {
+      background-color: var(--success-color) !important;
+    }
+
+    .badge.bg-warning {
+      background-color: var(--warning-color) !important;
+    }
+
+    .badge.bg-info {
+      background-color: var(--info-color) !important;
+    }
+
+    .badge.bg-secondary {
+      background-color: var(--text-secondary) !important;
+    }
+
+    @media (max-width: 768px) {
+      .navbar-custom .navbar-brand {
+        font-size: 1.1rem;
+      }
+
+      .navbar-top-row {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .report-toggle {
+        width: 100%;
+      }
+
+      .report-toggle .btn-toggle {
+        flex: 1;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+      }
+
+      .filter-toolbar {
+        padding: 0.5rem;
+      }
+
+      .table thead th,
+      .table tbody td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.85rem;
+      }
+
+      .table-sm td, .table-sm th {
+        padding: 0.4rem;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body class="theme-light">
+  <nav class="navbar-custom">
+    <div class="container-fluid">
+      <div class="navbar-top-row">
+        <div class="d-flex align-items-center gap-3">
+          <a class="btn-nav" href="{% url 'home' %}">
+            <i class="bi bi-house"></i> Volver al inicio
+          </a>
+          <span class="navbar-brand">
+            <i class="bi bi-graph-up"></i> Reporte de Movimientos
+          </span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <div class="report-toggle">
+            <a class="btn-toggle {% if request.GET.tipo_reporte == 'diario' %}active{% endif %}" href="{% url 'reporte_movimientos' %}?tipo_reporte=diario">
+              <i class="bi bi-calendar-day"></i> Diario
+            </a>
+            <a class="btn-toggle {% if request.GET.tipo_reporte == 'mensual' or not request.GET.tipo_reporte %}active{% endif %}" href="{% url 'reporte_movimientos' %}?tipo_reporte=mensual">
+              <i class="bi bi-calendar-month"></i> Mensual
+            </a>
+            <a class="btn-toggle {% if request.GET.tipo_reporte == 'anual' %}active{% endif %}" href="{% url 'reporte_movimientos' %}?tipo_reporte=anual">
+              <i class="bi bi-calendar-range"></i> Anual
+            </a>
+          </div>
+          <div class="export-dropdown">
+            <button class="btn btn-export dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-download"></i> Exportar
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="{% url 'export_resumen_operativo' %}?tipo=mensual&formato=csv{% if form.mes.value %}&anio={{ form.mes.value|date:'Y' }}&mes={{ form.mes.value|date:'m' }}{% endif %}"><i class="bi bi-filetype-csv"></i> CSV (Excel/Power BI)</a></li>
+              <li><a class="dropdown-item" href="{% url 'export_resumen_operativo' %}?tipo=mensual&formato=xlsx{% if form.mes.value %}&anio={{ form.mes.value|date:'Y' }}&mes={{ form.mes.value|date:'m' }}{% endif %}"><i class="bi bi-file-earmark-excel"></i> XLSX (Excel)</a></li>
+              <li><a class="dropdown-item" href="{% url 'export_resumen_operativo' %}?tipo=mensual&formato=pdf&detalle=1{% if form.mes.value %}&anio={{ form.mes.value|date:'Y' }}&mes={{ form.mes.value|date:'m' }}{% endif %}"><i class="bi bi-file-earmark-pdf"></i> PDF</a></li>
+              <li><a class="dropdown-item" href="{% url 'export_resumen_operativo' %}?tipo=mensual&formato=json{% if form.mes.value %}&anio={{ form.mes.value|date:'Y' }}&mes={{ form.mes.value|date:'m' }}{% endif %}"><i class="bi bi-filetype-json"></i> JSON (Power BI)</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-toolbar">
+        <form class="row g-2" method="get" id="form-mensual">
+          <input type="hidden" name="tipo_reporte" value="mensual">
+          <div class="col-md-3">
+            <label class="form-label">Mes</label>
+            {{ form.mes }}
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Farmacia</label>
+            {{ form.farmacia }}
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Ordenar por</label>
+            <select class="form-select" id="orden">
+              <option value="">Sin orden</option>
+              <option value="local_az">Local (A-Z)</option>
+              <option value="local_za">Local (Z-A)</option>
+              <option value="fecha_asc">Fecha (asc)</option>
+              <option value="fecha_desc">Fecha (desc)</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label d-block">&nbsp;</label>
+            <div class="d-flex gap-2">
+              <button class="btn btn-primary flex-fill" type="submit">
+                <i class="bi bi-funnel"></i> Filtrar
+              </button>
+              <button class="btn btn-outline-secondary" type="button" id="btn-filter-local-m" title="Filtrar tabla por mes">
+                <i class="bi bi-filter"></i>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container pb-5">
+    <div class="help-banner">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>Consejo: selecciona un mes específico para ver datos agregados. Usa el botón de exportar para descargar en diferentes formatos.</div>
+        <button id="hide-help-mensual" class="btn btn-sm btn-outline-secondary">No mostrar</button>
+      </div>
+    </div>
+
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="#">Reportes</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Movimientos - Mensual</li>
+      </ol>
+    </nav>
+
+    {% if resumen %}
+    <div class="card">
+      <div class="card-header">
+        <i class="bi bi-bar-chart"></i> Resumen Operativo Mensual
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-sm table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Año</th>
+                <th>Mes</th>
+                <th>Local ID</th>
+                <th>Farmacia</th>
+                <th>Comuna</th>
+                <th>Total</th>
+                <th>Entregados</th>
+                <th>Fallidos</th>
+                <th>En camino</th>
+                <th>Pendientes</th>
+                <th>Anulados</th>
+                <th>Con receta</th>
+                <th>Incidencias</th>
+                <th>Tiempo prom.</th>
+                <th>Valor total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in resumen %}
+              <tr>
+                <td>{{ r.0 }}</td>
+                <td>{{ r.1 }}</td>
+                <td><span class="badge bg-secondary">{{ r.2 }}</span></td>
+                <td>{{ r.3 }}</td>
+                <td>{{ r.4 }}</td>
+                <td><strong>{{ r.5 }}</strong></td>
+                <td><span class="badge bg-success">{{ r.6 }}</span></td>
+                <td><span class="badge bg-danger">{{ r.7 }}</span></td>
+                <td><span class="badge bg-info">{{ r.8 }}</span></td>
+                <td><span class="badge bg-warning">{{ r.9 }}</span></td>
+                <td>{{ r.10 }}</td>
+                <td>{{ r.11 }}</td>
+                <td>{{ r.12 }}</td>
+                <td>{{ r.13 }} min</td>
+                <td>${{ r.14|floatformat:0 }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="card">
+      <div class="card-header">
+        <i class="bi bi-list-ul"></i> Detalle de Movimientos
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Local</th>
+                <th>Despacho</th>
+                <th>Estado</th>
+                <th>Fecha</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for m in movimientos %}
+              <tr data-date="{{ m.fecha_movimiento|date:'Y-m-d'|default:m.fecha_movimiento }}" data-local="{{ m.despacho.farmacia_origen_local_id }}">
+                <td>{{ m.despacho.farmacia_origen_local_id }}</td>
+                <td>
+                  <span class="badge bg-info">{{ m.despacho.id }}</span>
+                </td>
+                <td>
+                  {% if m.estado_nuevo == 'EN_CAMINO' %}
+                    <span class="badge bg-info">{{ m.estado_nuevo }}</span>
+                  {% elif m.estado_nuevo == 'ENTREGADO' %}
+                    <span class="badge bg-success">{{ m.estado_nuevo }}</span>
+                  {% elif m.estado_nuevo == 'PENDIENTE' %}
+                    <span class="badge bg-warning">{{ m.estado_nuevo }}</span>
+                  {% else %}
+                    <span class="badge bg-secondary">{{ m.estado_nuevo }}</span>
+                  {% endif %}
+                </td>
+                <td>{{ m.fecha_movimiento }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="4" class="text-center text-muted py-5">
+                  <i class="bi bi-inbox" style="font-size: 3rem; opacity: 0.3;"></i>
+                  <div class="mt-2">No hay movimientos para mostrar</div>
+                  <small>Prueba seleccionando un mes diferente</small>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% if page_obj %}
+      <div class="card-footer d-flex justify-content-between align-items-center">
+        {% if page_obj.has_previous %}
+          <a class="btn btn-outline-secondary" href="?page={{ page_obj.previous_page_number }}&tipo_reporte=mensual">
+            <i class="bi bi-chevron-left"></i> Anterior
+          </a>
+        {% else %}
+          <span></span>
+        {% endif %}
+        <span class="text-secondary">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a class="btn btn-outline-secondary" href="?page={{ page_obj.next_page_number }}&tipo_reporte=mensual">
+            Siguiente <i class="bi bi-chevron-right"></i>
+          </a>
+        {% else %}
+          <span></span>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function(){
+      const orden = document.getElementById('orden');
+      const btnLocal = document.getElementById('btn-filter-local-m');
+      
+      function sortRows(){
+        const tbody = document.querySelector('.card:last-of-type tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr[data-date]'));
+        const val = orden.value;
+        
+        if (!val) return;
+        
+        const getDate = r => (r.getAttribute('data-date') || '');
+        const getLocal = r => (r.getAttribute('data-local') || '');
+        
+        rows.sort((a, b) => {
+          if (val === 'local_az') return getLocal(a).localeCompare(getLocal(b));
+          if (val === 'local_za') return getLocal(b).localeCompare(getLocal(a));
+          if (val === 'fecha_asc') return getDate(a).localeCompare(getDate(b));
+          if (val === 'fecha_desc') return getDate(b).localeCompare(getDate(a));
+          return 0;
+        });
+        
+        rows.forEach(r => tbody.appendChild(r));
+      }
+      
+      if (orden) orden.addEventListener('change', sortRows);
+
+      if (btnLocal) {
+        btnLocal.onclick = function(){
+          const monthInput = document.querySelector('#form-mensual input[name="mes"]');
+          const val = monthInput && monthInput.value ? monthInput.value : '';
+          const ym = val ? val.slice(0,7) : '';
+          const rows = document.querySelectorAll('.card:last-of-type tbody tr[data-date]');
+          
+          rows.forEach(r => {
+            const d = r.getAttribute('data-date') || '';
+            r.style.display = (!ym || d.slice(0,7) === ym) ? '' : 'none';
+          });
+        };
+      }
+
+      // Ayuda persistente
+      const help = document.querySelector('.help-banner');
+      const hideBtn = document.getElementById('hide-help-mensual');
+      if (localStorage.getItem('hide_help_mensual') === '1' && help) {
+        help.style.display = 'none';
+      }
+      if (hideBtn) {
+        hideBtn.onclick = function(){
+          localStorage.setItem('hide_help_mensual', '1');
+          if (help) help.style.display = 'none';
+        };
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Registro</title>
+  <style>
+    body { margin:0; font-family: system-ui, Arial, sans-serif; background:#0b1b2b; color:#eaf0f6; }
+    .wrap { min-height:100vh; display:grid; place-items:center; padding:24px; }
+    .card { width:100%; max-width:520px; background:#11263b; border-radius:12px; padding:24px; box-shadow:0 10px 30px rgba(0,0,0,0.3); }
+    h1 { margin:0 0 8px; font-size:22px; }
+    p.sub { margin:0 0 16px; color:#b8c6d9; font-size:14px; }
+    label { display:block; font-size:13px; margin:12px 0 6px; color:#cfe3ff; }
+    input, select { width:100%; padding:10px 12px; border-radius:8px; border:1px solid #2a4365; background:#0e2236; color:#eaf0f6; }
+    .actions { margin-top:16px; display:flex; gap:12px; align-items:center; }
+    button { background:#00b37e; border:none; color:#08212f; font-weight:600; padding:10px 14px; border-radius:8px; cursor:pointer; }
+    a { color:#74c0ff; text-decoration:none; }
+    .errorlist { background:#1b2f46; padding:10px 12px; border-radius:8px; margin:8px 0; color:#ffcccb; list-style:none; }
+    .brand { display:flex; align-items:center; gap:8px; margin-bottom:12px; color:#9cd2ff; font-weight:600; }
+    small { color:#9cb7d0; }
+  </style>
+  {% if messages %}
+  <style>.msg{background:#1b2f46;padding:10px 12px;border-radius:8px;margin-bottom:8px;color:#ffcccb;}</style>
+  {% endif %}
+  {% load static %}
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="brand">Logística Farmacéutica · Registro</div>
+      <h1>Crea tu cuenta</h1>
+      <p class="sub">Documento nacional chileno (DNI/Cédula/RUT), Pasaporte, Documento extranjero (DNI/Visa) o Visa de trabajo.</p>
+      {% for message in messages %}
+        <div class="msg">{{ message }}</div>
+      {% endfor %}
+      <form method="post" novalidate enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <ul class="errorlist">{% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}</ul>
+        {% endif %}
+
+        <label for="id_username">Usuario</label>
+        {{ form.username }}
+        {% if form.username.errors %}<ul class="errorlist">{% for e in form.username.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+
+        <label for="id_email">Email</label>
+        {{ form.email }}
+        {% if form.email.errors %}<ul class="errorlist">{% for e in form.email.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+
+        <label for="id_first_name">Nombre</label>
+        {{ form.first_name }}
+        {% if form.first_name.errors %}<ul class="errorlist">{% for e in form.first_name.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+
+        <label for="id_last_name">Apellido</label>
+        {{ form.last_name }}
+        {% if form.last_name.errors %}<ul class="errorlist">{% for e in form.last_name.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+
+        <label for="id_rol">Rol</label>
+        {{ form.rol }}
+        {% if form.rol.errors %}<ul class="errorlist">{% for e in form.rol.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        <small>El rol asigna permisos mediante grupos de Django.</small>
+
+        <label for="id_tipo_documento">Tipo de documento</label>
+        {{ form.tipo_documento }}
+        {% if form.tipo_documento.errors %}<ul class="errorlist">{% for e in form.tipo_documento.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+
+        <label for="id_documento_identidad">DNI / documento</label>
+        {{ form.documento_identidad }}
+        <small id="doc-help">Chile: DNI/Cédula/RUT (12.345.678-5). Extranjeros: alfanumérico 5–20 caracteres.</small>
+        {% if form.documento_identidad.errors %}<ul class="errorlist">{% for e in form.documento_identidad.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+
+        <label for="id_telefono">Teléfono</label>
+        {{ form.telefono }}
+        <small>7–15 dígitos, puede incluir + y guiones.</small>
+        {% if form.telefono.errors %}<ul class="errorlist">{% for e in form.telefono.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+
+        <label for="id_password1">Contraseña</label>
+        {{ form.password1 }}
+        {% if form.password1.errors %}<ul class="errorlist">{% for e in form.password1.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+
+        <label for="id_password2">Confirmación de contraseña</label>
+        {{ form.password2 }}
+        {% if form.password2.errors %}<ul class="errorlist">{% for e in form.password2.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+
+        <label>
+          {{ form.consiente_datos_salud }} Acepto el tratamiento de mis datos de salud
+        </label>
+        {% if form.consiente_datos_salud.errors %}<ul class="errorlist">{% for e in form.consiente_datos_salud.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+
+        <div class="actions">
+          <button type="submit">Crear cuenta</button>
+          <a href="/login/">Iniciar sesión</a>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script>
+    (function(){
+      var tipo = document.getElementById('id_tipo_documento');
+      var doc = document.getElementById('id_documento_identidad');
+      var help = document.getElementById('doc-help');
+      function upd(){
+        var v = (tipo && tipo.value) || '';
+        if(v === 'RUT'){
+          doc.placeholder = '12.345.678-5';
+          help.textContent = 'Formato RUT: 12.345.678-5, DV puede ser K.';
+        } else if(v === 'PASAPORTE'){
+          doc.placeholder = 'ABC123456';
+          help.textContent = 'Pasaporte: alfanumérico 5–20 caracteres.';
+        } else if(v === 'DNI_EXTRANJERO'){
+          doc.placeholder = 'DNI extranjero';
+          help.textContent = 'DNI extranjero: alfanumérico 5–20 caracteres.';
+        } else if(v === 'VISA'){
+          doc.placeholder = 'Número de visa';
+          help.textContent = 'Visa: alfanumérico 5–20 caracteres.';
+        } else if(v === 'VISA_TRABAJO'){
+          doc.placeholder = 'Visa de trabajo';
+          help.textContent = 'Visa trabajo: alfanumérico 5–20 caracteres.';
+        } else {
+          doc.placeholder = '';
+          help.textContent = 'Documento: alfanumérico 5–20 caracteres.';
+        }
+      }
+      if(tipo){ tipo.addEventListener('change', upd); upd(); }
+    })();
+  </script>
+</body>
+</html>
+        <label>Archivo documento (ambas caras en un solo archivo)</label>
+        <input type="file" name="documento_archivo" accept=".pdf,image/*" />
+        <small>Se admite PDF o imagen; máximo 10MB.</small>

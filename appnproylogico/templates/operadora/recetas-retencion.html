@@ -1,0 +1,509 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Recetas Retenidas - LOGICO</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+  <style>
+    :root {
+      --primary-color: #2ecc71;
+      --secondary-color: #27ae60;
+      --success-color: #00c853;
+      --warning-color: #ffa726;
+      --danger-color: #ef5350;
+      --dark-bg: #1a1d29;
+      --dark-surface: #252837;
+      --dark-card: #2d3142;
+      --dark-border: #3a3f5c;
+      --dark-text: #e8eaed;
+      --dark-text-secondary: #9aa0b3;
+      --light-bg: #f5f7fa;
+      --light-surface: #ffffff;
+      --light-card: #ffffff;
+      --light-border: #e1e4e8;
+      --light-text: #1a1d29;
+      --light-text-secondary: #586069;
+    }
+
+    * {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* Tema Claro */
+    .theme-light {
+      --bg-primary: var(--light-bg);
+      --bg-surface: var(--light-surface);
+      --bg-card: var(--light-card);
+      --border-color: var(--light-border);
+      --text-primary: var(--light-text);
+      --text-secondary: var(--light-text-secondary);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Tema Oscuro */
+    .theme-dark {
+      --bg-primary: var(--dark-bg);
+      --bg-surface: var(--dark-surface);
+      --bg-card: var(--dark-card);
+      --border-color: var(--dark-border);
+      --text-primary: var(--dark-text);
+      --text-secondary: var(--dark-text-secondary);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* Navbar estilo Farmacias */
+    .navbar-custom{
+      background-color:#212529; padding:0.75rem 0; box-shadow:0 2px 4px rgba(0,0,0,0.1); margin-bottom:2rem;
+    }
+    .navbar-top-row{ display:flex; justify-content:space-between; align-items:center; }
+    .navbar-custom .navbar-brand{ color:#fff; font-weight:600; font-size:1.25rem; margin:0; display:flex; align-items:center; gap:.5rem }
+    .btn-nav{ background:transparent; border:1px solid rgba(255,255,255,.2); color:#fff; padding:.4rem .8rem; border-radius:6px; display:inline-flex; align-items:center; gap:.5rem; text-decoration:none; font-size:.9rem }
+    .btn-nav:hover{ background-color:rgba(255,255,255,.1); border-color:rgba(255,255,255,.3) }
+    .btn-success-nav{ background-color:var(--primary-color); border:none; color:#fff; padding:.5rem 1rem; border-radius:6px; display:inline-flex; align-items:center; gap:.5rem; font-weight:500 }
+    .btn-success-nav:hover{ background-color:var(--secondary-color) }
+
+    /* Cards */
+    .card-custom {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+
+    .card-custom:hover {
+      box-shadow: var(--shadow-hover);
+    }
+
+    .card-header-custom {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 1rem 1.5rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Filtros */
+    .filters-section {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow);
+    }
+
+    .filters-section .form-control {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      border-radius: 8px;
+      padding: 0.625rem 1rem;
+    }
+
+    .filters-section .form-control:focus {
+      background-color: var(--bg-surface);
+      border-color: var(--primary-color);
+      color: var(--text-primary);
+      box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25);
+    }
+
+    .filters-section .form-control::placeholder { color:#fff; opacity:.85 }
+
+    /* Tabla */
+    .table-custom {
+      background-color: var(--bg-card);
+      color: var(--text-primary);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .table-custom thead {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+    }
+
+    .table-custom thead th {
+      border: none;
+      padding: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+    }
+
+    .table-custom tbody tr {
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .table-custom tbody tr:hover {
+      background-color: var(--bg-surface);
+    }
+
+    .table-custom tbody td {
+      padding: 1rem;
+      vertical-align: middle;
+      border: none;
+    }
+
+    .table-custom tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    /* Badges */
+    .badge-status {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: 500;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-pending {
+      background-color: var(--warning-color);
+      color: white;
+    }
+
+    .badge-returned {
+      background-color: var(--success-color);
+      color: white;
+    }
+
+    /* Botones */
+    .btn-custom {
+      border-radius: 8px;
+      padding: 0.625rem 1.25rem;
+      font-weight: 500;
+      border: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary-custom {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+    }
+
+    .btn-primary-custom:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4);
+    }
+
+    .btn-success-custom {
+      background-color: var(--success-color);
+      color: white;
+    }
+
+    .btn-success-custom:hover {
+      background-color: #00b248;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 200, 83, 0.4);
+    }
+
+    .btn-outline-custom {
+      background-color: transparent;
+      border: 2px solid var(--border-color);
+      color: var(--text-primary);
+    }
+
+    .btn-outline-custom:hover {
+      background-color: var(--bg-surface);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    /* Theme Toggle */
+    .theme-toggle {
+      position: relative;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .theme-btn {
+      background-color: var(--bg-card);
+      border: 2px solid var(--border-color);
+      color: var(--text-primary);
+      width: 45px;
+      height: 45px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1.25rem;
+    }
+
+    .theme-btn:hover {
+      border-color: var(--primary-color);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .theme-btn.active {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border-color: var(--primary-color);
+      color: white;
+    }
+
+    /* Formulario inline */
+    .inline-form {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .inline-form .form-control {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      border-radius: 6px;
+      padding: 0.375rem 0.75rem;
+      min-width: 120px;
+    }
+
+    .inline-form .form-control:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25);
+    }
+
+    .inline-form .form-control::placeholder {
+      color: var(--text-secondary);
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-secondary);
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    /* Stats */
+    .stat-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: rgba(46, 204, 113, 0.1);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      color: var(--primary-color);
+      font-weight: 600;
+      margin-left: 1rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header-section h1 {
+        font-size: 1.5rem;
+      }
+
+      .table-custom {
+        font-size: 0.875rem;
+      }
+
+      .inline-form {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .inline-form .form-control {
+        width: 100%;
+      }
+
+      .theme-toggle {
+        margin-top: 1rem;
+      }
+    }
+  </style>
+</head>
+<body class="theme-light">
+  <nav class="navbar-custom">
+    <div class="container-fluid">
+      <div class="navbar-top-row">
+        <div class="d-flex align-items-center gap-2">
+          <a class="btn-nav" href="{% url 'home' %}"><i class="bi bi-house"></i> Volver al inicio</a>
+          <a class="btn-nav" href="{% url 'panel_operadora' %}"><i class="bi bi-grid"></i> Operadora</a>
+          <span class="navbar-brand"><i class="bi bi-file-medical"></i> Recetas retenidas</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <a class="btn-success-nav" href="{% url 'despachos_activos' %}"><i class="bi bi-activity"></i> Despachos activos</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container pb-5">
+    <!-- Filtros -->
+    <div class="filters-section">
+      <h5 class="mb-3"><i class="bi bi-funnel"></i> Filtros de búsqueda</h5>
+      <form class="row g-3" method="get">
+        <div class="col-md-4">
+          <label class="form-label">Farmacia (Local ID)</label>
+          <input class="form-control" type="text" name="farmacia" value="{{ farmacia }}" 
+                 placeholder="Ej: 001, 045, CV-123">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Motorista</label>
+          <input class="form-control" type="text" name="motorista" value="{{ motorista }}" 
+                 placeholder="Nombre del motorista">
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+          <button class="btn btn-success-nav w-100" type="submit">
+            <i class="bi bi-search"></i> Buscar
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Pendientes de devolución -->
+    <div class="card-custom">
+      <div class="card-header-custom">
+        <i class="bi bi-exclamation-triangle"></i>
+        Pendientes de Devolución
+        <span class="badge bg-light text-dark ms-2">{{ recetas|length }}</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-custom mb-0">
+          <thead>
+            <tr>
+              <th><i class="bi bi-hash"></i> Código</th>
+              <th><i class="bi bi-shop"></i> Farmacia</th>
+              <th><i class="bi bi-person-badge"></i> Motorista</th>
+              <th><i class="bi bi-geo-alt"></i> Dirección</th>
+              <th><i class="bi bi-flag"></i> Estado</th>
+              <th><i class="bi bi-calendar"></i> Fecha</th>
+              <th><i class="bi bi-gear"></i> Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for d in recetas %}
+            <tr>
+              <td><strong>{{ d.codigo_despacho }}</strong></td>
+              <td>{{ d.farmacia_origen_local_id }}</td>
+              <td>{{ d.motorista.usuario.nombre }} {{ d.motorista.usuario.apellido }}</td>
+              <td>{{ d.cliente_nombre|default:"<em class='text-muted'>Sin datos</em>" }}</td>
+              <td><span class="badge-status badge-pending">{{ d.estado }}</span></td>
+              <td>{{ d.fecha_registro|date:"d/m/Y H:i" }}</td>
+              <td>
+                {% if d.id %}
+                <div class="d-flex flex-column gap-2">
+                  <form class="inline-form" method="post" action="{% url 'receta_marcar_devuelta' despacho_id=d.id %}">
+                    {% csrf_token %}
+                    <input class="form-control form-control-sm" name="quien_recibe" 
+                           placeholder="Quién recibe" required {% if d.estado|upper != 'EN PROCESO' and d.estado|upper != 'EN_PROCESO' and d.estado|upper != 'PROCESO' %}disabled title="Solo en estado EN PROCESO"{% endif %} />
+                    <input class="form-control form-control-sm" name="observaciones" 
+                           placeholder="Observaciones" {% if d.estado|upper != 'EN PROCESO' and d.estado|upper != 'EN_PROCESO' and d.estado|upper != 'PROCESO' %}disabled{% endif %} />
+                    <button class="btn btn-success-custom btn-sm" type="submit" {% if d.estado|upper != 'EN PROCESO' and d.estado|upper != 'EN_PROCESO' and d.estado|upper != 'PROCESO' %}disabled{% endif %}>
+                      <i class="bi bi-check-circle"></i> Marcar devuelta
+                    </button>
+                  </form>
+                  <form class="inline-form" method="post" action="{% url 'actualizar_despacho' pk=d.id %}">
+                    {% csrf_token %}
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="checkbox" name="tiene_receta_retenida" id="ret-{{ d.id }}" checked {% if d.estado|upper != 'EN PROCESO' and d.estado|upper != 'EN_PROCESO' and d.estado|upper != 'PROCESO' %}disabled{% endif %}>
+                      <label class="form-check-label" for="ret-{{ d.id }}">Receta retenida</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="checkbox" name="requiere_devolucion_receta" id="req-{{ d.id }}" checked {% if d.estado|upper != 'EN PROCESO' and d.estado|upper != 'EN_PROCESO' and d.estado|upper != 'PROCESO' %}disabled{% endif %}>
+                      <label class="form-check-label" for="req-{{ d.id }}">Requiere devolución</label>
+                    </div>
+                    <input type="hidden" name="numero_receta" value="{{ d.numero_receta|default:'' }}" />
+                    <button class="btn btn-primary-custom btn-sm" type="submit" {% if d.estado|upper != 'EN PROCESO' and d.estado|upper != 'EN_PROCESO' and d.estado|upper != 'PROCESO' %}disabled{% endif %}>
+                      <i class="bi bi-save"></i> Guardar cambios
+                    </button>
+                  </form>
+                </div>
+                {% else %}
+                <button class="btn btn-sm btn-outline-secondary" disabled title="Modo ejemplo">
+                  <i class="bi bi-lock"></i> Ejemplo
+                </button>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="empty-state">
+                <i class="bi bi-inbox"></i>
+                <p class="mb-0">No hay recetas pendientes de devolución</p>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Histórico de devueltas -->
+    <div class="card-custom mt-4">
+      <div class="card-header-custom">
+        <i class="bi bi-clock-history"></i>
+        Histórico de Devoluciones
+        <span class="badge bg-light text-dark ms-2">{{ historico|length }}</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-custom mb-0">
+          <thead>
+            <tr>
+              <th><i class="bi bi-hash"></i> Código</th>
+              <th><i class="bi bi-shop"></i> Farmacia</th>
+              <th><i class="bi bi-person-badge"></i> Motorista</th>
+              <th><i class="bi bi-geo-alt"></i> Dirección</th>
+              <th><i class="bi bi-calendar-check"></i> Fecha Devolución</th>
+              <th><i class="bi bi-person-check"></i> Recibido por</th>
+              <th><i class="bi bi-journal-text"></i> Observaciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for d in historico %}
+            <tr>
+              <td><strong>{{ d.codigo_despacho }}</strong></td>
+              <td>{{ d.farmacia_origen_local_id }}</td>
+              <td>{{ d.motorista.usuario.nombre }} {{ d.motorista.usuario.apellido }}</td>
+              <td>{{ d.cliente_nombre|default:"<em class='text-muted'>Sin datos</em>" }}</td>
+              <td>{{ d.fecha_devolucion_receta|date:"d/m/Y H:i" }}</td>
+              <td>{{ d.quien_recibe_receta|default:"<em class='text-muted'>-</em>" }}</td>
+              <td>{{ d.observaciones_receta|default:"<em class='text-muted'>Sin observaciones</em>" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="empty-state">
+                <i class="bi bi-archive"></i>
+                <p class="mb-0">No hay histórico de devoluciones</p>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

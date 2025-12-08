@@ -1,0 +1,728 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Detalle Despacho - LOGICO</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+  <style>
+    :root {
+      --primary-color: #2ecc71;
+      --secondary-color: #27ae60;
+      --success-color: #00c853;
+      --warning-color: #ffa726;
+      --danger-color: #ef5350;
+      --info-color: #29b6f6;
+      --dark-bg: #1a1d29;
+      --dark-surface: #252837;
+      --dark-card: #2d3142;
+      --dark-border: #3a3f5c;
+      --dark-text: #e8eaed;
+      --dark-text-secondary: #9aa0b3;
+      --light-bg: #f5f7fa;
+      --light-surface: #ffffff;
+      --light-card: #ffffff;
+      --light-border: #e1e4e8;
+      --light-text: #1a1d29;
+      --light-text-secondary: #586069;
+    }
+
+    * {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* Tema Claro */
+    .theme-light {
+      --bg-primary: var(--light-bg);
+      --bg-surface: var(--light-surface);
+      --bg-card: var(--light-card);
+      --border-color: var(--light-border);
+      --text-primary: var(--light-text);
+      --text-secondary: var(--light-text-secondary);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Tema Oscuro */
+    .theme-dark {
+      --bg-primary: var(--dark-bg);
+      --bg-surface: var(--dark-surface);
+      --bg-card: var(--dark-card);
+      --border-color: var(--dark-border);
+      --text-primary: var(--dark-text);
+      --text-secondary: var(--dark-text-secondary);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* Header/Navbar - NEGRO */
+    .navbar-custom {
+      background-color: #212529;
+      padding: 0.75rem 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+    }
+
+    .navbar-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar-custom .navbar-brand {
+      color: white;
+      font-weight: 600;
+      font-size: 1.25rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .navbar-custom .btn-nav {
+      background-color: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .navbar-custom .btn-nav:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+      color: white;
+    }
+
+    .navbar-custom .btn-success-nav {
+      background-color: var(--primary-color);
+      border: none;
+      color: white;
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .navbar-custom .btn-success-nav:hover {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+
+    .navbar-custom .btn-warning-nav {
+      background-color: var(--warning-color);
+      border: none;
+      color: white;
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .navbar-custom .btn-warning-nav:hover {
+      background-color: #ff9800;
+      color: white;
+    }
+
+    .navbar-custom .btn-danger-nav {
+      background-color: transparent;
+      border: 1px solid var(--danger-color);
+      color: var(--danger-color);
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .navbar-custom .btn-danger-nav:hover {
+      background-color: var(--danger-color);
+      border-color: var(--danger-color);
+      color: white;
+    }
+
+    /* Theme Toggle */
+    .theme-toggle {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .theme-btn {
+      background-color: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 1rem;
+    }
+
+    .theme-btn:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .theme-btn.active {
+      background-color: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      background-color: transparent;
+      padding: 0;
+      margin-bottom: 1.5rem;
+    }
+
+    .breadcrumb-item a {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .breadcrumb-item a:hover {
+      text-decoration: underline;
+    }
+
+    .breadcrumb-item.active {
+      color: var(--text-secondary);
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+      color: var(--text-secondary);
+    }
+
+    /* Card */
+    .card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+      background-color: var(--bg-surface);
+      border-bottom: 2px solid var(--border-color);
+      padding: 1rem 1.5rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: var(--text-primary);
+    }
+
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    .card-body > div {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .card-body > div:last-child {
+      border-bottom: none;
+    }
+
+    /* Forms */
+    .form-label {
+      color: var(--text-primary);
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-control,
+    .form-select {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      border-radius: 8px;
+      padding: 0.6rem 0.75rem;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+      background-color: var(--bg-surface);
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.25);
+      color: var(--text-primary);
+    }
+
+    .form-control:disabled,
+    .form-select:disabled {
+      background-color: var(--bg-primary);
+      opacity: 0.6;
+    }
+
+    .form-check-input {
+      width: 1.25rem;
+      height: 1.25rem;
+      border: 2px solid var(--border-color);
+      background-color: var(--bg-surface);
+      cursor: pointer;
+    }
+
+    .form-check-input:checked {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+
+    .form-check-input:focus {
+      box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.25);
+    }
+
+    .form-check-input:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Badges */
+    .badge {
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 0.875rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .badge.bg-success {
+      background-color: var(--success-color) !important;
+    }
+
+    .badge.bg-secondary {
+      background-color: var(--text-secondary) !important;
+    }
+
+    .badge.bg-info {
+      background-color: var(--info-color) !important;
+    }
+
+    .badge.bg-warning {
+      background-color: var(--warning-color) !important;
+      color: #1a1d29 !important;
+    }
+
+    .badge.bg-danger {
+      background-color: var(--danger-color) !important;
+    }
+
+    /* Buttons */
+    .btn {
+      border-radius: 8px;
+      padding: 0.6rem 1.25rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-success {
+      background-color: var(--success-color);
+      border: none;
+      color: white;
+    }
+
+    .btn-success:hover:not(:disabled) {
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+    }
+
+    .btn-success:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Table */
+    .table-responsive {
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .table {
+      color: var(--text-primary);
+      margin-bottom: 0;
+    }
+
+    .table thead {
+      background-color: var(--bg-surface);
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .table thead th {
+      color: var(--text-primary);
+      font-weight: 600;
+      padding: 1rem;
+      border: none;
+    }
+
+    .table tbody tr {
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .table tbody td {
+      padding: 1rem;
+      vertical-align: middle;
+      border: none;
+    }
+
+    .table-sm td,
+    .table-sm th {
+      padding: 0.75rem;
+    }
+
+    /* Status Alert */
+    .status-alert {
+      background: linear-gradient(135deg, rgba(46, 204, 113, 0.1), rgba(39, 174, 96, 0.1));
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--primary-color);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      color: var(--text-primary);
+    }
+
+    .status-alert.warning {
+      background: linear-gradient(135deg, rgba(255, 167, 38, 0.1), rgba(251, 140, 0, 0.1));
+      border-left-color: var(--warning-color);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .navbar-custom .navbar-brand {
+        font-size: 1.1rem;
+      }
+
+      .navbar-top-row {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: stretch;
+      }
+
+      .btn-nav,
+      .theme-btn {
+        font-size: 0.85rem;
+      }
+
+      .card-body {
+        padding: 1rem;
+      }
+
+      .table thead th,
+      .table tbody td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body class="theme-light">
+  <nav class="navbar-custom">
+    <div class="container-fluid">
+      <div class="navbar-top-row">
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <a class="btn-nav" href="{% url 'home' %}">
+            <i class="bi bi-house"></i> Inicio
+          </a>
+          <a class="btn-nav" href="{% url 'listado_despachos' %}">
+            <i class="bi bi-arrow-left"></i> Volver a despachos
+          </a>
+          <span class="navbar-brand">
+            <i class="bi bi-box-seam"></i> Despacho {{ despacho.codigo_despacho }}
+          </span>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          
+          <a class="btn-warning-nav" href="{% url 'actualizar_despacho' despacho.id %}">
+            <i class="bi bi-pencil"></i> Editar
+          </a>
+          <a class="btn-danger-nav" href="{% url 'remover_despacho' despacho.id %}">
+            <i class="bi bi-trash"></i> Eliminar
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container pb-5">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'listado_despachos' %}">Despachos</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ despacho.codigo_despacho }}</li>
+      </ol>
+    </nav>
+
+    {% if despacho.estado|upper == 'EN PROCESO' or despacho.estado|upper == 'EN_PROCESO' or despacho.estado|upper == 'PROCESO' %}
+    <div class="status-alert">
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-info-circle-fill" style="font-size: 1.25rem; color: var(--primary-color);"></i>
+        <div>
+          <strong>Estado: EN PROCESO</strong> - Puedes editar la información de la receta retenida.
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="status-alert warning">
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-exclamation-triangle-fill" style="font-size: 1.25rem; color: var(--warning-color);"></i>
+        <div>
+          <strong>Estado: {{ despacho.estado }}</strong> - La edición de receta está bloqueada. Solo disponible en estado "EN PROCESO".
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Receta Retenida Card -->
+    <div class="card">
+      <div class="card-header">
+        <i class="bi bi-file-medical"></i> Receta Retenida
+      </div>
+      <div class="card-body">
+        <form method="post" action="{% url 'despacho_actualizar_receta' despacho.id %}">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label">
+                <i class="bi bi-check-square"></i> Tiene receta retenida
+              </label>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="tiene_receta_retenida" 
+                  {% if despacho.tiene_receta_retenida %}checked{% endif %} 
+                  {% if despacho.estado|upper != 'EN PROCESO' and despacho.estado|upper != 'EN_PROCESO' and despacho.estado|upper != 'PROCESO' %}
+                    disabled title="Disponible solo en estado EN PROCESO"
+                  {% endif %}>
+                <label class="form-check-label">Sí, tiene receta</label>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">
+                <i class="bi bi-hash"></i> Número de receta
+              </label>
+              <input class="form-control" name="numero_receta" 
+                value="{{ despacho.numero_receta|default:'' }}" 
+                placeholder="Ej: RX-2025-001"
+                {% if despacho.estado|upper != 'EN PROCESO' and despacho.estado|upper != 'EN_PROCESO' and despacho.estado|upper != 'PROCESO' %}
+                  disabled
+                {% endif %} />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">
+                <i class="bi bi-arrow-return-left"></i> Requiere devolución
+              </label>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="requiere_devolucion_receta" 
+                  {% if despacho.requiere_devolucion_receta %}checked{% endif %} 
+                  {% if despacho.estado|upper != 'EN PROCESO' and despacho.estado|upper != 'EN_PROCESO' and despacho.estado|upper != 'PROCESO' %}
+                    disabled title="Disponible solo en estado EN PROCESO"
+                  {% endif %}>
+                <label class="form-check-label">Sí, devolver</label>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">
+                <i class="bi bi-check-circle"></i> Marcar devuelta ahora
+              </label>
+              <select class="form-select" name="marcar_devuelta">
+                <option value="no" {% if not despacho.receta_devuelta_farmacia %}selected{% endif %}>No</option>
+                <option value="si">Sí, marcar devuelta</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">
+                <i class="bi bi-person"></i> Quién recibe
+              </label>
+              <input class="form-control" name="quien_recibe_receta" 
+                value="{{ despacho.quien_recibe_receta|default:'' }}" 
+                placeholder="Nombre de quien recibe"
+                {% if despacho.estado|upper != 'EN PROCESO' and despacho.estado|upper != 'EN_PROCESO' and despacho.estado|upper != 'PROCESO' %}
+                  disabled
+                {% endif %} />
+            </div>
+            <div class="col-md-8">
+              <label class="form-label">
+                <i class="bi bi-chat-left-text"></i> Observaciones
+              </label>
+              <textarea class="form-control" name="observaciones_receta" rows="2" 
+                placeholder="Escribe observaciones sobre la receta..."
+                {% if despacho.estado|upper != 'EN PROCESO' and despacho.estado|upper != 'EN_PROCESO' and despacho.estado|upper != 'PROCESO' %}
+                  disabled
+                {% endif %}>{{ despacho.observaciones_receta|default:'' }}</textarea>
+            </div>
+          </div>
+          <div class="d-flex justify-content-end gap-2 mt-3">
+            <button class="btn btn-success" type="submit" 
+              {% if despacho.estado|upper != 'EN PROCESO' and despacho.estado|upper != 'EN_PROCESO' and despacho.estado|upper != 'PROCESO' %}
+                disabled title="Disponible solo en estado EN PROCESO"
+              {% endif %}>
+              <i class="bi bi-check-lg"></i> Guardar información de receta
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Información General -->
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <i class="bi bi-info-circle"></i> Información General
+          </div>
+          <div class="card-body">
+            <div><strong>Código:</strong> <span class="text-primary">{{ despacho.codigo_despacho }}</span></div>
+            <div><strong>Estado:</strong> {{ despacho.estado }}</div>
+            <div><strong>Tipo de despacho:</strong> {{ despacho.tipo_despacho }}</div>
+            <div><strong>Prioridad:</strong> {{ despacho.prioridad }}</div>
+            <div><strong>Farmacia origen:</strong> {{ despacho.farmacia_origen_local_id }}</div>
+            <div><strong>Motorista:</strong> {{ despacho.motorista.usuario.nombre }} {{ despacho.motorista.usuario.apellido }}</div>
+            <div><strong>Fecha de registro:</strong> {{ despacho.fecha_registro|date:'d/m/Y H:i' }}</div>
+            <div>
+              <strong>Estado de receta:</strong>
+              <div class="mt-2">
+                {% if despacho.tiene_receta_retenida %}
+                  <span class="badge bg-warning text-dark">
+                    <i class="bi bi-file-earmark-lock"></i> Receta retenida
+                  </span>
+                  {% if despacho.requiere_devolucion_receta and not despacho.receta_devuelta_farmacia %}
+                    <span class="badge bg-danger">
+                      <i class="bi bi-arrow-counterclockwise"></i> Pendiente de devolución
+                    </span>
+                  {% endif %}
+                  {% if despacho.receta_devuelta_farmacia %}
+                    <span class="badge bg-success">
+                      <i class="bi bi-check-circle"></i> Receta devuelta
+                    </span>
+                  {% endif %}
+                {% else %}
+                  <span class="badge bg-secondary">
+                    <i class="bi bi-x-circle"></i> Sin receta
+                  </span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <i class="bi bi-person-circle"></i> Cliente y Destino
+          </div>
+          <div class="card-body">
+            <div>
+              <strong>Nombre del cliente:</strong> 
+              {{ despacho.cliente_nombre|default:'<em class="text-muted">No especificado</em>' }}
+            </div>
+            <div>
+              <strong>Teléfono:</strong> 
+              {% if despacho.cliente_telefono %}
+                <a href="tel:{{ despacho.cliente_telefono }}" style="color: var(--primary-color);">
+                  <i class="bi bi-telephone"></i> {{ despacho.cliente_telefono }}
+                </a>
+              {% else %}
+                <em class="text-muted">No especificado</em>
+              {% endif %}
+            </div>
+            <div>
+              <strong>Dirección de destino:</strong> 
+              {{ despacho.destino_direccion }}
+            </div>
+            <div>
+              <strong>Referencia:</strong> 
+              {{ despacho.destino_referencia|default:'<em class="text-muted">Sin referencia</em>' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Movimientos -->
+    <div class="card">
+      <div class="card-header">
+        <i class="bi bi-clock-history"></i> Historial de Movimientos
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover table-sm align-middle mb-0">
+            <thead>
+              <tr>
+                <th><i class="bi bi-calendar-event"></i> Fecha y hora</th>
+                <th><i class="bi bi-arrow-left-circle"></i> Estado anterior</th>
+                <th><i class="bi bi-arrow-right-circle"></i> Estado nuevo</th>
+                <th><i class="bi bi-chat-left-text"></i> Observación</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for m in movimientos %}
+              <tr>
+                <td>{{ m.fecha_movimiento|date:'d/m/Y H:i' }}</td>
+                <td>
+                  {% if m.estado_anterior %}
+                    <span class="badge bg-secondary">{{ m.estado_anterior }}</span>
+                  {% else %}
+                    <em class="text-muted">-</em>
+                  {% endif %}
+                </td>
+                <td><span class="badge bg-info">{{ m.estado_nuevo }}</span></td>
+                <td>{{ m.observacion|default:'<em class="text-muted">Sin observaciones</em>' }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="4" class="text-center text-muted py-4">
+                  <i class="bi bi-inbox" style="font-size: 2rem; opacity: 0.5;"></i>
+                  <div class="mt-2">No hay movimientos registrados para este despacho</div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function(){
+    })();
+  </script>
+</body>
+</html>

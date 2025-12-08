@@ -1,0 +1,712 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Motoristas - LOGICO</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+  <link rel="stylesheet" href="{% static 'css/motoristas_list.css' %}">
+  <style>
+    :root {
+      --primary-color: #2ecc71;
+      --secondary-color: #27ae60;
+      --success-color: #00c853;
+      --warning-color: #ffa726;
+      --danger-color: #ef5350;
+      --info-color: #29b6f6;
+      --dark-bg: #1a1d29;
+      --dark-surface: #252837;
+      --dark-card: #2d3142;
+      --dark-border: #3a3f5c;
+      --dark-text: #e8eaed;
+      --dark-text-secondary: #9aa0b3;
+      --light-bg: #f5f7fa;
+      --light-surface: #ffffff;
+      --light-card: #ffffff;
+      --light-border: #e1e4e8;
+      --light-text: #1a1d29;
+      --light-text-secondary: #586069;
+    }
+
+    * {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* Tema Claro */
+    .theme-light {
+      --bg-primary: var(--light-bg);
+      --bg-surface: var(--light-surface);
+      --bg-card: var(--light-card);
+      --border-color: var(--light-border);
+      --text-primary: var(--light-text);
+      --text-secondary: var(--light-text-secondary);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Tema Oscuro */
+    .theme-dark {
+      --bg-primary: var(--dark-bg);
+      --bg-surface: var(--dark-surface);
+      --bg-card: var(--dark-card);
+      --border-color: var(--dark-border);
+      --text-primary: var(--dark-text);
+      --text-secondary: var(--dark-text-secondary);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* Header/Navbar estilo Farmacias */
+    .navbar-custom { background-color:#212529; padding:0.75rem 0; box-shadow:0 2px 4px rgba(0,0,0,0.1); margin-bottom:2rem }
+    .navbar-top-row { display:flex; justify-content:space-between; align-items:center }
+    .navbar-custom .navbar-brand { color:#fff; font-weight:600; font-size:1.25rem; margin:0; display:flex; align-items:center; gap:.5rem }
+    .navbar-custom .btn-nav { background:transparent; border:1px solid rgba(255,255,255,.2); color:#fff; padding:.4rem .8rem; border-radius:6px; display:inline-flex; align-items:center; gap:.5rem; text-decoration:none; font-size:.9rem }
+    .navbar-custom .btn-nav:hover { background-color:rgba(255,255,255,.1); border-color:rgba(255,255,255,.3) }
+    .navbar-custom .btn-success-nav { background-color:var(--primary-color); border:none; color:#fff; padding:.5rem 1rem; border-radius:6px; display:inline-flex; align-items:center; gap:.5rem; font-weight:500 }
+    .navbar-custom .btn-success-nav:hover { background-color:var(--secondary-color) }
+
+    .navbar-custom .btn-success-nav:hover {
+      background-color: #00b248;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 200, 83, 0.4);
+      color: white;
+    }
+
+    /* Theme Toggle */
+    .theme-toggle {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .theme-btn {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      width: 45px;
+      height: 45px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1.25rem;
+    }
+
+    .theme-btn:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .theme-btn.active {
+      background-color: rgba(255, 255, 255, 0.95);
+      border-color: white;
+      color: var(--primary-color);
+    }
+
+    /* Help Banner */
+    .help-banner {
+      background: linear-gradient(135deg, rgba(0, 102, 204, 0.1), rgba(0, 163, 224, 0.1));
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      color: var(--text-primary);
+    }
+
+    .help-banner .btn {
+      border-radius: 8px;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      background-color: transparent;
+      padding: 0;
+      margin-bottom: 1.5rem;
+    }
+
+    .breadcrumb-item a {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .breadcrumb-item a:hover {
+      text-decoration: underline;
+    }
+
+    .breadcrumb-item.active {
+      color: var(--text-secondary);
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+      color: var(--text-secondary);
+    }
+
+    /* Search Toolbar */
+    .toolbar {
+      margin-bottom: 1.5rem;
+    }
+
+    .toolbar .form-control {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+    }
+
+    .toolbar .form-control:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25);
+      background-color: var(--bg-card);
+      color: var(--text-primary);
+    }
+
+    .toolbar .form-control::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .toolbar .btn-primary {
+      background-color: var(--primary-color);
+      border: none;
+      border-radius: 10px;
+      padding: 0.75rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .toolbar .btn-primary:hover {
+      background-color: #0052a3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4);
+    }
+
+    /* Card */
+    .card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    .card-footer {
+      background-color: var(--bg-surface);
+      border-top: 1px solid var(--border-color);
+      padding: 1rem 1.5rem;
+    }
+
+    /* Table Controls */
+    .btn-outline-secondary {
+      background-color: transparent;
+      border: 2px solid var(--border-color);
+      color: var(--text-primary);
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-outline-secondary:hover {
+      background-color: var(--bg-surface);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    /* Table */
+    .table-responsive {
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .table {
+      color: var(--text-primary);
+      margin-bottom: 0;
+    }
+
+    .table thead {
+      background-color: var(--bg-surface);
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .table thead th {
+      color: var(--text-primary);
+      font-weight: 600;
+      padding: 1rem;
+      border: none;
+      white-space: nowrap;
+    }
+
+    .table tbody tr {
+      border-bottom: 1px solid var(--border-color);
+      transition: background-color 0.2s ease;
+      background-color: var(--bg-surface);
+    }
+
+    .table tbody tr:hover {
+      background-color: var(--bg-surface);
+    }
+
+    .table tbody td {
+      padding: 1rem;
+      vertical-align: middle;
+      border: none;
+    }
+
+    /* Columnas opcionales: siempre visibles en motoristas */
+
+    /* Badges */
+    .badge {
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    .badge.bg-success {
+      background-color: var(--success-color) !important;
+    }
+
+    .badge.bg-secondary {
+      background-color: var(--text-secondary) !important;
+    }
+
+    .badge.bg-info {
+      background-color: var(--info-color) !important;
+    }
+
+    .badge.bg-warning {
+      background-color: var(--warning-color) !important;
+    }
+
+    /* Action Buttons */
+    .btn-group {
+      gap: 0.25rem;
+      display: flex;
+    }
+
+    .btn-group .btn-sm {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: all 0.3s ease;
+    }
+
+    .btn-outline-info {
+      border: 2px solid var(--info-color);
+      color: var(--info-color);
+      background-color: transparent;
+    }
+
+    .btn-outline-info:hover {
+      background-color: var(--info-color);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .btn-outline-primary {
+      border: 2px solid var(--primary-color);
+      color: var(--primary-color);
+      background-color: transparent;
+    }
+
+    .btn-outline-primary:hover {
+      background-color: var(--primary-color);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .btn-outline-success {
+      border: 2px solid var(--success-color);
+      color: var(--success-color);
+      background-color: transparent;
+    }
+
+    .btn-outline-success:hover {
+      background-color: var(--success-color);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    /* Pagination */
+    .card-footer .btn-outline-secondary {
+      margin-bottom: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .navbar-custom .navbar-brand {
+        font-size: 1.25rem;
+      }
+
+      .btn-nav,
+      .theme-btn {
+        width: 40px;
+        height: 40px;
+      }
+
+      .btn-success-nav {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+      }
+
+      .table thead th,
+      .table tbody td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.9rem;
+      }
+
+      .btn-group .btn-sm {
+        width: 32px;
+        height: 32px;
+      }
+
+      .help-banner {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body class="theme-light">
+  <nav class="navbar-custom">
+    <div class="container-fluid">
+      <div class="navbar-top-row">
+        <div class="d-flex align-items-center gap-2">
+          <a class="btn-nav" href="{% url 'home' %}"><i class="bi bi-house"></i> Volver al inicio</a>
+          <span class="navbar-brand"><i class="bi bi-person-badge"></i> Motoristas</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <a class="btn-success-nav" href="{% url 'agregar_motorista' %}"><i class="bi bi-plus-lg"></i> Nuevo</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container pb-5">
+    <div class="help-banner">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>Consejo: usa "Asignar moto" para vincular rápidamente y "Ver asignaciones" para revisar su estado.</div>
+        <button id="hide-help-mot" class="btn btn-sm btn-outline-secondary">No mostrar</button>
+      </div>
+    </div>
+
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Inicio</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Motoristas</li>
+      </ol>
+    </nav>
+
+    <form class="row g-2 toolbar" method="get" id="form-motoristas">
+      <div class="col-md-6">
+        <input class="form-control" type="text" name="search" list="dl-motoristas" value="{{ search_query }}" placeholder="Buscar por nombre, licencia o teléfono">
+        <datalist id="dl-motoristas"></datalist>
+      </div>
+      <div class="col-md-4">
+        <div class="dropdown w-100">
+          <button class="btn btn-outline-secondary w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-sliders"></i> Búsqueda avanzada
+          </button>
+          <div class="dropdown-menu p-3 w-100" style="max-width:420px">
+            <div class="mb-2">
+              <label class="form-label">Texto libre</label>
+              <input type="text" class="form-control" id="adv-text-mot" placeholder="Escribe para buscar">
+            </div>
+            <div class="mb-2">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="estado_opt_mot" id="estado_activos_mot" value="activos" {% if estado == 'activos' %}checked{% endif %}>
+                <label class="form-check-label" for="estado_activos_mot">Solo activos</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="estado_opt_mot" id="estado_inactivos_mot" value="inactivos" {% if estado == 'inactivos' %}checked{% endif %}>
+                <label class="form-check-label" for="estado_inactivos_mot">Solo inactivos</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="estado_opt_mot" id="estado_todos_mot" value="" {% if not estado %}checked{% endif %}>
+                <label class="form-check-label" for="estado_todos_mot">Todos</label>
+              </div>
+            </div>
+            <div class="d-grid">
+              <button class="btn btn-primary" type="button" id="btn-apply-mot"><i class="bi bi-funnel"></i> Aplicar</button>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" name="estado" id="estado-mot" value="{{ estado }}">
+      </div>
+      <div class="col-md-4 d-grid">
+        <button class="btn btn-primary" type="submit">
+          <i class="bi bi-search"></i> Buscar
+        </button>
+      </div>
+    </form>
+
+    <div class="card">
+      <div class="card-body">
+        
+        <div class="table-responsive" id="tbl-wrap-m">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Motorista</th>
+                <th class="col-optional">Licencia</th>
+                <th class="col-optional">Documento</th>
+                <th class="col-optional">Emergencia</th>
+                <th>Disponibilidad</th>
+                <th class="col-optional">Rendimiento</th>
+                <th>Último envío</th>
+                <th class="text-end">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for mot in page_obj.object_list %}
+              <tr>
+                <td>{{ mot.usuario.nombre }} {{ mot.usuario.apellido }}</td>
+                <td class="col-optional">{{ mot.licencia_numero }} {{ mot.licencia_clase }}</td>
+                <td class="col-optional">{{ mot.usuario.tipo_documento }} · {{ mot.usuario.documento_identidad }}</td>
+                <td class="col-optional">{{ mot.emergencia_telefono }}</td>
+                <td>
+                  {% if mot.disponible_hoy %}
+                    <span class="badge bg-success">Disponible</span>
+                  {% else %}
+                    <span class="badge bg-secondary">No disponible</span>
+                  {% endif %}
+                  {% if mot.incluye_moto_personal %}
+                    <span class="badge bg-info ms-1">Moto personal</span>
+                  {% endif %}
+                </td>
+                <td class="col-optional">
+                  <span class="badge bg-info">{{ mot.total_entregas_completadas }} OK</span>
+                  <span class="badge bg-warning text-dark">{{ mot.total_entregas_fallidas }} Fallidas</span>
+                </td>
+                <td>
+                  {% if mot.latest_despacho %}
+                    <div>
+                      {% if mot.latest_despacho.origen %}
+                        <div class="small text-muted">Origen: {{ mot.latest_despacho.origen.local_nombre }}</div>
+                      {% else %}
+                        <div class="small text-muted">Origen: {{ mot.latest_despacho.farmacia_origen_local_id }}</div>
+                      {% endif %}
+                      <div class="small text-muted">Destino: {{ mot.latest_despacho.destino_direccion|default:'-' }}</div>
+                      <div class="small text-muted">Estado: {{ mot.latest_despacho.estado }}</div>
+                      {% if mot.latest_despacho.min_en_ruta %}
+                        <div class="small text-muted">En ruta: {{ mot.latest_despacho.min_en_ruta }} min</div>
+                      {% endif %}
+                      <div>
+                        {% if mot.latest_despacho.tipo_despacho == 'DOMICILIO' %}
+                          <span class="badge bg-info">Domicilio</span>
+                        {% elif mot.latest_despacho.tipo_despacho == 'INTERCAMBIO' %}
+                          <span class="badge bg-info">Entre farmacias</span>
+                        {% elif mot.latest_despacho.tipo_despacho == 'REENVIO_RECETA' %}
+                          <span class="badge bg-info">Reenvío receta</span>
+                        {% else %}
+                          <span class="badge bg-info">{{ mot.latest_despacho.tipo_despacho }}</span>
+                        {% endif %}
+                        {% if mot.latest_despacho.tiene_receta_retenida %}
+                          <span class="badge bg-danger">Receta retenida</span>
+                        {% else %}
+                          <span class="badge bg-success">Sin receta</span>
+                        {% endif %}
+                      </div>
+                      <div class="mt-1">
+                        {% if mot.latest_despacho.origen and mot.latest_despacho.destino_lat and mot.latest_despacho.destino_lng and mot.latest_despacho.origen.local_lat and mot.latest_despacho.origen.local_lng %}
+                          <a class="btn btn-outline-primary btn-sm" target="_blank" href="https://www.google.com/maps/dir/?api=1&origin={{ mot.latest_despacho.origen.local_lat }},{{ mot.latest_despacho.origen.local_lng }}&destination={{ mot.latest_despacho.destino_lat }},{{ mot.latest_despacho.destino_lng }}">Ruta</a>
+                        {% else %}
+                          <a class="btn btn-outline-secondary btn-sm" target="_blank" href="https://www.google.com/maps/dir/?api=1&origin={{ mot.latest_despacho.origen.local_direccion|default:mot.latest_despacho.farmacia_origen_local_id|urlencode }}&destination={{ mot.latest_despacho.destino_direccion|urlencode }}">Mapa</a>
+                        {% endif %}
+                      </div>
+                    </div>
+                  {% else %}
+                    <span class="text-muted">Sin envíos</span>
+                  {% endif %}
+                </td>
+                <td class="text-end">
+                  <div class="btn-group">
+                    <a class="btn btn-sm btn-outline-primary" href="{% url 'agregar_asignacion_mf' %}?motorista={{ mot.id }}" title="Asignar a farmacia">
+                      <i class="bi bi-link-45deg"></i>
+                    </a>
+                    <a class="btn btn-sm btn-outline-secondary" href="{% url 'listado_asignaciones' %}?search={{ mot.usuario.nombre }}" title="Ver asignaciones">
+                      <i class="bi bi-diagram-3"></i>
+                    </a>
+                    <a class="btn btn-sm btn-outline-info" href="{% url 'detalle_motorista' mot.id %}" title="Ver detalle">
+                      <i class="bi bi-eye"></i>
+                    </a>
+                    <a class="btn btn-sm btn-outline-success" href="{% url 'agregar_moto' %}?motorista={{ mot.id }}" title="Registrar moto personal">
+                      <i class="bi bi-motorcycle"></i>
+                    </a>
+                    
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              {% for s in samples %}
+              <tr>
+                <td>{% if s.usuario_nombre %}{{ s.usuario_nombre }} {{ s.usuario_apellido }}{% else %}Usuario ID {{ s.usuario_id }}{% endif %}</td>
+                <td class="col-optional">{{ s.licencia_numero }} {{ s.licencia_clase }}</td>
+                <td class="col-optional">{{ s.emergencia_telefono }}</td>
+                <td>
+                  {% if s.disponible_hoy %}
+                    <span class="badge bg-success" data-bs-toggle="tooltip" title="Listo para operar">Disponible</span>
+                  {% else %}
+                    <span class="badge bg-secondary" data-bs-toggle="tooltip" title="Fuera de turno">No disponible</span>
+                  {% endif %}
+                </td>
+                <td class="col-optional">
+                  <span class="badge bg-info">{{ s.total_entregas_completadas }} OK</span>
+                  <span class="badge bg-warning text-dark">{{ s.total_entregas_fallidas }} Fallidas</span>
+                </td>
+                <td class="text-end">
+                  <div class="btn-group">
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+              {% if not samples and not page_obj.object_list %}
+              <tr>
+                <td colspan="7">
+                  <div class="text-center py-4 text-secondary">
+                    <div class="mb-2"><i class="bi bi-inbox" style="font-size:2rem"></i></div>
+                    <div class="mb-2">No se encontraron motoristas</div>
+                    <a class="btn btn-success" href="{% url 'agregar_motorista' %}"><i class="bi bi-plus-lg"></i> Nuevo motorista</a>
+                  </div>
+                </td>
+              </tr>
+              {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+  <div class="card-footer d-flex justify-content-between align-items-center">
+        {% if page_obj.has_previous %}
+          <a class="btn btn-outline-secondary" href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}&estado={{ estado }}">
+            <i class="bi bi-chevron-left"></i> Anterior
+          </a>
+        {% else %}
+          <span></span>
+        {% endif %}
+        <span class="text-secondary">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a class="btn btn-outline-secondary" href="?page={{ page_obj.next_page_number }}&search={{ search_query }}&estado={{ estado }}">
+            Siguiente <i class="bi bi-chevron-right"></i>
+          </a>
+        {% else %}
+          <span></span>
+        {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Detalle</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body p-0">
+        <iframe id="detailFrame" style="width:100%; height:70vh; border:0" title="Detalle"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function(){
+      
+      const modalEl = document.getElementById('detailModal');
+      const frame = document.getElementById('detailFrame');
+      if (modalEl && frame){
+        document.querySelectorAll('a.btn-outline-info').forEach(function(a){
+          a.addEventListener('click', function(ev){
+            const href = this.getAttribute('href');
+            if (!href) return;
+            ev.preventDefault();
+            frame.src = href;
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+          });
+        });
+      }
+
+      // Autocompletar motoristas
+      const dl = document.getElementById('dl-motoristas');
+      const inp = document.querySelector('input[name="search"]');
+      let t;
+      function suggestMotoristas(q){
+        if (!dl) return;
+        dl.innerHTML = '';
+        fetch(`/api/motoristas/?search=${encodeURIComponent(q)}`)
+          .then(r => r.json())
+          .then(items => {
+            (items.results || items).slice(0, 10).forEach(it => {
+              const opt = document.createElement('option');
+              opt.value = `${it.nombre} · ${it.licencia_numero || ''}`.trim();
+              dl.appendChild(opt);
+            });
+          })
+          .catch(() => {});
+      }
+
+      // Dropdown avanzada
+      const adv = document.getElementById('adv-text-mot');
+      const estadoH = document.getElementById('estado-mot');
+      const form = document.getElementById('form-motoristas');
+      const applyBtn = document.getElementById('btn-apply-mot');
+      document.querySelectorAll('input[name="estado_opt_mot"]').forEach(function(r){
+        r.addEventListener('change', function(){ if (estadoH) estadoH.value = this.value; });
+      });
+      if (adv && inp){
+        adv.addEventListener('input', function(){ inp.value = this.value; });
+        adv.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); if (form) form.submit(); }});
+      }
+      if (applyBtn){ applyBtn.onclick = function(){ if (adv && inp) inp.value = adv.value; if (form) form.submit(); }; }
+      
+      if (inp) {
+        inp.addEventListener('input', function(){
+          const v = this.value.trim();
+          clearTimeout(t);
+          t = setTimeout(() => {
+            if (v.length >= 2) suggestMotoristas(v);
+          }, 250);
+        });
+      }
+
+      // Ayuda persistente
+      const help = document.querySelector('.help-banner');
+      const hideBtn = document.getElementById('hide-help-mot');
+      if (localStorage.getItem('hide_help_mot') === '1' && help) {
+        help.style.display = 'none';
+      }
+      if (hideBtn) {
+        hideBtn.onclick = function(){
+          localStorage.setItem('hide_help_mot', '1');
+          if (help) help.style.display = 'none';
+        };
+      }
+
+      
+    })();
+  </script>
+</body>
+</html>

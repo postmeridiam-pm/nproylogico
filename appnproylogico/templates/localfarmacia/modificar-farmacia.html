@@ -1,0 +1,650 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Modificar Farmacia - LOGICO</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    :root {
+      --primary-color: #1b5e20;
+      --secondary-color: #2e7d32;
+      --success-color: #00c853;
+      --warning-color: #43a047;
+      --danger-color: #c62828;
+      --dark-bg: #0d1f12;
+      --dark-surface: #1a2f1e;
+      --dark-card: #243a28;
+      --dark-border: #2d4a32;
+      --dark-text: #e8f5e9;
+      --dark-text-secondary: #a5d6a7;
+      --light-bg: #f1f8f4;
+      --light-surface: #ffffff;
+      --light-card: #ffffff;
+      --light-border: #c8e6c9;
+      --light-text: #1b5e20;
+      --light-text-secondary: #388e3c;
+    }
+
+    * {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .theme-light {
+      --bg-primary: var(--light-bg);
+      --bg-surface: var(--light-surface);
+      --bg-card: var(--light-card);
+      --border-color: var(--light-border);
+      --text-primary: var(--light-text);
+      --text-secondary: var(--light-text-secondary);
+      --shadow: 0 2px 8px rgba(27, 94, 32, 0.12);
+      --shadow-hover: 0 4px 12px rgba(27, 94, 32, 0.18);
+    }
+
+    .theme-dark {
+      --bg-primary: var(--dark-bg);
+      --bg-surface: var(--dark-surface);
+      --bg-card: var(--dark-card);
+      --border-color: var(--dark-border);
+      --text-primary: var(--dark-text);
+      --text-secondary: var(--dark-text-secondary);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+      --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.8);
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      min-height: 100vh;
+    }
+
+    .navbar-custom {
+      background: linear-gradient(135deg, #2e7d32, #1b5e20);
+      padding: 1rem 0;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+
+    .navbar-custom .navbar-brand {
+      color: white;
+      font-weight: 600;
+      font-size: 1.5rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .navbar-custom .btn-nav {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      width: 45px;
+      height: 45px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .navbar-custom .btn-nav:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+      color: white;
+    }
+
+    .theme-toggle {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .theme-btn {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      width: 45px;
+      height: 45px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1.25rem;
+      border: none;
+    }
+
+    .theme-btn:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .theme-btn.active {
+      background-color: rgba(255, 255, 255, 0.95);
+      color: var(--primary-color);
+    }
+
+    .card-custom {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-header-custom {
+      background: linear-gradient(135deg, #2e7d32, #1b5e20);
+      color: white;
+      padding: 1.25rem 1.5rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-body-custom {
+      padding: 2rem;
+    }
+
+    .form-label {
+      color: var(--text-primary);
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .form-control,
+    .form-select {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      border-radius: 8px;
+      padding: 0.625rem 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+      background-color: var(--bg-surface);
+      border-color: var(--success-color);
+      color: var(--text-primary);
+      box-shadow: 0 0 0 0.2rem rgba(0, 200, 83, 0.25);
+      outline: none;
+    }
+
+    .form-control::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .form-control:disabled {
+      background-color: var(--bg-primary);
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .errorlist {
+      list-style: none;
+      padding: 0;
+      margin: 0.5rem 0 0 0;
+    }
+
+    .errorlist li {
+      color: var(--danger-color);
+      font-size: 0.85rem;
+      padding: 0.25rem 0;
+    }
+
+    .form-check-input {
+      background-color: var(--bg-surface);
+      border: 2px solid var(--border-color);
+      width: 1.5rem;
+      height: 1.5rem;
+      cursor: pointer;
+    }
+
+    .form-check-input:checked {
+      background-color: var(--success-color);
+      border-color: var(--success-color);
+    }
+
+    .form-check-input:focus {
+      border-color: var(--success-color);
+      box-shadow: 0 0 0 0.2rem rgba(0, 200, 83, 0.25);
+    }
+
+    .form-check-label {
+      color: var(--text-primary);
+      margin-left: 0.5rem;
+      cursor: pointer;
+    }
+
+    .btn-custom {
+      border-radius: 8px;
+      padding: 0.625rem 1.5rem;
+      font-weight: 500;
+      border: none;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+    }
+
+    .btn-success-custom {
+      background-color: var(--success-color);
+      color: white;
+    }
+
+    .btn-success-custom:hover {
+      background-color: #00b248;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 200, 83, 0.4);
+    }
+
+    .btn-outline-custom {
+      background-color: transparent;
+      border: 2px solid var(--border-color);
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+
+    .btn-outline-custom:hover {
+      background-color: var(--bg-surface);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    @media (max-width: 768px) {
+      .card-body-custom {
+        padding: 1.5rem;
+      }
+
+      .navbar-custom .navbar-brand {
+        font-size: 1.25rem;
+      }
+
+      .btn-nav,
+      .theme-btn {
+        width: 40px;
+        height: 40px;
+      }
+    }
+  </style>
+</head>
+<body class="theme-dark">
+  <nav class="navbar-custom">
+    <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center w-100">
+        <h1 class="navbar-brand mb-0">
+          <i class="bi bi-hospital"></i>
+          LOGICO - Modificar Farmacia
+        </h1>
+        <div class="d-flex gap-2 align-items-center">
+          <div class="theme-toggle">
+            <button class="theme-btn" id="lightThemeBtn" title="Tema Claro">
+              <i class="bi bi-sun-fill"></i>
+            </button>
+            <button class="theme-btn active" id="darkThemeBtn" title="Tema Oscuro">
+              <i class="bi bi-moon-stars-fill"></i>
+            </button>
+          </div>
+          <a class="btn-nav" href="{% url 'listado_farmacias' %}" title="Volver al listado">
+            <i class="bi bi-arrow-left"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid px-4">
+    <div class="card-custom">
+      <div class="card-header-custom">
+        <i class="bi bi-pencil-square"></i>
+        Modificar Información de la Farmacia
+      </div>
+      <div class="card-body-custom">
+        <form method="post" id="pharmacyForm">
+          {% csrf_token %}
+          
+          <div class="row">
+            <!-- Columna izquierda -->
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="id_local_nombre" class="form-label">Nombre del Local</label>
+                <input type="text" name="local_nombre" class="form-control" id="id_local_nombre" 
+                       value="{{ form.local_nombre.value|default:'' }}" 
+                       maxlength="150"
+                       required>
+                {% if form.local_nombre.errors %}
+                  <ul class="errorlist">
+                    {% for error in form.local_nombre.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label for="id_local_direccion" class="form-label">Dirección</label>
+                <input type="text" name="local_direccion" class="form-control" id="id_local_direccion" 
+                       value="{{ form.local_direccion.value|default:'' }}" 
+                       maxlength="250"
+                       pattern="[A-Za-z0-9áéíóúÁÉÍÓÚñÑ\s,.]+"
+                       title="Solo se permiten letras, números, espacios, comas y puntos"
+                       required>
+                {% if form.local_direccion.errors %}
+                  <ul class="errorlist">
+                    {% for error in form.local_direccion.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label for="id_comuna_nombre" class="form-label">Comuna</label>
+                <input type="text" name="comuna_nombre" class="form-control" id="id_comuna_nombre" 
+                       value="{{ form.comuna_nombre.value|default:'' }}"
+                       maxlength="80"
+                       pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+"
+                       title="Solo se permiten letras con tildes y espacios"
+                       required>
+                {% if form.comuna_nombre.errors %}
+                  <ul class="errorlist">
+                    {% for error in form.comuna_nombre.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label for="id_localidad_nombre" class="form-label">Localidad</label>
+                <input type="text" name="localidad_nombre" class="form-control" id="id_localidad_nombre" 
+                       value="{{ form.localidad_nombre.value|default:'' }}"
+                       maxlength="80"
+                       pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+"
+                       title="Solo se permiten letras con tildes y espacios">
+                {% if form.localidad_nombre.errors %}
+                  <ul class="errorlist">
+                    {% for error in form.localidad_nombre.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label for="id_local_telefono" class="form-label">Teléfono</label>
+                <input type="tel" name="local_telefono" class="form-control" id="id_local_telefono" 
+                       value="{{ form.local_telefono.value|default:'' }}"
+                       pattern="^\+?[0-9]{1,14}$"
+                       title="Debe comenzar con + opcional seguido de hasta 14 dígitos"
+                       maxlength="15">
+                {% if form.local_telefono.errors %}
+                  <ul class="errorlist">
+                    {% for error in form.local_telefono.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Columna derecha -->
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="id_local_lng" class="form-label">Longitud (lng)</label>
+                <input type="number" name="local_lng" class="form-control" id="id_local_lng" 
+                       value="{{ form.local_lng.value|default:'' }}"
+                       step="any"
+                       placeholder="-70.6483"
+                       title="Ingrese la longitud con decimales">
+                {% if form.local_lng.errors %}
+                  <ul class="errorlist">
+                    {% for error in form.local_lng.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label for="id_local_lat" class="form-label">Latitud (lat)</label>
+                <input type="number" name="local_lat" class="form-control" id="id_local_lat" 
+                       value="{{ form.local_lat.value|default:'' }}"
+                       step="any"
+                       placeholder="-33.4372"
+                       title="Ingrese la latitud con decimales">
+                {% if form.local_lat.errors %}
+                  <ul class="errorlist">
+                    {% for error in form.local_lat.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Días de Funcionamiento</label>
+                <div class="row g-2">
+                  <div class="col-6">
+                    <label for="id_dia_inicio" class="form-label text-muted small">De:</label>
+                    <select name="dia_inicio" class="form-select" id="id_dia_inicio">
+                      <option value="">Seleccione</option>
+                      <option value="lunes">Lunes</option>
+                      <option value="martes">Martes</option>
+                      <option value="miércoles">Miércoles</option>
+                      <option value="jueves">Jueves</option>
+                      <option value="viernes">Viernes</option>
+                      <option value="sábado">Sábado</option>
+                      <option value="domingo">Domingo</option>
+                    </select>
+                  </div>
+                  <div class="col-6">
+                    <label for="id_dia_fin" class="form-label text-muted small">A:</label>
+                    <select name="dia_fin" class="form-select" id="id_dia_fin">
+                      <option value="">Seleccione</option>
+                      <option value="lunes">Lunes</option>
+                      <option value="martes">Martes</option>
+                      <option value="miércoles">Miércoles</option>
+                      <option value="jueves">Jueves</option>
+                      <option value="viernes">Viernes</option>
+                      <option value="sábado">Sábado</option>
+                      <option value="domingo">Domingo</option>
+                    </select>
+                  </div>
+                </div>
+                <input type="hidden" name="funcionamiento_dia" id="id_funcionamiento_dia" value="{{ form.funcionamiento_dia.value|default:'' }}">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Horario de Atención</label>
+                <div class="row g-2 mb-2">
+                  <div class="col-6">
+                    <label for="id_funcionamiento_hora_apertura" class="form-label text-muted small">Apertura:</label>
+                    <input type="time" name="funcionamiento_hora_apertura" class="form-control" id="id_funcionamiento_hora_apertura" 
+                           value="{{ form.funcionamiento_hora_apertura.value|default:'' }}" required>
+                  </div>
+                  <div class="col-6">
+                    <label for="id_funcionamiento_hora_cierre" class="form-label text-muted small">Cierre:</label>
+                    <input type="time" name="funcionamiento_hora_cierre" class="form-control" id="id_funcionamiento_hora_cierre" 
+                           value="{{ form.funcionamiento_hora_cierre.value|default:'' }}" required>
+                  </div>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="id_abierto_24_7" name="abierto_24_7">
+                  <label class="form-check-label" for="id_abierto_24_7">
+                    Abierto 24/7
+                  </label>
+                </div>
+                {% if form.funcionamiento_hora_apertura.errors %}
+                  <ul class="errorlist">
+                    {% for error in form.funcionamiento_hora_apertura.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+                {% if form.funcionamiento_hora_cierre.errors %}
+                  <ul class="errorlist">
+                    {% for error in form.funcionamiento_hora_cierre.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-4">
+            <a class="btn btn-outline-custom btn-custom" href="{% url 'listado_farmacias' %}">
+              <i class="bi bi-x-lg"></i> Cancelar
+            </a>
+            <button class="btn btn-success-custom btn-custom" type="submit">
+              <i class="bi bi-check-lg"></i> Guardar Cambios
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Theme Toggle Functionality
+    const lightThemeBtn = document.getElementById('lightThemeBtn');
+    const darkThemeBtn = document.getElementById('darkThemeBtn');
+    const body = document.body;
+
+    // Load saved theme preference
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    body.className = `theme-${savedTheme}`;
+    updateThemeButtons(savedTheme);
+
+    lightThemeBtn.addEventListener('click', () => {
+      body.className = 'theme-light';
+      localStorage.setItem('theme', 'light');
+      updateThemeButtons('light');
+    });
+
+    darkThemeBtn.addEventListener('click', () => {
+      body.className = 'theme-dark';
+      localStorage.setItem('theme', 'dark');
+      updateThemeButtons('dark');
+    });
+
+    function updateThemeButtons(theme) {
+      if (theme === 'light') {
+        lightThemeBtn.classList.add('active');
+        darkThemeBtn.classList.remove('active');
+      } else {
+        darkThemeBtn.classList.add('active');
+        lightThemeBtn.classList.remove('active');
+      }
+    }
+
+    // 24/7 Checkbox functionality
+    const abierto247Checkbox = document.getElementById('id_abierto_24_7');
+    const horarioApertura = document.getElementById('id_funcionamiento_hora_apertura');
+    const horarioCierre = document.getElementById('id_funcionamiento_hora_cierre');
+    const funcionamientoDia = document.getElementById('id_funcionamiento_dia');
+    const diaInicio = document.getElementById('id_dia_inicio');
+    const diaFin = document.getElementById('id_dia_fin');
+
+    abierto247Checkbox.addEventListener('change', function() {
+      if (this.checked) {
+        horarioApertura.value = '00:00';
+        horarioCierre.value = '23:59';
+        funcionamientoDia.value = '24/7';
+        diaInicio.value = '';
+        diaFin.value = '';
+        horarioApertura.disabled = true;
+        horarioCierre.disabled = true;
+        diaInicio.disabled = true;
+        diaFin.disabled = true;
+      } else {
+        horarioApertura.disabled = false;
+        horarioCierre.disabled = false;
+        diaInicio.disabled = false;
+        diaFin.disabled = false;
+        actualizarFuncionamientoDia();
+      }
+    });
+
+    // Actualizar funcionamiento_dia cuando cambian los días
+    function actualizarFuncionamientoDia() {
+      const inicio = diaInicio.value;
+      const fin = diaFin.value;
+      
+      if (inicio && fin) {
+        if (inicio === fin) {
+          // Si son el mismo día, solo mostrar uno
+          funcionamientoDia.value = inicio;
+        } else {
+          // Si son diferentes, mostrar rango
+          funcionamientoDia.value = `${inicio} a ${fin}`;
+        }
+      } else if (inicio) {
+        funcionamientoDia.value = inicio;
+      } else if (fin) {
+        funcionamientoDia.value = fin;
+      } else {
+        funcionamientoDia.value = '';
+      }
+    }
+
+    diaInicio.addEventListener('change', actualizarFuncionamientoDia);
+    diaFin.addEventListener('change', actualizarFuncionamientoDia);
+
+    // Cargar valores iniciales si existen
+    window.addEventListener('DOMContentLoaded', function() {
+      const funcionamientoDiaValue = funcionamientoDia.value.trim();
+      
+      if (funcionamientoDiaValue === '24/7') {
+        abierto247Checkbox.checked = true;
+        abierto247Checkbox.dispatchEvent(new Event('change'));
+      } else if (funcionamientoDiaValue) {
+        // Intentar parsear el formato "día a día"
+        const match = funcionamientoDiaValue.match(/^(\w+)\s+a\s+(\w+)$/i);
+        if (match) {
+          const [, inicio, fin] = match;
+          diaInicio.value = inicio.toLowerCase();
+          diaFin.value = fin.toLowerCase();
+        } else {
+          // Es un solo día
+          diaInicio.value = funcionamientoDiaValue.toLowerCase();
+          diaFin.value = funcionamientoDiaValue.toLowerCase();
+        }
+      }
+    });
+
+    // Validación adicional del formulario
+    document.getElementById('pharmacyForm').addEventListener('submit', function(e) {
+      const telefono = document.getElementById('id_local_telefono').value;
+      const direccion = document.getElementById('id_local_direccion').value;
+      
+      // Validar teléfono
+      if (telefono && !telefono.match(/^\+?[0-9]{1,14}$/)) {
+        e.preventDefault();
+        alert('El teléfono debe comenzar con + opcional seguido de hasta 14 dígitos');
+        return false;
+      }
+      
+      // Validar dirección
+      if (direccion && !direccion.match(/^[A-Za-z0-9áéíóúÁÉÍÓÚñÑ\s,.]+$/)) {
+        e.preventDefault();
+        alert('La dirección solo puede contener letras, números, espacios, comas y puntos');
+        return false;
+      }
+      
+      return true;
+    });
+  </script>
+</body>
+</html>

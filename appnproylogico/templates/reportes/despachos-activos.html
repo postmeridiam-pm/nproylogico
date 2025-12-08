@@ -1,0 +1,887 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Despachos Activos</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+  <style>
+    :root{ 
+      --primary-color: #2ecc71; 
+      --secondary-color: #27ae60;
+      --dark-bg: #212529;
+      --light-bg: #f8f9fa;
+    }
+    
+    body {
+      background-color: var(--light-bg);
+    }
+    
+    /* NAVBAR */
+    .navbar-custom{ 
+      background-color: var(--dark-bg); 
+      padding: 0.75rem 0; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15); 
+      margin-bottom: 2rem;
+    }
+    
+    .navbar-top-row{ 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+    }
+    
+    .navbar-custom .navbar-brand{ 
+      color: #fff; 
+      font-weight: 600; 
+      font-size: 1.25rem; 
+      margin: 0; 
+      display: flex; 
+      align-items: center; 
+      gap: .5rem;
+    }
+    
+    .btn-nav{ 
+      background: transparent; 
+      border: 1px solid rgba(255,255,255,.3); 
+      color: #fff; 
+      padding: .5rem 1rem; 
+      border-radius: 6px; 
+      display: inline-flex; 
+      align-items: center; 
+      gap: .5rem; 
+      text-decoration: none; 
+      font-size: .9rem;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-nav:hover{ 
+      background-color: rgba(255,255,255,.1); 
+      border-color: rgba(255,255,255,.5);
+      color: #fff;
+    }
+    
+    .btn-success-nav{ 
+      background-color: var(--primary-color); 
+      border: none; 
+      color: #fff; 
+      padding: .5rem 1rem; 
+      border-radius: 6px; 
+      display: inline-flex; 
+      align-items: center; 
+      gap: .5rem; 
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-success-nav:hover{ 
+      background-color: var(--secondary-color);
+      color: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(46,204,113,0.3);
+    }
+    
+    /* TÍTULO Y HEADER */
+    h1.h4 {
+      color: #2c3e50;
+      font-weight: 700;
+    }
+    
+    /* HELP BANNER */
+    .help-banner {
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      border-left: 4px solid #2196F3;
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+      color: #1565c0;
+      font-weight: 500;
+    }
+    
+    .help-banner button {
+      background-color: #fff;
+      border: 1px solid #90caf9;
+      color: #1976d2;
+      font-size: 0.85rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+    }
+    
+    .help-banner button:hover {
+      background-color: #1976d2;
+      border-color: #1976d2;
+      color: #fff;
+    }
+    
+    /* FORMULARIO DE FILTROS */
+    .form-label {
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+    
+    .form-control, .form-select {
+      background-color: #fff;
+      color: #2c3e50;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 0.65rem 0.85rem;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+      color: #2c3e50;
+      background-color: #fff;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.2rem rgba(46,204,113,.15);
+    }
+    
+    .form-control::placeholder {
+      color: #95a5a6;
+      opacity: 1;
+    }
+    
+    /* BOTONES */
+    .btn {
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      padding: 0.5rem 1rem;
+    }
+    
+    .btn-outline-primary {
+      border: 2px solid #3498db;
+      color: #3498db;
+      background-color: #fff;
+    }
+    
+    .btn-outline-primary:hover {
+      background-color: #3498db;
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    }
+    
+    .btn-outline-secondary {
+      border: 2px solid #6c757d;
+      color: #6c757d;
+      background-color: #fff;
+    }
+    
+    .btn-outline-secondary:hover {
+      background-color: #6c757d;
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+    }
+    
+    .btn-pill {
+      border-radius: 20px;
+    }
+    
+    /* CHIPS DE FILTRO RÁPIDO */
+    .chip {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      margin-right: 0.5rem;
+      background-color: #fff;
+      border: 2px solid #e0e0e0;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: #2c3e50;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    
+    .chip:hover {
+      border-color: var(--primary-color);
+      background-color: #e8f8f5;
+      transform: translateY(-1px);
+    }
+    
+    .chip.active {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      color: #fff;
+    }
+    
+    /* TABLA */
+    .table-responsive {
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      padding: 1rem;
+    }
+    
+    .table {
+      margin-bottom: 0;
+    }
+    
+    .table thead th {
+      background-color: #f8f9fa;
+      color: #2c3e50;
+      font-weight: 700;
+      border-bottom: 2px solid #dee2e6;
+      padding: 1rem 0.75rem;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .table tbody tr {
+      transition: all 0.2s ease;
+      color: #2c3e50;
+    }
+    
+    .table tbody tr:hover {
+      background-color: #f8f9fa;
+      transform: scale(1.01);
+    }
+    
+    .table tbody td {
+      padding: 0.85rem 0.75rem;
+      vertical-align: middle;
+      border-bottom: 1px solid #e9ecef;
+    }
+    
+    /* BADGES */
+    .badge {
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+    
+    .bg-warning {
+      background-color: #ffc107 !important;
+      color: #000 !important;
+    }
+    
+    .bg-danger {
+      background-color: #dc3545 !important;
+    }
+    
+    .bg-info {
+      background-color: #17a2b8 !important;
+    }
+    
+    .bg-success {
+      background-color: var(--primary-color) !important;
+    }
+    
+    .bg-secondary {
+      background-color: #6c757d !important;
+    }
+    
+    /* DENSIDAD */
+    .density-comfortable tbody td {
+      padding: 1rem 0.75rem;
+    }
+    
+    .density-compact tbody td {
+      padding: 0.5rem 0.5rem;
+      font-size: 0.85rem;
+    }
+    
+    /* VISTA SIMPLE */
+    .simple-mode .col-optional {
+      display: none !important;
+    }
+    
+    /* COLUMNAS OCULTAS */
+    .col-hidden {
+      display: none !important;
+    }
+    
+    /* DROPDOWN */
+    .dropdown-menu {
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      border: 1px solid #e0e0e0;
+    }
+    
+    /* PAGINACIÓN */
+    .btn-group {
+      gap: 0.5rem;
+    }
+    
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .navbar-brand {
+        font-size: 1rem;
+      }
+      
+      .chip {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+      }
+      
+      .table {
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar-custom">
+    <div class="container-fluid">
+      <div class="navbar-top-row">
+        <div class="d-flex align-items-center gap-2">
+          <a class="btn-nav" href="{% url 'home' %}">
+            <i class="bi bi-house-door"></i> Volver al inicio
+          </a>
+          <span class="navbar-brand">
+            <i class="bi bi-clipboard-data"></i> Reportes · Despachos activos
+          </span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <a class="btn-success-nav" href="{% url 'panel_operadora' %}">
+            <i class="bi bi-grid"></i> Operadora
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h4 mb-0">
+        <i class="bi bi-activity"></i> Despachos activos
+      </h1>
+      <div class="btn-group" role="group" aria-label="Acciones principales">
+        <button class="btn btn-outline-primary btn-pill" id="btn-tour" type="button" aria-label="Iniciar vista guiada">
+          <i class="bi bi-compass"></i> Vista guiada
+        </button>
+        <div class="dropdown">
+          <button class="btn btn-outline-secondary btn-pill dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Opciones de tabla">
+            <i class="bi bi-gear"></i> Tabla
+          </button>
+          <div class="dropdown-menu dropdown-menu-end p-3" style="min-width: 260px">
+            <div class="mb-2"><strong>Densidad</strong></div>
+            <div class="d-flex gap-2 mb-3" role="group" aria-label="Cambiar densidad">
+              <button class="btn btn-sm btn-outline-secondary" type="button" id="density-comfort">Cómoda</button>
+              <button class="btn btn-sm btn-outline-secondary" type="button" id="density-compact">Compacta</button>
+            </div>
+            <div class="mb-2"><strong>Columnas</strong></div>
+            <div id="cols-controls" class="d-grid gap-1" aria-label="Configurar columnas"></div>
+            <div class="mt-3 d-grid">
+              <button class="btn btn-sm btn-outline-primary" type="button" id="btn-export" aria-label="Exportar a CSV">
+                <i class="bi bi-download"></i> Exportar CSV
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <div class="d-inline-flex gap-2 align-items-center">
+        <form class="d-inline-flex gap-2" method="get" action="{% url 'export_resumen_operativo' %}">
+          <input type="hidden" name="tipo" value="despachos_activos" />
+          <input type="hidden" name="formato" value="pdf" />
+          <label class="form-label mb-0">Fecha cierre</label>
+          <input type="date" name="fecha" class="form-control form-control-sm" value="{% now 'Y-m-d' %}" />
+          <button class="btn btn-sm btn-outline-primary" type="submit"><i class="bi bi-download"></i> PDF cierre</button>
+        </form>
+      </div>
+      <a class="btn btn-sm btn-success" href="{% url 'cerrar_dia_operadora' %}"><i class="bi bi-flag"></i> Cerrar día ahora</a>
+    </div>
+
+    <div class="help-banner">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <i class="bi bi-lightbulb"></i> 
+          <strong>Consejo:</strong> Usa los filtros rápidos para ver solo lo importante. Puedes activar la "Vista simple" para ocultar columnas avanzadas.
+        </div>
+        <button id="hide-help-desp" class="btn btn-sm">
+          <i class="bi bi-x-lg"></i> Ocultar
+        </button>
+      </div>
+    </div>
+
+    <form class="row g-3 mb-4" method="get" id="form-despachos">
+      <div class="col-md-3">
+        <label class="form-label">
+          <i class="bi bi-exclamation-triangle"></i> Prioridad
+        </label>
+        <select class="form-select" name="prioridad">
+          <option value="">Todas</option>
+          <option value="ALTA" {% if prioridad == 'ALTA' %}selected{% endif %}>Alta</option>
+          <option value="MEDIA" {% if prioridad == 'MEDIA' %}selected{% endif %}>Media</option>
+          <option value="BAJA" {% if prioridad == 'BAJA' %}selected{% endif %}>Baja</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">
+          <i class="bi bi-file-medical"></i> Con receta retenida
+        </label>
+        <select class="form-select" name="receta">
+          <option value="">Todas</option>
+          <option value="si" {% if receta == 'si' %}selected{% endif %}>Sí</option>
+          <option value="no" {% if receta == 'no' %}selected{% endif %}>No</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">
+          <i class="bi bi-exclamation-circle"></i> Incidencias
+        </label>
+        <select class="form-select" name="incidencia">
+          <option value="">Todas</option>
+          <option value="si" {% if incidencia == 'si' %}selected{% endif %}>Con incidencia</option>
+          <option value="no" {% if incidencia == 'no' %}selected{% endif %}>Sin incidencia</option>
+        </select>
+      </div>
+      <div class="col-md-3 d-flex align-items-end gap-2">
+        <button class="btn btn-outline-primary w-100" type="submit">
+          <i class="bi bi-funnel"></i> Aplicar filtros
+        </button>
+      </div>
+    </form>
+
+    <div class="d-flex align-items-center mb-3 flex-wrap gap-2" aria-label="Filtros rápidos">
+      <span class="chip" id="chip-receta">
+        <i class="bi bi-file-medical"></i> Con receta
+      </span>
+      <span class="chip" id="chip-incidencia">
+        <i class="bi bi-exclamation-triangle"></i> Con incidencia
+      </span>
+      <span class="chip" id="chip-alta">
+        <i class="bi bi-arrow-up-circle"></i> Prioridad ALTA
+      </span>
+      <button class="btn btn-outline-secondary ms-auto" id="btn-simple">
+        <i class="bi bi-eye"></i> Vista simple
+      </button>
+      <button class="btn btn-outline-secondary" id="btn-filter-local-d">
+        <i class="bi bi-filter"></i> Filtrar en tabla
+      </button>
+    </div>
+
+    <div class="table-responsive density-comfortable" id="tbl-wrap" aria-live="polite">
+      <table class="table table-hover align-middle" role="table">
+        <thead>
+          <tr>
+            <th data-col-key="codigo">Código</th>
+            <th data-col-key="estado">Estado</th>
+            <th class="col-optional" data-col-key="tipo">Tipo</th>
+            <th data-col-key="prioridad">Prioridad</th>
+            <th class="col-optional" data-col-key="farmacia">Farmacia</th>
+            <th class="col-optional" data-col-key="motorista">Motorista</th>
+            <th class="col-optional" data-col-key="moto">Moto</th>
+            <th data-col-key="cliente">Cliente</th>
+            <th class="col-optional" data-col-key="destino">Destino</th>
+            <th data-col-key="retenida">Receta retenida</th>
+            <th class="col-optional" data-col-key="requiere">Requiere devol.</th>
+            <th class="col-optional" data-col-key="aprobacion">Aprobación</th>
+            <th class="col-optional" data-col-key="registro">Registro</th>
+            <th class="col-optional" data-col-key="minutos">Min. en ruta</th>
+            <th data-col-key="incidencia">Incidencia</th>
+            <th class="text-end" data-col-key="acciones">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rows %}
+          <tr data-prioridad="{{ r.4 }}" data-receta="{% if r.11 %}si{% else %}no{% endif %}" data-incidencia="{% if r.18 %}si{% else %}no{% endif %}">
+            <td><strong>{{ r.1 }}</strong></td>
+            <td><span class="badge bg-info">{{ r.2 }}</span></td>
+            <td class="col-optional">{{ r.3 }}</td>
+            <td>
+              {% if r.4 == 'ALTA' %}
+                <span class="badge bg-danger">{{ r.4 }}</span>
+              {% elif r.4 == 'MEDIA' %}
+                <span class="badge bg-warning text-dark">{{ r.4 }}</span>
+              {% else %}
+                <span class="badge bg-secondary">{{ r.4 }}</span>
+              {% endif %}
+            </td>
+            <td class="col-optional">{{ r.5 }}</td>
+            <td class="col-optional">{{ r.6 }}</td>
+            <td class="col-optional">{{ r.7 }}</td>
+            <td>{{ r.8 }}</td>
+            <td class="col-optional">{{ r.10 }}</td>
+            <td>
+              {% if r.11 %}
+                <span class="badge bg-warning text-dark" data-bs-toggle="tooltip" title="Tiene receta retenida">
+                  <i class="bi bi-file-medical"></i> Receta retenida
+                </span>
+              {% else %}
+                <span class="badge bg-secondary" data-bs-toggle="tooltip" title="Sin receta">No</span>
+              {% endif %}
+            </td>
+            <td class="col-optional">
+              {% if r.12 %}
+                <span class="badge bg-info" data-bs-toggle="tooltip" title="Requiere aprobación operadora">Sí</span>
+              {% else %}
+                <span class="badge bg-secondary" data-bs-toggle="tooltip" title="No requiere">No</span>
+              {% endif %}
+            </td>
+            <td class="col-optional">{{ r.14 }}</td>
+            <td class="col-optional">{{ r.17 }}</td>
+            <td>
+              {% if r.18 %}
+                <span class="badge bg-danger" data-bs-toggle="tooltip" title="Incidencia en ruta">
+                  <i class="bi bi-exclamation-triangle"></i> {{ r.19 }}
+                </span>
+              {% else %}
+                -
+              {% endif %}
+            </td>
+            <td class="text-end">
+              <div class="d-inline-flex gap-1">
+                {% if r.2 == 'PENDIENTE' %}
+                  <form method="post" action="{% url 'registrar_movimiento' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="metodo" value="boton">
+                    <input type="hidden" name="codigo_despacho" value="{{ r.1 }}">
+                    <input type="hidden" name="estado" value="ASIGNADO">
+                    <button class="btn btn-sm btn-outline-primary" type="submit">
+                      <i class="bi bi-check-circle"></i> Asignar
+                    </button>
+                  </form>
+                {% endif %}
+                {% if r.2 == 'ASIGNADO' %}
+                  <form method="post" action="{% url 'registrar_movimiento' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="metodo" value="boton">
+                    <input type="hidden" name="codigo_despacho" value="{{ r.1 }}">
+                    <input type="hidden" name="estado" value="EN_CAMINO">
+                    <button class="btn btn-sm btn-outline-success" type="submit">
+                      <i class="bi bi-truck"></i> En camino
+                    </button>
+                  </form>
+                {% endif %}
+                {% if r.2 == 'EN_CAMINO' %}
+                  <form method="post" action="{% url 'registrar_movimiento' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="metodo" value="boton">
+                    <input type="hidden" name="codigo_despacho" value="{{ r.1 }}">
+                    <input type="hidden" name="estado" value="ENTREGADO">
+                    <button class="btn btn-sm btn-outline-success" type="submit">
+                      <i class="bi bi-check2-circle"></i> Entregado
+                    </button>
+                  </form>
+                  <form method="post" action="{% url 'registrar_movimiento' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="metodo" value="boton">
+                    <input type="hidden" name="codigo_despacho" value="{{ r.1 }}">
+                    <input type="hidden" name="estado" value="FALLIDO">
+                    <button class="btn btn-sm btn-outline-danger" type="submit">
+                      <i class="bi bi-x-circle"></i> Fallido
+                    </button>
+                  </form>
+                {% endif %}
+                {% if r.11 %}
+                  <a class="btn btn-sm btn-outline-info" href="{% url 'recetas_retencion_panel' %}">
+                    <i class="bi bi-file-medical"></i> Receta
+                  </a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="16" class="text-center text-muted py-4">
+              <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+              <p class="mb-0 mt-2">No hay despachos activos en este momento</p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if page_obj %}
+    <div class="d-flex justify-content-between align-items-center mt-4">
+      <div><strong>Mostrando página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</strong></div>
+      <div class="btn-group">
+        {% if page_obj.has_previous %}
+          <a class="btn btn-outline-secondary" href="?page={{ page_obj.previous_page_number }}&prioridad={{ prioridad }}&receta={{ receta }}&incidencia={{ incidencia }}">
+            <i class="bi bi-chevron-left"></i> Anterior
+          </a>
+        {% endif %}
+        {% if page_obj.has_next %}
+          <a class="btn btn-outline-secondary" href="?page={{ page_obj.next_page_number }}&prioridad={{ prioridad }}&receta={{ receta }}&incidencia={{ incidencia }}">
+            Siguiente <i class="bi bi-chevron-right"></i>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function(){
+      const root = document.documentElement;
+      
+      // Alto contraste
+      const btnHC = document.getElementById('btn-hc');
+      if (btnHC){
+        const hcSaved = localStorage.getItem('operadora_hc')==='1';
+        if (hcSaved) root.classList.add('high-contrast');
+        btnHC.onclick=function(){ 
+          root.classList.toggle('high-contrast'); 
+          localStorage.setItem('operadora_hc', root.classList.contains('high-contrast')?'1':'0'); 
+        };
+      }
+      
+      // Filtro local en tabla
+      const btnLocal = document.getElementById('btn-filter-local-d');
+      if (btnLocal) {
+        btnLocal.onclick = function(){
+          const pr = document.querySelector('#form-despachos select[name="prioridad"]').value.trim().toUpperCase();
+          const rc = document.querySelector('#form-despachos select[name="receta"]').value.trim();
+          const inx = document.querySelector('#form-despachos select[name="incidencia"]').value.trim();
+          const rows = document.querySelectorAll('tbody tr[data-prioridad]');
+          rows.forEach(r => {
+            const okPr = !pr || (r.getAttribute('data-prioridad')||'').toUpperCase() === pr;
+            const okRc = !rc || (r.getAttribute('data-receta')||'') === rc;
+            const okIx = !inx || (r.getAttribute('data-incidencia')||'') === inx;
+            r.style.display = (okPr && okRc && okIx) ? '' : 'none';
+          });
+          const live = document.getElementById('tbl-wrap'); 
+          if (live){ live.setAttribute('aria-label', 'Tabla filtrada'); }
+        };
+      }
+      
+      // Ayuda persistente
+      const help = document.querySelector('.help-banner');
+      const hideBtn = document.getElementById('hide-help-desp');
+      if (localStorage.getItem('hide_help_desp')==='1' && help) help.style.display='none';
+      if (hideBtn) hideBtn.onclick=function(){ 
+        localStorage.setItem('hide_help_desp','1'); 
+        if(help) help.style.display='none'; 
+      };
+      
+      // Chips rápidos
+      const chipR = document.getElementById('chip-receta');
+      const chipI = document.getElementById('chip-incidencia');
+      const chipA = document.getElementById('chip-alta');
+      
+      function applyChips(){
+        const rows = document.querySelectorAll('tbody tr[data-prioridad]');
+        rows.forEach(r=>{
+          const hasRec = r.getAttribute('data-receta') === 'si';
+          const hasInc = r.getAttribute('data-incidencia') === 'si';
+          const isAlta = r.getAttribute('data-prioridad') === 'ALTA';
+          const ok = (!chipR.classList.contains('active') || hasRec) && 
+                     (!chipI.classList.contains('active') || hasInc) && 
+                     (!chipA.classList.contains('active') || isAlta);
+          r.style.display = ok ? '' : 'none';
+        });
+      }
+      
+      [chipR,chipI,chipA].forEach(c=>{ 
+        if(!c) return; 
+        c.onclick=function(){ 
+          this.classList.toggle('active'); 
+          applyChips(); 
+        }; 
+      });
+      
+      // Vista simple
+      const tblWrap = document.getElementById('tbl-wrap');
+      const btnSimple = document.getElementById('btn-simple');
+      const simpleSaved = localStorage.getItem('desp_simple')==='1';
+      if (simpleSaved && tblWrap) tblWrap.classList.add('simple-mode');
+      if (btnSimple) btnSimple.onclick=function(){ 
+        if(!tblWrap) return; 
+        tblWrap.classList.toggle('simple-mode'); 
+        localStorage.setItem('desp_simple', tblWrap.classList.contains('simple-mode')?'1':'0'); 
+      };
+
+      // Densidad
+      const btnComfort = document.getElementById('density-comfort');
+      const btnCompact = document.getElementById('density-compact');
+      const savedDensity = localStorage.getItem('desp_density')||'comfort';
+      if (tblWrap){ 
+        if (savedDensity==='compact') tblWrap.classList.add('density-compact'); 
+        else tblWrap.classList.add('density-comfortable'); 
+      }
+      if (btnComfort) btnComfort.onclick=function(){ 
+        if(!tblWrap) return; 
+        tblWrap.classList.remove('density-compact'); 
+        tblWrap.classList.add('density-comfortable'); 
+        localStorage.setItem('desp_density','comfort'); 
+      };
+      if (btnCompact) btnCompact.onclick=function(){ 
+        if(!tblWrap) return; 
+        tblWrap.classList.remove('density-comfortable'); 
+        tblWrap.classList.add('density-compact'); 
+        localStorage.setItem('desp_density','compact'); 
+      };
+
+      // Columnas configurables
+      function setupColumnControls(){
+        const thead = document.querySelector('table thead tr'); 
+        if(!thead) return;
+        const ths = Array.from(thead.children);
+        const panel = document.getElementById('cols-controls'); 
+        if(!panel) return;
+        panel.innerHTML = '';
+        
+        ths.forEach((th, idx)=>{
+          const key = th.getAttribute('data-col-key')||('col'+idx);
+          const label = th.textContent.trim()||key;
+          const saved = localStorage.getItem('col_'+key)==='0';
+          
+          if (saved){ 
+            th.classList.add('col-hidden'); 
+            Array.from(document.querySelectorAll('table tbody tr')).forEach(row=>{ 
+              const td = row.children[idx]; 
+              if(td) td.classList.add('col-hidden'); 
+            }); 
+          }
+          
+          const id = 'colchk_'+key;
+          const wrap = document.createElement('label'); 
+          wrap.className='form-check d-flex align-items-center gap-2'; 
+          wrap.setAttribute('for', id);
+          
+          const chk = document.createElement('input'); 
+          chk.type='checkbox'; 
+          chk.className='form-check-input'; 
+          chk.id=id; 
+          chk.checked=!saved; 
+          chk.setAttribute('aria-label', 'Mostrar columna '+label);
+          
+          const txt = document.createElement('span'); 
+          txt.textContent=label;
+          
+          wrap.appendChild(chk); 
+          wrap.appendChild(txt); 
+          panel.appendChild(wrap);
+          
+          chk.addEventListener('change', function(){
+            const hide = !this.checked;
+            if (hide){ th.classList.add('col-hidden'); } 
+            else { th.classList.remove('col-hidden'); }
+            
+            Array.from(document.querySelectorAll('table tbody tr')).forEach(row=>{ 
+              const td = row.children[idx]; 
+              if(!td) return; 
+              if (hide){ td.classList.add('col-hidden'); } 
+              else { td.classList.remove('col-hidden'); } 
+            });
+            
+            localStorage.setItem('col_'+key, hide?'0':'1');
+          });
+        });
+      }
+      setupColumnControls();
+
+      // Exportar CSV
+      const btnExport = document.getElementById('btn-export');
+      if (btnExport){
+        btnExport.onclick=function(){
+          const rows = Array.from(document.querySelectorAll('table tbody tr')).filter(r=>r.style.display!=="none");
+          const heads = Array.from(document.querySelectorAll('table thead th')).filter(th=>!th.classList.contains('col-hidden')).map(th=>th.textContent.trim());
+          const data = rows.map(r=> Array.from(r.children).filter((td,i)=>!document.querySelector('table thead th:nth-child('+(i+1)+')').classList.contains('col-hidden')).map(td=> '"'+(td.textContent||'').replace(/"/g,'\"')+'"').join(','));
+          const audit = 'Generado: '+new Date().toISOString()+', Vista: Despachos activos';
+          const csv = [heads.join(','), ...data, audit].join('\n');
+          const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a'); 
+          a.href=url; 
+          a.download='despachos_activos.csv'; 
+          a.click(); 
+          URL.revokeObjectURL(url);
+        };
+      }
+
+      // Vista guiada
+      const btnTour = document.getElementById('btn-tour');
+      if (btnTour){
+        btnTour.onclick=function(){
+          const steps = [
+            {el:'#form-despachos', msg:'Usa estos filtros para acotar los resultados. Puedes filtrar en la tabla sin recargar.'},
+            {el:'#tbl-wrap', msg:'Aquí ves los despachos activos. Configura densidad y columnas desde "Tabla".'},
+            {el:'#btn-simple', msg:'Activa la Vista simple para ocultar columnas avanzadas.'}
+          ];
+          let idx = 0;
+          
+          const overlay = document.createElement('div'); 
+          overlay.style.position='fixed'; 
+          overlay.style.inset='0'; 
+          overlay.style.background='rgba(0,0,0,.5)'; 
+          overlay.style.zIndex='1040'; 
+          overlay.setAttribute('aria-hidden','false');
+          
+          const tip = document.createElement('div'); 
+          tip.className='card'; 
+          tip.style.position='fixed'; 
+          tip.style.maxWidth='420px'; 
+          tip.style.padding='12px'; 
+          tip.style.zIndex='1041';
+          
+          const actions = document.createElement('div'); 
+          actions.className='d-flex gap-2 mt-2';
+          
+          const btnNext = document.createElement('button'); 
+          btnNext.className='btn btn-primary btn-sm'; 
+          btnNext.textContent='Siguiente';
+          
+          const btnExit = document.createElement('button'); 
+          btnExit.className='btn btn-outline-secondary btn-sm'; 
+          btnExit.textContent='Salir';
+          
+          actions.appendChild(btnNext); 
+          actions.appendChild(btnExit); 
+          tip.appendChild(actions);
+          
+          function show(){
+            const step = steps[idx]; 
+            const target = document.querySelector(step.el);
+            if (!target){ 
+              idx++; 
+              if (idx>=steps.length){ cleanup(); return; } 
+              show(); 
+              return; 
+            }
+            
+            const rect = target.getBoundingClientRect();
+            tip.querySelector('p')?.remove(); 
+            const p = document.createElement('p'); 
+            p.textContent = step.msg; 
+            tip.insertBefore(p, actions);
+            tip.style.left = (rect.left+8)+'px'; 
+            tip.style.top = (rect.top+8)+'px';
+            target.setAttribute('tabindex','-1'); 
+            target.focus({preventScroll:true});
+          }
+          
+          function cleanup(){ 
+            document.body.removeChild(overlay); 
+            document.body.removeChild(tip); 
+          }
+          
+          btnNext.onclick=function(){ 
+            idx++; 
+            if (idx>=steps.length){ cleanup(); } 
+            else { show(); } 
+          };
+          
+          btnExit.onclick=function(){ cleanup(); };
+          
+          document.body.appendChild(overlay); 
+          document.body.appendChild(tip); 
+          show();
+        };
+      }
+      
+      // Inicializar tooltips
+      const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tooltipTriggerList.forEach(function (tooltipTriggerEl) { 
+        new bootstrap.Tooltip(tooltipTriggerEl); 
+      });
+    })();
+  </script>
+</body>
+</html>

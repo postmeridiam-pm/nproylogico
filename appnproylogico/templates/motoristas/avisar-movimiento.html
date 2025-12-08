@@ -1,0 +1,89 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Avisar movimiento</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+  <link rel="stylesheet" href="{% static 'css/asignaciones.css' %}">
+</head>
+<body class="theme-light">
+  <nav class="navbar-custom">
+    <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center w-100">
+        <div class="d-flex align-items-center gap-3">
+          <a class="btn-nav" href="{% url 'home' %}"><i class="bi bi-arrow-left"></i> Volver</a>
+          <div class="page-title"><i class="bi bi-chat-dots"></i> Avisar movimiento</div>
+        </div>
+        
+      </div>
+    </div>
+  </nav>
+  <div class="container py-3">
+    {% if messages %}{% for m in messages %}
+      <div class="alert alert-{{ m.tags }}">{{ m }}</div>
+    {% endfor %}{% endif %}
+    <div class="help-banner mb-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <strong>Consejo:</strong> Usa esta plantilla para comunicarte con la operadora a través de mensajería. Cuando la operadora lo apruebe y registre, se guardará el cambio de estado de tu pedido asignado.
+        </div>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-outline-success btn-sm" data-msg="Salí de farmacia"><i class="bi bi-check"></i> Salí de farmacia</button>
+          <button type="button" class="btn btn-outline-success btn-sm" data-msg="En camino"><i class="bi bi-truck"></i> En camino</button>
+          <button type="button" class="btn btn-outline-success btn-sm" data-msg="Entregado"><i class="bi bi-box-seam"></i> Entregado</button>
+          <button type="button" class="btn btn-outline-success btn-sm" data-msg="Reenvío"><i class="bi bi-arrow-repeat"></i> Reenvío</button>
+        </div>
+      </div>
+    </div>
+    <form method="post">
+      {% csrf_token %}
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Código de despacho</label>
+          <input class="form-control" name="codigo_despacho" placeholder="DSP-AAAA-NNNNNN" required />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Tipo de movimiento</label>
+          <select class="form-select" name="tipo_movimiento" required>
+            <option value="DIRECTO">DIRECTO</option>
+            <option value="TRASLADO">TRASLADO</option>
+            <option value="REENVIO">REENVIO</option>
+            <option value="RECETA">RECETA</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Método de aviso</label>
+          <select class="form-select" name="metodo">
+            <option value="llamada">Llamada</option>
+            <option value="sms">SMS</option>
+            <option value="whatsapp">WhatsApp</option>
+          </select>
+        </div>
+        <div class="col-md-12">
+          <label class="form-label">Mensaje</label>
+          <textarea class="form-control" name="mensaje" rows="2" placeholder="Ej.: Salí de farmacia / En camino / Entregado"></textarea>
+        </div>
+      </div>
+      <div class="d-flex justify-content-end gap-2 mt-3">
+        <button class="btn btn-success" type="submit"><i class="bi bi-send"></i> Enviar aviso</button>
+      </div>
+    </form>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function(){
+      
+      // Plantillas rápidas
+      document.querySelectorAll('[data-msg]').forEach(b=>{
+        b.onclick=function(){
+          const ta=document.querySelector('textarea[name="mensaje"]');
+          if(ta){ ta.value=this.getAttribute('data-msg'); }
+        };
+      });
+    })();
+  </script>
+</body>
+</html>

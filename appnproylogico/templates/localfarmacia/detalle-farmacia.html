@@ -1,0 +1,918 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Detalle Farmacia - LOGICO</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+  <link rel="stylesheet" href="{% static 'css/farmacia_detalle.css' %}">
+  <style>
+    :root {
+      --primary-color: #2ecc71;
+      --secondary-color: #27ae60;
+      --success-color: #00c853;
+      --warning-color: #ffa726;
+      --danger-color: #ef5350;
+      --info-color: #29b6f6;
+      --dark-bg: #1a1d29;
+      --dark-surface: #252837;
+      --dark-card: #2d3142;
+      --dark-border: #3a3f5c;
+      --dark-text: #e8eaed;
+      --dark-text-secondary: #9aa0b3;
+      --light-bg: #f5f7fa;
+      --light-surface: #ffffff;
+      --light-card: #ffffff;
+      --light-border: #e1e4e8;
+      --light-text: #1a1d29;
+      --light-text-secondary: #586069;
+    }
+
+    * {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* Tema Claro */
+    .theme-light {
+      --bg-primary: var(--light-bg);
+      --bg-surface: var(--light-surface);
+      --bg-card: var(--light-card);
+      --border-color: var(--light-border);
+      --text-primary: var(--light-text);
+      --text-secondary: var(--light-text-secondary);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Tema Oscuro */
+    .theme-dark {
+      --bg-primary: var(--dark-bg);
+      --bg-surface: var(--dark-surface);
+      --bg-card: var(--dark-card);
+      --border-color: var(--dark-border);
+      --text-primary: var(--dark-text);
+      --text-secondary: var(--dark-text-secondary);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* Header/Navbar - Negro */
+    .navbar-custom {
+      background-color: #212529;
+      padding: 1rem 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+    }
+
+    .navbar-custom .page-title {
+      color: white;
+      font-weight: 600;
+      font-size: 1.5rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .navbar-custom .page-title i {
+      font-size: 1.75rem;
+    }
+
+    .navbar-custom .btn-nav {
+      background-color: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .navbar-custom .btn-nav:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+      color: white;
+    }
+
+    .navbar-custom .btn-success-nav {
+      background-color: var(--primary-color);
+      border: none;
+      color: white;
+      padding: 0.5rem 1.25rem;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .navbar-custom .btn-success-nav:hover {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+
+    /* Theme Toggle */
+    .theme-toggle {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .theme-btn {
+      background-color: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 1rem;
+    }
+
+    .theme-btn:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .theme-btn.active {
+      background-color: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      background-color: transparent;
+      padding: 0;
+      margin-bottom: 2rem;
+    }
+
+    .breadcrumb-item a {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .breadcrumb-item a:hover {
+      text-decoration: underline;
+    }
+
+    .breadcrumb-item.active {
+      color: var(--text-secondary);
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+      color: var(--text-secondary);
+    }
+
+    /* Farmacia Cards Grid */
+    .farmacia-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .farmacia-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      transition: all 0.3s ease;
+    }
+
+    .farmacia-card:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-2px);
+    }
+
+    .farmacia-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .farmacia-card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .farmacia-card-id {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+
+    .farmacia-card-body {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .farmacia-info-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .farmacia-info-item i {
+      color: var(--primary-color);
+      font-size: 1.1rem;
+      margin-top: 0.125rem;
+      flex-shrink: 0;
+    }
+
+    .farmacia-info-item .info-content {
+      flex: 1;
+    }
+
+    .farmacia-info-item .info-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.125rem;
+    }
+
+    .farmacia-info-item .info-value {
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .farmacia-card-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .btn-card-action {
+      flex: 1;
+      padding: 0.5rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.25rem;
+      text-decoration: none;
+    }
+
+    .btn-edit {
+      background-color: var(--warning-color);
+      color: white;
+      border: none;
+    }
+
+    .btn-edit:hover {
+      background-color: #fb8c00;
+      color: white;
+    }
+
+    .btn-delete {
+      background-color: var(--danger-color);
+      color: white;
+      border: none;
+    }
+
+    .btn-delete:hover {
+      background-color: #d32f2f;
+      color: white;
+    }
+
+    /* Badges */
+    .badge {
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    .badge.bg-success {
+      background-color: var(--success-color) !important;
+    }
+
+    .badge.bg-secondary {
+      background-color: var(--text-secondary) !important;
+    }
+
+    /* Asignación Section */
+    .asignacion-section {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+
+    .section-title {
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 1.25rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-title i {
+      color: var(--primary-color);
+    }
+
+    /* Form styling */
+    .form-label {
+      color: var(--text-primary);
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .form-control,
+    .form-select {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      border-radius: 8px;
+      padding: 0.625rem 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+      background-color: var(--bg-surface);
+      border-color: var(--primary-color);
+      color: var(--text-primary);
+      box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.25);
+    }
+
+    .form-control::placeholder {
+      color: var(--text-secondary);
+    }
+
+    /* Autocomplete dropdown */
+    .autocomplete-dropdown {
+      position: absolute;
+      z-index: 1030;
+      width: 100%;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: var(--shadow-hover);
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 0.25rem;
+    }
+
+    .autocomplete-item {
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      color: var(--text-primary);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .autocomplete-item:last-child {
+      border-bottom: none;
+    }
+
+    .autocomplete-item:hover,
+    .autocomplete-item.active {
+      background-color: var(--bg-surface);
+    }
+
+    .autocomplete-item.active {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    /* Alert */
+    .alert {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+    }
+
+    .alert ul {
+      margin: 0;
+      padding-left: 1.5rem;
+    }
+
+    .alert.alert-danger {
+      background-color: rgba(239, 83, 80, 0.1);
+      border-color: var(--danger-color);
+      color: var(--danger-color);
+    }
+
+    /* Buttons */
+    .btn-custom {
+      border-radius: 8px;
+      padding: 0.625rem 1.5rem;
+      font-weight: 500;
+      border: none;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary-custom {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .btn-primary-custom:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(46, 204, 113, 0.4);
+    }
+
+    .btn-outline-custom {
+      background-color: transparent;
+      border: 2px solid var(--border-color);
+      color: var(--text-primary);
+    }
+
+    .btn-outline-custom:hover {
+      background-color: var(--bg-surface);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .farmacia-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .navbar-custom .page-title {
+        font-size: 1.25rem;
+      }
+
+      .farmacia-card-actions {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body class="theme-light">
+  <nav class="navbar-custom">
+    <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center w-100">
+        <div class="d-flex align-items-center gap-3">
+          <a class="btn-nav" href="{% url 'listado_farmacias' %}">
+            <i class="bi bi-arrow-left"></i> Volver
+          </a>
+          <h1 class="page-title">
+            <i class="bi bi-hospital"></i> Administración de Farmacias
+          </h1>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <div class="theme-toggle">
+            <button id="btn-light" class="theme-btn active" type="button" title="Modo claro">
+              ☀️
+            </button>
+            <button id="btn-dark" class="theme-btn" type="button" title="Modo oscuro">
+              🌙
+            </button>
+          </div>
+          <a class="btn-success-nav" href="{% url 'agregar_farmacia' %}">
+            <i class="bi bi-plus-lg"></i> Registrar Farmacia
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container pb-5">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'listado_farmacias' %}">Farmacias</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Detalle</li>
+      </ol>
+    </nav>
+
+    <!-- Farmacia Card (estilo similar a la imagen de motoristas) -->
+    <div class="farmacia-grid">
+      <div class="farmacia-card">
+        <div class="farmacia-card-header">
+          <div>
+            <h2 class="farmacia-card-title">{{ farmacia.local_nombre }}</h2>
+            <div class="farmacia-card-id">{{ farmacia.local_id }}</div>
+          </div>
+          {% if farmacia.activo %}
+            <span class="badge bg-success">Activa</span>
+          {% else %}
+            <span class="badge bg-secondary">Inactiva</span>
+          {% endif %}
+        </div>
+        
+        <div class="farmacia-card-body">
+          <div class="farmacia-info-item">
+            <i class="bi bi-telephone"></i>
+            <div class="info-content">
+              <div class="info-label">Teléfono</div>
+              <div class="info-value">{{ farmacia.local_telefono|default:"Sin información actualizada" }}</div>
+            </div>
+          </div>
+
+          <div class="farmacia-info-item">
+            <i class="bi bi-geo-alt"></i>
+            <div class="info-content">
+              <div class="info-label">Dirección</div>
+              <div class="info-value">{{ farmacia.local_direccion|default:"Datos por completar" }}</div>
+            </div>
+          </div>
+
+          <div class="farmacia-info-item">
+            <i class="bi bi-pin-map"></i>
+            <div class="info-content">
+              <div class="info-label">Comuna</div>
+              <div class="info-value">{{ farmacia.comuna_nombre|default:"Datos por completar" }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="farmacia-card-actions">
+          <a href="{% url 'actualizar_farmacia' farmacia.id %}" class="btn-card-action btn-edit">
+            <i class="bi bi-pencil"></i> Editar
+          </a>
+          <a href="{% url 'remover_farmacia' farmacia.id %}" class="btn-card-action btn-delete">
+            <i class="bi bi-trash"></i> Eliminar
+          </a>
+        </div>
+      </div>
+
+      <!-- Información adicional -->
+      <div class="farmacia-card">
+        <div class="farmacia-card-header">
+          <h3 class="farmacia-card-title" style="font-size: 1.1rem;">Información Adicional</h3>
+        </div>
+        
+        <div class="farmacia-card-body">
+          <div class="farmacia-info-item">
+            <i class="bi bi-pin-map-fill"></i>
+            <div class="info-content">
+              <div class="info-label">Localidad</div>
+              <div class="info-value">{{ farmacia.localidad_nombre|default:"Datos por completar" }}</div>
+            </div>
+          </div>
+
+          <div class="farmacia-info-item">
+            <i class="bi bi-clock"></i>
+            <div class="info-content">
+              <div class="info-label">Horario</div>
+              <div class="info-value">
+                {% if farmacia.funcionamiento_hora_apertura and farmacia.funcionamiento_hora_cierre %}
+                  {{ farmacia.funcionamiento_hora_apertura|time:"H:i" }} - {{ farmacia.funcionamiento_hora_cierre|time:"H:i" }}
+                {% else %}
+                  Sin información actualizada
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="farmacia-info-item">
+            <i class="bi bi-calendar3"></i>
+            <div class="info-content">
+              <div class="info-label">Día de Funcionamiento</div>
+              <div class="info-value">{{ farmacia.funcionamiento_dia|default:"-" }}</div>
+            </div>
+          </div>
+
+          <div class="farmacia-info-item">
+            <i class="bi bi-globe"></i>
+            <div class="info-content">
+              <div class="info-label">Coordenadas GPS</div>
+              <div class="info-value">
+                {% if farmacia.local_lat and farmacia.local_lng %}
+                  {{ farmacia.local_lat }}, {{ farmacia.local_lng }}
+                {% else %}
+                  -
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="farmacia-info-item">
+            <i class="bi bi-shield-check"></i>
+            <div class="info-content">
+              <div class="info-label">Geolocalización Validada</div>
+              <div class="info-value">
+                {% if farmacia.geolocalizacion_validada %}
+                  <span class="badge bg-success">Sí</span>
+                {% else %}
+                  <span class="badge bg-secondary">No</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="farmacia-info-item">
+            <i class="bi bi-calendar2"></i>
+            <div class="info-content">
+              <div class="info-label">Fecha de Registro</div>
+              <div class="info-value">{{ farmacia.fecha|date:"d/m/Y" }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Asignar Motorista -->
+    <div class="asignacion-section">
+      <div class="section-title">
+        <i class="bi bi-person-badge"></i>
+        Asignar Motorista a esta Farmacia
+      </div>
+      
+      <div id="mf-react-errors"></div>
+      
+      <form method="post" id="form-asignar-farmacia">
+        {% csrf_token %}
+        <input type="hidden" name="farmacia" value="{{ farmacia.id }}">
+        
+        <div class="row g-3">
+          <div class="col-md-12">
+            <label class="form-label">
+              <i class="bi bi-person"></i> Motorista
+            </label>
+            {{ asignacion_mf_form.motorista }}
+            {% for e in asignacion_mf_form.motorista.errors %}
+              <div class="text-danger small">{{ e }}</div>
+            {% endfor %}
+          </div>
+          
+          <div class="col-md-6">
+            <label class="form-label">
+              <i class="bi bi-calendar-plus"></i> Fecha de Asignación
+            </label>
+            {{ asignacion_mf_form.fecha_asignacion }}
+            {% for e in asignacion_mf_form.fecha_asignacion.errors %}
+              <div class="text-danger small">{{ e }}</div>
+            {% endfor %}
+          </div>
+          
+          <div class="col-md-6">
+            <label class="form-label">
+              <i class="bi bi-toggle-on"></i> Estado
+            </label>
+            {{ asignacion_mf_form.activa }}
+            {% for e in asignacion_mf_form.activa.errors %}
+              <div class="text-danger small">{{ e }}</div>
+            {% endfor %}
+          </div>
+          
+          <div class="col-md-12">
+            <label class="form-label">
+              <i class="bi bi-chat-left-text"></i> Observaciones
+            </label>
+            {{ asignacion_mf_form.observaciones }}
+            {% for e in asignacion_mf_form.observaciones.errors %}
+              <div class="text-danger small">{{ e }}</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+          <button class="btn btn-primary-custom btn-custom" type="submit">
+            <i class="bi bi-check-lg"></i> Asignar Motorista
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Botón Volver -->
+    <div class="d-flex justify-content-start">
+      <a class="btn btn-outline-custom btn-custom" href="{% url 'listado_farmacias' %}">
+        <i class="bi bi-arrow-left"></i> Volver al Listado
+      </a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function(){
+      const root = document.documentElement;
+      const btnLight = document.getElementById('btn-light');
+      const btnDark = document.getElementById('btn-dark');
+      
+      // Cargar tema guardado
+      const saved = localStorage.getItem('farmacias_theme') || 'light';
+      root.classList.remove('theme-dark', 'theme-light');
+      root.classList.add(saved === 'dark' ? 'theme-dark' : 'theme-light');
+      
+      // Actualizar botones activos
+      if (saved === 'dark') {
+        btnDark.classList.add('active');
+        btnLight.classList.remove('active');
+      } else {
+        btnLight.classList.add('active');
+        btnDark.classList.remove('active');
+      }
+      
+      // Cambiar a tema claro
+      btnLight.onclick = function(){
+        root.classList.remove('theme-dark');
+        root.classList.add('theme-light');
+        localStorage.setItem('farmacias_theme', 'light');
+        btnLight.classList.add('active');
+        btnDark.classList.remove('active');
+      };
+      
+      // Cambiar a tema oscuro
+      btnDark.onclick = function(){
+        root.classList.remove('theme-light');
+        root.classList.add('theme-dark');
+        localStorage.setItem('farmacias_theme', 'dark');
+        btnDark.classList.add('active');
+        btnLight.classList.remove('active');
+      };
+
+      // Añadir clases de Bootstrap a los campos del formulario
+      document.querySelectorAll('input[type="text"], input[type="number"], input[type="date"], select, textarea').forEach(function(el){
+        if (!el.classList.contains('form-control') && !el.classList.contains('form-select')) {
+          if (el.tagName === 'SELECT') {
+            el.classList.add('form-select');
+          } else {
+            el.classList.add('form-control');
+          }
+        }
+      });
+    })();
+  </script>
+  
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script>
+    (function(){
+      const {useState, useEffect} = React;
+      
+      function App(){
+        const [errors, setErrors] = useState([]);
+        const [q, setQ] = useState('');
+        const [open, setOpen] = useState(false);
+        const [items, setItems] = useState([]);
+        const [active, setActive] = useState(0);
+        const [busy, setBusy] = useState(false);
+        
+        useEffect(function(){
+          const form = document.getElementById('form-asignar-farmacia');
+          if(!form) return;
+          
+          form.addEventListener('submit', function(ev){
+            const errs = [];
+            const motorista = form.querySelector('[name="motorista"]');
+            const fechaAsig = form.querySelector('[name="fecha_asignacion"]');
+            const activa = form.querySelector('[name="activa"]');
+            const obs = form.querySelector('[name="observaciones"]');
+            
+            if(!motorista || !motorista.value.trim()) errs.push('Selecciona un motorista');
+            if(!fechaAsig || !fechaAsig.value.trim()) errs.push('Ingresa fecha de asignación');
+            if(obs && obs.value && obs.value.length>500) errs.push('Observaciones supera 500 caracteres');
+            
+            if(errs.length){
+              ev.preventDefault();
+              setErrors(errs);
+              window.scrollTo({top: 0, behavior: 'smooth'});
+            } else {
+              setBusy(true);
+              const btn = form.querySelector('button[type="submit"]');
+              if(btn){
+                btn.disabled = true;
+                btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Asignando…';
+              }
+            }
+          });
+        }, []);
+        
+        useEffect(function(){
+          const sel = document.querySelector('#form-asignar-farmacia [name="motorista"]');
+          if(!sel) return;
+          const opts = Array.from(sel.options).map(o=>({value:o.value, text:o.text}));
+          setItems(opts);
+        }, []);
+        
+        const filtered = items.filter(i=> q ? (i.text||'').toLowerCase().includes(q.toLowerCase()) : true).slice(0,10);
+        
+        useEffect(function(){ setActive(0); }, [q]);
+        
+        function onKey(e){
+          if(!open) return;
+          if(e.key==='ArrowDown'){ e.preventDefault(); setActive(a=> Math.min(a+1, filtered.length-1)); }
+          if(e.key==='ArrowUp'){ e.preventDefault(); setActive(a=> Math.max(a-1, 0)); }
+          if(e.key==='Enter'){
+            e.preventDefault();
+            const sel = document.querySelector('#form-asignar-farmacia [name="motorista"]');
+            const pick = filtered[active];
+            if(sel && pick){
+              sel.value = pick.value;
+              setQ(pick.text);
+              setOpen(false);
+            }
+          }
+          if(e.key==='Escape'){ setOpen(false); }
+        }
+        
+        return React.createElement('div', null,
+          errors.length ? React.createElement('div', {className:'alert alert-danger', role:'alert'},
+            React.createElement('strong', null, 'Errores en el formulario:'),
+            React.createElement('ul', {className:'mb-0 mt-2'},
+              errors.map((e,i)=>React.createElement('li', {key:i}, e))
+            )
+          ) : null,
+          
+          React.createElement('div', {className:'mb-3 position-relative'},
+            React.createElement('label', {className:'form-label'},
+              React.createElement('i', {className:'bi bi-search'}), ' Buscar Motorista'
+            ),
+            React.createElement('input', {
+              type:'text',
+              className:'form-control',
+              placeholder:'Escribe para buscar motorista…',
+              value:q,
+              onChange:e=>{setQ(e.target.value); setOpen(true);},
+              onFocus:()=>setOpen(true),
+              onKeyDown:onKey
+            }),
+            open && filtered.length ? React.createElement('div', {className:'autocomplete-dropdown'},
+              filtered.map((it,idx)=>
+                React.createElement('div', {
+                  className:'autocomplete-item'+(idx===active?' active':''),
+                  role:'option',
+                  'aria-selected': idx===active,
+                  onMouseEnter:()=>setActive(idx),
+                  onClick:()=>{
+                    const sel = document.querySelector('#form-asignar-farmacia [name="motorista"]');
+                    if(sel){
+                      sel.value = it.value;
+                      setQ(it.text);
+                      setOpen(false);
+                    }
+                  }
+                }, it.text)
+              )
+            ) : null
+          )
+        );
+      }
+      
+      const root = ReactDOM.createRoot(document.getElementById('mf-react-errors'));
+      root.render(React.createElement(App));
+    })();
+  </script>
+</body>
+</html>
+          <div class="farmacia-info-item">
+            <i class="bi bi-calendar-check"></i>
+            <div class="info-content">
+              <div class="info-label">Última actualización</div>
+              <div class="info-value">{{ farmacia.fecha_actualizacion|date:"Y-m-d"|default:"Sin información actualizada" }}</div>
+            </div>
+          </div>
+
+          <div class="farmacia-info-item">
+            <i class="bi bi-geo"></i>
+            <div class="info-content">
+              <div class="info-label">Coordenadas</div>
+              <div class="info-value">
+                {% if farmacia.local_lat and farmacia.local_lng %}
+                  {{ farmacia.local_lat }}, {{ farmacia.local_lng }}
+                {% else %}
+                  Sin coordenadas
+                {% endif %}
+              </div>
+            </div>
+          </div>

@@ -1,0 +1,429 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Detalle Asignación Motorista-Farmacia - LOGICO</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+  <style>
+    :root {
+      --primary-color: #2ecc71;
+      --secondary-color: #27ae60;
+      --success-color: #00c853;
+      --warning-color: #ffa726;
+      --danger-color: #ef5350;
+      --info-color: #29b6f6;
+      --light-bg: #f5f7fa;
+      --light-surface: #ffffff;
+      --light-card: #ffffff;
+      --light-border: #e1e4e8;
+      --light-text: #1a1d29;
+      --light-text-secondary: #586069;
+    }
+
+    * {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    body {
+      background-color: var(--light-bg);
+      color: var(--light-text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* Header/Navbar */
+    .navbar-custom {
+      background-color: #212529;
+      padding: 0.75rem 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+
+    .navbar-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar-custom .navbar-brand {
+      color: #fff;
+      font-weight: 600;
+      font-size: 1.25rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .navbar-custom .btn-nav {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,.2);
+      color: #fff;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .navbar-custom .btn-nav:hover {
+      background-color: rgba(255,255,255,.1);
+      border-color: rgba(255,255,255,.3);
+      color: #fff;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      background-color: var(--light-card);
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--light-border);
+    }
+
+    .breadcrumb-item a {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .breadcrumb-item a:hover {
+      text-decoration: underline;
+      color: var(--secondary-color);
+    }
+
+    .breadcrumb-item.active {
+      color: var(--light-text-secondary);
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+      color: var(--light-text-secondary);
+    }
+
+    /* Page Header */
+    .page-header {
+      background-color: var(--light-card);
+      border: 1px solid var(--light-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .page-header h1 {
+      color: var(--light-text);
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Action Buttons */
+    .btn-group {
+      gap: 0.5rem;
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border-radius: 8px;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+      border: none;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(46, 204, 113, 0.4);
+    }
+
+    .btn-outline-secondary {
+      background-color: transparent;
+      border: 2px solid var(--light-border);
+      color: var(--light-text);
+    }
+
+    .btn-outline-secondary:hover {
+      background-color: var(--light-surface);
+      border-color: var(--light-text-secondary);
+      color: var(--light-text);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline-danger {
+      background-color: transparent;
+      border: 2px solid var(--danger-color);
+      color: var(--danger-color);
+    }
+
+    .btn-outline-danger:hover {
+      background-color: var(--danger-color);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(239, 83, 80, 0.4);
+    }
+
+    /* Card */
+    .card {
+      background-color: var(--light-card);
+      border: 1px solid var(--light-border);
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+    }
+
+    .card-header {
+      background-color: var(--light-surface);
+      border-bottom: 2px solid var(--light-border);
+      padding: 1rem 1.5rem;
+      font-weight: 600;
+      color: var(--light-text);
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-body {
+      padding: 1.5rem;
+      background-color: var(--light-card);
+      color: var(--light-text);
+    }
+
+    .card-body > div {
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+
+    .card-body > div:last-child {
+      margin-bottom: 0;
+    }
+
+    .card-body strong {
+      color: var(--light-text-secondary);
+      font-weight: 600;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: inline-block;
+      min-width: 140px;
+    }
+
+    /* Badges */
+    .badge {
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    .badge.bg-success {
+      background-color: var(--success-color) !important;
+    }
+
+    .badge.bg-danger {
+      background-color: var(--danger-color) !important;
+    }
+
+    /* Info Section */
+    .info-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .info-label {
+      color: var(--light-text-secondary);
+      font-weight: 600;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .info-value {
+      color: var(--light-text);
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .page-header {
+        padding: 1rem;
+      }
+
+      .page-header h1 {
+        font-size: 1.5rem;
+      }
+
+      .btn-group {
+        width: 100%;
+      }
+
+      .btn-group .btn {
+        flex: 1;
+        justify-content: center;
+      }
+
+      .card-header {
+        font-size: 1rem;
+        padding: 0.75rem 1rem;
+      }
+
+      .card-body {
+        padding: 1rem;
+      }
+
+      .card-body strong {
+        min-width: 120px;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar-custom">
+    <div class="container-fluid">
+      <div class="navbar-top-row">
+        <div class="d-flex align-items-center gap-2">
+          <a class="btn-nav" href="{% url 'home' %}"><i class="bi bi-house"></i> Volver al inicio</a>
+          <span class="navbar-brand"><i class="bi bi-diagram-3"></i> Detalle Asignación</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <a class="btn-nav" href="{% url 'listado_asignaciones_mf' %}"><i class="bi bi-arrow-left"></i> Volver</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container pb-5">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'listado_asignaciones_mf' %}">Asignaciones</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Detalle</li>
+      </ol>
+    </nav>
+
+    <div class="page-header">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <h1><i class="bi bi-info-circle"></i> Detalle de Asignación</h1>
+        <div class="btn-group">
+          <a class="btn btn-primary" href="{% url 'modificar_asignacion_mf' asignacion.id %}">
+            <i class="bi bi-pencil"></i> Editar
+          </a>
+          <form class="d-inline" method="post" action="{% url 'remover_asignacion_mf' asignacion.id %}">
+            {% csrf_token %}
+            <button class="btn btn-outline-danger" type="submit">
+              <i class="bi bi-{% if asignacion.activa %}x-circle{% else %}check-circle{% endif %}"></i>
+              {% if asignacion.activa %}Desactivar{% else %}Activar{% endif %}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <i class="bi bi-person-badge"></i> Motorista
+          </div>
+          <div class="card-body">
+            <div class="info-item">
+              <div class="info-label">Nombre completo</div>
+              <div class="info-value">
+                {{ asignacion.motorista.usuario.nombre }} {{ asignacion.motorista.usuario.apellido }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <i class="bi bi-shop"></i> Farmacia
+          </div>
+          <div class="card-body">
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-label">Local</div>
+                <div class="info-value">
+                  {{ asignacion.farmacia.local_nombre }} ({{ asignacion.farmacia.local_id }})
+                </div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Dirección</div>
+                <div class="info-value">{{ asignacion.farmacia.local_direccion }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <i class="bi bi-calendar-check"></i> Información de la Asignación
+      </div>
+      <div class="card-body">
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="info-item">
+              <div class="info-label">Fecha de asignación</div>
+              <div class="info-value">{{ asignacion.fecha_asignacion }}</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="info-item">
+              <div class="info-label">Fecha de desasignación</div>
+              <div class="info-value">{{ asignacion.fecha_desasignacion|default:'-' }}</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="info-item">
+              <div class="info-label">Estado</div>
+              <div class="info-value">
+                {% if asignacion.activa %}
+                <span class="badge bg-success">Activa</span>
+                {% else %}
+                <span class="badge bg-danger">Inactiva</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="info-item">
+              <div class="info-label">Observaciones</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

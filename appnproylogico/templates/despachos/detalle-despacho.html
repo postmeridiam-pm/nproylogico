@@ -1,0 +1,155 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Detalle despacho</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+</head>
+<body>
+  <div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1 class="h4 mb-0">Detalle despacho</h1>
+      <div class="btn-group">
+        <a class="btn btn-outline-secondary" href="{% url 'home' %}"><i class="bi bi-house"></i> Inicio</a>
+        <a class="btn btn-outline-secondary" href="{% url 'listado_despachos' %}"><i class="bi bi-arrow-left"></i> Volver</a>
+        <a class="btn btn-primary" href="{% url 'actualizar_despacho' despacho.id %}"><i class="bi bi-pencil"></i> Editar</a>
+        <a class="btn btn-outline-danger" href="{% url 'remover_despacho' despacho.id %}"><i class="bi bi-trash"></i> Eliminar</a>
+      </div>
+    </div>
+    <div class="card mt-3">
+      <div class="card-header">Receta retenida</div>
+      <div class="card-body">
+        <form method="post" action="{% url 'despacho_actualizar_receta' despacho.id %}">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label">Tiene receta retenida</label>
+              <div class="form-check"><input class="form-check-input" type="checkbox" name="tiene_receta_retenida" {% if despacho.tiene_receta_retenida %}checked{% endif %} {% if despacho.estado|upper != 'EN PROCESO' and despacho.estado|upper != 'EN_PROCESO' and despacho.estado|upper != 'PROCESO' %}disabled title="Disponible solo en estado EN PROCESO"{% endif %}></div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Número de receta</label>
+              <input class="form-control" name="numero_receta" value="{{ despacho.numero_receta|default:'' }}" {% if despacho.estado|upper != 'EN PROCESO' and despacho.estado|upper != 'EN_PROCESO' and despacho.estado|upper != 'PROCESO' %}disabled{% endif %} />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Requiere devolución</label>
+              <div class="form-check"><input class="form-check-input" type="checkbox" name="requiere_devolucion_receta" {% if despacho.requiere_devolucion_receta %}checked{% endif %} {% if despacho.estado|upper != 'EN PROCESO' and despacho.estado|upper != 'EN_PROCESO' and despacho.estado|upper != 'PROCESO' %}disabled title="Disponible solo en estado EN PROCESO"{% endif %}></div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Marcar devuelta ahora</label>
+              <select class="form-select" name="marcar_devuelta">
+                <option value="no" {% if not despacho.receta_devuelta_farmacia %}selected{% endif %}>No</option>
+                <option value="si">Sí</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Quién recibe</label>
+              <input class="form-control" name="quien_recibe_receta" value="{{ despacho.quien_recibe_receta|default:'' }}" {% if despacho.estado|upper != 'EN PROCESO' and despacho.estado|upper != 'EN_PROCESO' and despacho.estado|upper != 'PROCESO' %}disabled{% endif %} />
+            </div>
+            <div class="col-md-8">
+              <label class="form-label">Observaciones</label>
+              <textarea class="form-control" name="observaciones_receta" rows="2" {% if despacho.estado|upper != 'EN PROCESO' and despacho.estado|upper != 'EN_PROCESO' and despacho.estado|upper != 'PROCESO' %}disabled{% endif %}>{{ despacho.observaciones_receta|default:'' }}</textarea>
+            </div>
+          </div>
+          <div class="d-flex justify-content-end gap-2 mt-3">
+            <button class="btn btn-success" type="submit" {% if despacho.estado|upper != 'EN PROCESO' and despacho.estado|upper != 'EN_PROCESO' and despacho.estado|upper != 'PROCESO' %}disabled title="Disponible solo en estado EN PROCESO"{% endif %}><i class="bi bi-check-lg"></i> Guardar receta</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">Información</div>
+          <div class="card-body">
+            <div><strong>Código:</strong> {{ despacho.codigo_despacho }}</div>
+            <div><strong>Estado:</strong> {{ despacho.estado }}</div>
+            <div><strong>Tipo:</strong> {{ despacho.tipo_despacho }}</div>
+            <div><strong>Prioridad:</strong> {{ despacho.prioridad }}</div>
+            <div><strong>Farmacia origen:</strong> {{ despacho.farmacia_origen_local_id }}</div>
+            <div><strong>Motorista:</strong> {{ despacho.motorista.usuario.nombre }} {{ despacho.motorista.usuario.apellido }}</div>
+            <div><strong>Registro:</strong> {{ despacho.fecha_registro }}</div>
+            <div class="mt-2">
+              <strong>Receta:</strong>
+              {% if despacho.tiene_receta_retenida %}
+                <span class="badge bg-warning text-dark" title="Receta retenida"><i class="bi bi-file-earmark-lock"></i> Receta retenida</span>
+                {% if despacho.requiere_devolucion_receta and not despacho.receta_devuelta_farmacia %}
+                  <span class="badge bg-danger" title="Pendiente de devolución"><i class="bi bi-arrow-counterclockwise"></i> Pend. devolución</span>
+                {% endif %}
+                {% if despacho.receta_devuelta_farmacia %}
+                  <span class="badge bg-success" title="Receta devuelta a farmacia"><i class="bi bi-check-circle"></i> Devuelta</span>
+                {% endif %}
+              {% else %}
+                <span class="badge bg-secondary" title="Sin receta">Sin receta</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">Cliente y destino</div>
+          <div class="card-body">
+            <div><strong>Cliente:</strong> {{ despacho.cliente_nombre|default:'-' }} / {{ despacho.cliente_telefono|default:'-' }}</div>
+            <div><strong>Dirección:</strong> {{ despacho.destino_direccion }}</div>
+            <div><strong>Referencia:</strong> {{ despacho.destino_referencia|default:'-' }}</div>
+          </div>
+        </div>
+        <div class="card mt-3">
+          <div class="card-header">Corrección de estado</div>
+          <div class="card-body">
+            <form method="post" action="{% url 'solicitar_correccion_estado' despacho.id %}">
+              {% csrf_token %}
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Estado actual</label>
+                  <input class="form-control" value="{{ despacho.estado }}" disabled />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Volver a</label>
+                  <select class="form-select" name="estado_objetivo">
+                    {% if despacho.estado|upper == 'ASIGNADO' %}<option value="PENDIENTE">PENDIENTE</option>{% endif %}
+                    {% if despacho.estado|upper == 'PREPARANDO' %}<option value="ASIGNADO">ASIGNADO</option>{% endif %}
+                    {% if despacho.estado|upper == 'PREPARADO' %}<option value="PREPARANDO">PREPARANDO</option>{% endif %}
+                    {% if despacho.estado|upper == 'EN CAMINO' or despacho.estado|upper == 'EN_CAMINO' %}<option value="PREPARADO">PREPARADO</option>{% endif %}
+                    {% if despacho.estado|upper == 'ENTREGADO' or despacho.estado|upper == 'FALLIDO' %}<option value="EN_CAMINO">EN_CAMINO</option>{% endif %}
+                  </select>
+                </div>
+                <div class="col-md-12">
+                  <label class="form-label">Motivo</label>
+                  <textarea class="form-control" name="motivo" rows="2" placeholder="Explica el motivo del error…" required></textarea>
+                </div>
+              </div>
+              <div class="d-flex justify-content-end gap-2 mt-3">
+                <button class="btn btn-outline-warning" type="submit"><i class="bi bi-arrow-counterclockwise"></i> Solicitar corrección</button>
+                <a class="btn btn-success" href="{% url 'aplicar_correccion_estado' despacho.id %}"><i class="bi bi-check-circle"></i> Aplicar corrección</a>
+              </div>
+            </form>
+            <small class="text-muted d-block mt-2">La corrección solo permite volver un paso atrás y queda auditada para revisión del supervisor.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card mt-3">
+      <div class="card-header">Movimientos</div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead><tr><th>Fecha</th><th>Anterior</th><th>Nuevo</th><th>Observación</th></tr></thead>
+            <tbody>
+              {% for m in movimientos %}
+              <tr><td>{{ m.fecha_movimiento }}</td><td>{{ m.estado_anterior|default:'-' }}</td><td>{{ m.estado_nuevo }}</td><td>{{ m.observacion|default:'-' }}</td></tr>
+              {% empty %}
+              <tr><td colspan="4" class="text-center text-muted">Sin movimientos</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

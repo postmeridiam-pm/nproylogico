@@ -1,0 +1,541 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Importar Farmacias - LOGICO</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+  <link rel="stylesheet" href="{% static 'css/farmacia_form.css' %}">
+  <style>
+    :root {
+      --primary-color: #2ecc71;
+      --secondary-color: #27ae60;
+      --success-color: #00c853;
+      --warning-color: #ffa726;
+      --danger-color: #ef5350;
+      --info-color: #29b6f6;
+      --dark-bg: #1a1d29;
+      --dark-surface: #252837;
+      --dark-card: #2d3142;
+      --dark-border: #3a3f5c;
+      --dark-text: #e8eaed;
+      --dark-text-secondary: #9aa0b3;
+      --light-bg: #f5f7fa;
+      --light-surface: #ffffff;
+      --light-card: #ffffff;
+      --light-border: #e1e4e8;
+      --light-text: #1a1d29;
+      --light-text-secondary: #586069;
+    }
+
+    * {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* Tema Claro */
+    .theme-light {
+      --bg-primary: var(--light-bg);
+      --bg-surface: var(--light-surface);
+      --bg-card: var(--light-card);
+      --border-color: var(--light-border);
+      --text-primary: var(--light-text);
+      --text-secondary: var(--light-text-secondary);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Tema Oscuro */
+    .theme-dark {
+      --bg-primary: var(--dark-bg);
+      --bg-surface: var(--dark-surface);
+      --bg-card: var(--dark-card);
+      --border-color: var(--dark-border);
+      --text-primary: var(--dark-text);
+      --text-secondary: var(--dark-text-secondary);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* Header/Navbar - NEGRO */
+    .navbar-custom {
+      background-color: #212529;
+      padding: 0.75rem 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+    }
+
+    .navbar-custom .navbar-brand {
+      color: white;
+      font-weight: 600;
+      font-size: 1.25rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .navbar-custom .btn-nav {
+      background-color: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .navbar-custom .btn-nav:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+      color: white;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      background-color: transparent;
+      padding: 0;
+      margin-bottom: 1.5rem;
+    }
+
+    .breadcrumb-item a {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .breadcrumb-item a:hover {
+      text-decoration: underline;
+    }
+
+    .breadcrumb-item.active {
+      color: var(--text-secondary);
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+      color: var(--text-secondary);
+    }
+
+    /* Alerts */
+    .alert {
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      padding: 1rem 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .alert-warning {
+      background: linear-gradient(135deg, rgba(255, 167, 38, 0.1), rgba(255, 152, 0, 0.1));
+      color: var(--text-primary);
+      border-color: var(--warning-color);
+    }
+
+    .alert-success {
+      background: linear-gradient(135deg, rgba(46, 204, 113, 0.1), rgba(39, 174, 96, 0.1));
+      color: var(--text-primary);
+      border-color: var(--success-color);
+    }
+
+    .alert-info {
+      background: linear-gradient(135deg, rgba(41, 182, 246, 0.1), rgba(33, 150, 243, 0.1));
+      color: var(--text-primary);
+      border-color: var(--info-color);
+    }
+
+    /* Cards */
+    .card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-hover);
+    }
+
+    .card-header {
+      background-color: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    /* Form Controls */
+    .form-control,
+    .form-select {
+      background-color: var(--bg-surface);
+      border: 2px solid var(--border-color);
+      color: var(--text-primary);
+      border-radius: 8px;
+      padding: 0.625rem 0.875rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+      background-color: var(--bg-surface);
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.1);
+      color: var(--text-primary);
+    }
+
+    .form-control::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .form-label {
+      color: var(--text-primary);
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    textarea.form-control {
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background-color: var(--primary-color);
+      border: none;
+      color: white;
+      border-radius: 8px;
+      padding: 0.625rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+    }
+
+    /* Text Muted */
+    .text-muted {
+      color: var(--text-secondary) !important;
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+
+    /* Table */
+    .table-responsive {
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 1rem;
+    }
+
+    .table {
+      color: var(--text-primary);
+      margin-bottom: 0;
+    }
+
+    .table thead {
+      background-color: var(--bg-surface);
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .table thead th {
+      color: var(--text-primary);
+      font-weight: 600;
+      padding: 0.875rem;
+      border: none;
+      white-space: nowrap;
+      font-size: 0.9rem;
+    }
+
+    .table tbody tr {
+      border-bottom: 1px solid var(--border-color);
+      transition: background-color 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+      background-color: var(--bg-surface);
+    }
+
+    .table tbody td {
+      padding: 0.75rem 0.875rem;
+      vertical-align: middle;
+      border: none;
+      font-size: 0.9rem;
+    }
+
+    .table-sm th,
+    .table-sm td {
+      padding: 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+      background-color: rgba(0, 0, 0, 0.02);
+    }
+
+    .theme-dark .table-striped tbody tr:nth-of-type(odd) {
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Code elements */
+    code {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--primary-color);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.875em;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .navbar-custom .navbar-brand {
+        font-size: 1.1rem;
+      }
+
+      .btn-nav {
+        padding: 0.35rem 0.7rem;
+        font-size: 0.85rem;
+      }
+
+      .card-body {
+        padding: 1rem;
+      }
+
+      .table thead th,
+      .table tbody td {
+        padding: 0.5rem;
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
+<body class="theme-light">
+  <nav class="navbar-custom">
+    <div class="container-fluid">
+      <div class="d-flex align-items-center gap-2">
+        <a class="btn-nav" href="{% url 'home' %}">
+          <i class="bi bi-house"></i> Inicio
+        </a>
+        <a class="btn-nav" href="{% url 'listado_farmacias' %}">
+          <i class="bi bi-arrow-left"></i> Volver
+        </a>
+        <span class="navbar-brand">
+          <i class="bi bi-upload"></i> Importar Farmacias
+        </span>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-4">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'listado_farmacias' %}">Farmacias</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Importar</li>
+      </ol>
+    </nav>
+
+    {% if mensajes %}
+      {% for m in mensajes %}
+        <div class="alert alert-warning">
+          <i class="bi bi-exclamation-triangle"></i> {{ m }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {% if creados %}
+      <div class="alert alert-success">
+        <i class="bi bi-check-circle"></i> <strong>¡Éxito!</strong> Se crearon {{ creados }} registros correctamente.
+      </div>
+    {% endif %}
+
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <i class="bi bi-file-earmark-arrow-up"></i> Subir archivo CSV
+          </div>
+          <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label for="csv_file" class="form-label">Selecciona tu archivo</label>
+                <input class="form-control" id="csv_file" type="file" name="csv_file" accept=".csv,.tsv,text/csv,text/tab-separated-values">
+              </div>
+              <button class="btn btn-primary" type="submit">
+                <i class="bi bi-upload"></i> Importar archivo
+              </button>
+            </form>
+            <small class="text-muted d-block mt-3">
+              <strong>Encabezados sugeridos:</strong><br>
+              <code>local_id</code>, <code>local_nombre</code>, <code>local_direccion</code>, <code>comuna_nombre</code>, <code>localidad_nombre</code>, <code>funcionamiento_hora_apertura</code>, <code>funcionamiento_hora_cierre</code>, <code>funcionamiento_dia</code>, <code>local_telefono</code>, <code>local_lat</code>, <code>local_lng</code>, <code>fecha</code>
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <i class="bi bi-clipboard-data"></i> Pegar datos (CSV o TSV)
+          </div>
+          <div class="card-body">
+            <form method="post">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label for="csv_text" class="form-label">Copia y pega tus datos aquí</label>
+                <textarea class="form-control" id="csv_text" name="csv_text" rows="10" placeholder="Pega aquí tus datos con encabezados. Usa comas o tabulaciones como separadores."></textarea>
+              </div>
+              <button class="btn btn-primary" type="submit">
+                <i class="bi bi-clipboard-data"></i> Importar datos
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-4">
+      <div class="card-header">
+        <i class="bi bi-eye"></i> Previsualización y mapeo de columnas
+      </div>
+      <div class="card-body">
+        <p class="text-muted">
+          <i class="bi bi-info-circle"></i> La previsualización no guarda datos. Sirve para confirmar encabezados, detectar duplicados por <code>local_id</code> y revisar las primeras filas antes de importar.
+        </p>
+
+        <div class="row g-3 mb-4">
+          <div class="col-md-3">
+            <label class="form-label">Columna → local_id</label>
+            <select id="map_local_id" class="form-select">
+              <option value="">Seleccionar...</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Columna → local_nombre</label>
+            <select id="map_local_nombre" class="form-select">
+              <option value="">Seleccionar...</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Columna → local_direccion</label>
+            <select id="map_local_direccion" class="form-select">
+              <option value="">Seleccionar...</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Columna → comuna_nombre</label>
+            <select id="map_comuna_nombre" class="form-select">
+              <option value="">Seleccionar...</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="preview_stats" class="mb-3"></div>
+
+        <div class="table-responsive">
+          <table class="table table-sm table-striped" id="preview_table">
+            <thead></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function parseDelimited(text) {
+      const sep = text.indexOf('\t') !== -1 ? '\t' : ',';
+      const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
+      if (lines.length === 0) return { headers: [], rows: [] };
+      const headers = lines[0].split(sep).map(h => h.trim());
+      const rows = lines.slice(1).map(l => l.split(sep));
+      return { headers, rows };
+    }
+
+    function fillMapping(headers) {
+      const ids = ['map_local_id','map_local_nombre','map_local_direccion','map_comuna_nombre'];
+      ids.forEach(id => {
+        const sel = document.getElementById(id);
+        sel.innerHTML = '<option value="">Seleccionar...</option>' + 
+          headers.map(h => `<option value="${h}">${h}</option>`).join('');
+      });
+    }
+
+    function renderPreview(headers, rows) {
+      const thead = document.querySelector('#preview_table thead');
+      const tbody = document.querySelector('#preview_table tbody');
+      thead.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+      const max = Math.min(rows.length, 20);
+      tbody.innerHTML = rows.slice(0, max).map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('');
+      
+      const key = document.getElementById('map_local_id').value || 'local_id';
+      const idx = headers.indexOf(key);
+      let dups = 0;
+      const seen = new Set();
+      rows.forEach(r => { 
+        const v = (r[idx]||'').trim(); 
+        if (v) { 
+          if (seen.has(v)) dups++; 
+          else seen.add(v); 
+        } 
+      });
+      
+      document.getElementById('preview_stats').innerHTML = `
+        <div class="alert alert-info">
+          <i class="bi bi-bar-chart"></i> 
+          <strong>Estadísticas:</strong> 
+          ${rows.length} filas detectadas. 
+          ${dups > 0 ? `<strong class="text-warning">${dups} duplicados</strong> encontrados por <code>${key}</code>.` : 'No se detectaron duplicados.'}
+        </div>`;
+    }
+
+    function updateFromText(text) {
+      const { headers, rows } = parseDelimited(text);
+      if (headers.length === 0) return;
+      fillMapping(headers);
+      renderPreview(headers, rows);
+    }
+
+    document.getElementById('csv_text').addEventListener('input', (e) => updateFromText(e.target.value));
+    
+    document.getElementById('csv_file').addEventListener('change', (e) => {
+      const f = e.target.files[0]; 
+      if (!f) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => updateFromText(ev.target.result);
+      reader.readAsText(f);
+    });
+
+    ['map_local_id','map_local_nombre','map_local_direccion','map_comuna_nombre'].forEach(id => {
+      document.getElementById(id).addEventListener('change', () => {
+        const text = document.getElementById('csv_text').value;
+        if (text) updateFromText(text);
+      });
+    });
+  </script>
+</body>
+</html>

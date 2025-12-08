@@ -1,0 +1,458 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Registrar Movimiento</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+  <style>
+    :root{ 
+      --primary-color:#2ecc71; 
+      --secondary-color:#27ae60;
+      --dark-bg: #212529;
+      --light-bg: #f8f9fa;
+    }
+    
+    body {
+      background-color: var(--light-bg);
+    }
+    
+    /* NAVBAR */
+    .navbar-custom{ 
+      background-color: var(--dark-bg);
+      padding: 0.75rem 0; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15); 
+      margin-bottom: 2rem;
+    }
+    
+    .navbar-top-row{ 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+    }
+    
+    .navbar-custom .navbar-brand{ 
+      color: #fff; 
+      font-weight: 600; 
+      font-size: 1.25rem; 
+      margin: 0; 
+      display: flex; 
+      align-items: center; 
+      gap: .5rem;
+    }
+    
+    .btn-nav{ 
+      background: transparent; 
+      border: 1px solid rgba(255,255,255,.3); 
+      color: #fff; 
+      padding: .5rem 1rem; 
+      border-radius: 6px; 
+      display: inline-flex; 
+      align-items: center; 
+      gap: .5rem; 
+      text-decoration: none; 
+      font-size: .9rem;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-nav:hover{ 
+      background-color: rgba(255,255,255,.1); 
+      border-color: rgba(255,255,255,.5);
+      color: #fff;
+    }
+    
+    .btn-success-nav{ 
+      background-color: var(--primary-color); 
+      border: none; 
+      color: #fff; 
+      padding: .5rem 1rem; 
+      border-radius: 6px; 
+      display: inline-flex; 
+      align-items: center; 
+      gap: .5rem; 
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-success-nav:hover{ 
+      background-color: var(--secondary-color);
+      color: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(46,204,113,0.3);
+    }
+    
+    /* HELP BANNER */
+    .help-banner {
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      border-left: 4px solid #2196F3;
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    }
+    
+    .help-banner .text-muted {
+      color: #546e7a !important;
+      font-size: 0.9rem;
+    }
+    
+    .help-banner button {
+      background-color: #fff;
+      border: 1px solid #90caf9;
+      color: #1976d2;
+      font-size: 0.85rem;
+      padding: 0.35rem 0.75rem;
+    }
+    
+    .help-banner button:hover {
+      background-color: #1976d2;
+      border-color: #1976d2;
+      color: #fff;
+    }
+    
+    /* CARDS */
+    .card {
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      height: 100%;
+    }
+    
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+    }
+    
+    .card-header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: #fff;
+      font-weight: 600;
+      font-size: 1.1rem;
+      padding: 1rem 1.25rem;
+      border-radius: 12px 12px 0 0 !important;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .card-header i {
+      font-size: 1.3rem;
+    }
+    
+    .card-body {
+      padding: 1.5rem;
+      background-color: #fff;
+    }
+    
+    /* FORMS */
+    .form-label {
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+    
+    .form-control, .form-select {
+      background-color: #fff;
+      color: #2c3e50;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 0.65rem 0.85rem;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+      color: #2c3e50;
+      background-color: #fff;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.2rem rgba(46,204,113,.15);
+    }
+    
+    .form-control::placeholder {
+      color: #95a5a6;
+      opacity: 1;
+    }
+    
+    textarea.form-control {
+      resize: vertical;
+      min-height: 100px;
+    }
+    
+    /* BUTTONS */
+    .btn-primary {
+      background-color: var(--primary-color);
+      border: none;
+      color: #fff;
+      padding: 0.65rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      width: 100%;
+      justify-content: center;
+      font-size: 1rem;
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(46,204,113,0.3);
+    }
+    
+    .btn-primary i {
+      font-size: 1.1rem;
+    }
+    
+    /* ALERT */
+    .alert-info {
+      background-color: #e8f5e9;
+      border-left: 4px solid var(--primary-color);
+      color: #1b5e20;
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      font-weight: 500;
+    }
+    
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .navbar-top-row {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      
+      .card {
+        margin-bottom: 1rem;
+      }
+    }
+  </style>
+</head>
+<body class="theme-light">
+  <nav class="navbar-custom">
+    <div class="container-fluid">
+      <div class="navbar-top-row">
+        <div class="d-flex align-items-center gap-2">
+          <a class="btn-nav" href="{% url 'home' %}">
+            <i class="bi bi-house-door"></i> Volver al inicio
+          </a>
+          <span class="navbar-brand">
+            <i class="bi bi-journal-arrow-up"></i> Registrar movimiento
+          </span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <a class="btn-success-nav" href="{% url 'despachos_activos' %}">
+            <i class="bi bi-activity"></i> Despachos activos
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-4">
+    <div class="help-banner">
+      <div class="d-flex justify-content-between align-items-start gap-3">
+        <div>
+          <div style="color: #1565c0; font-weight: 600; margin-bottom: 0.5rem;">
+            <i class="bi bi-info-circle"></i> Guía rápida de registro
+          </div>
+          <div style="color: #37474f;">
+            <strong>Paso a paso:</strong> 1) Escribe el código del despacho, 2) Elige el estado nuevo, 3) Registra el movimiento.
+          </div>
+          <div class="mt-2" style="color: #546e7a; font-size: 0.9rem;">
+            <strong>Atajos de teclado:</strong> A=ASIGNADO, C=EN_CAMINO, E=ENTREGADO, F=FALLIDO
+          </div>
+          <div class="mt-1 text-muted">
+            <strong>Flujo operativo:</strong> PENDIENTE → ASIGNADO → PREPARANDO → PREPARADO → EN_CAMINO → ENTREGADO/FALLIDO
+          </div>
+        </div>
+        <button id="hide-help-mov" class="btn btn-sm btn-outline-secondary flex-shrink-0">
+          <i class="bi bi-x-lg"></i> Ocultar
+        </button>
+      </div>
+    </div>
+
+    {% if feedback %}
+      <div class="alert alert-info">
+        <i class="bi bi-check-circle"></i> {{ feedback }}
+      </div>
+    {% endif %}
+
+    <div class="row g-4">
+      <!-- POR LLAMADA -->
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <i class="bi bi-telephone-fill"></i> Registro por llamada
+          </div>
+          <div class="card-body">
+            <form method="post">
+              {% csrf_token %}
+              <input type="hidden" name="metodo" value="llamada">
+              
+              <div class="mb-3">
+                <label class="form-label">
+                  <i class="bi bi-hash"></i> Código del despacho
+                </label>
+                <input 
+                  class="form-control" 
+                  name="codigo_despacho" 
+                  placeholder="Ej: DSP-2025-000123"
+                  required
+                  autocomplete="off"
+                >
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">
+                  <i class="bi bi-arrow-repeat"></i> Estado nuevo
+                </label>
+                <select class="form-select" name="estado" required>
+                  <option value="">-- Seleccionar estado --</option>
+                  <option value="ASIGNADO">ASIGNADO</option>
+                  <option value="EN_CAMINO">EN_CAMINO</option>
+                  <option value="ENTREGADO">ENTREGADO</option>
+                  <option value="FALLIDO">FALLIDO</option>
+                </select>
+              </div>
+              
+              <div class="mb-4">
+                <label class="form-label">
+                  <i class="bi bi-chat-left-text"></i> Resumen de la llamada
+                </label>
+                <textarea 
+                  class="form-control" 
+                  name="mensaje" 
+                  rows="3"
+                  placeholder="Describe brevemente lo conversado con el motorista..."
+                ></textarea>
+              </div>
+              
+              <button class="btn btn-primary" type="submit">
+                <i class="bi bi-telephone"></i> Registrar llamada
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- POR MENSAJE -->
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <i class="bi bi-chat-dots-fill"></i> Registro por mensaje
+          </div>
+          <div class="card-body">
+            <form method="post">
+              {% csrf_token %}
+              <input type="hidden" name="metodo" value="mensaje">
+              
+              <div class="mb-3">
+                <label class="form-label">
+                  <i class="bi bi-hash"></i> Código del despacho
+                </label>
+                <input 
+                  class="form-control" 
+                  name="codigo_despacho" 
+                  placeholder="Ej: DSP-2025-000123"
+                  required
+                  autocomplete="off"
+                >
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">
+                  <i class="bi bi-arrow-repeat"></i> Estado nuevo
+                </label>
+                <select class="form-select" name="estado" required>
+                  <option value="">-- Seleccionar estado --</option>
+                  <option value="ASIGNADO">ASIGNADO</option>
+                  <option value="EN_CAMINO">EN_CAMINO</option>
+                  <option value="ENTREGADO">ENTREGADO</option>
+                  <option value="FALLIDO">FALLIDO</option>
+                </select>
+              </div>
+              
+              <div class="mb-4">
+                <label class="form-label">
+                  <i class="bi bi-envelope"></i> Mensaje recibido
+                </label>
+                <textarea 
+                  class="form-control" 
+                  name="mensaje" 
+                  rows="3"
+                  placeholder="Copia el mensaje recibido del motorista..."
+                ></textarea>
+              </div>
+              
+              <button class="btn btn-primary" type="submit">
+                <i class="bi bi-chat-dots"></i> Registrar mensaje
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function(){
+      const stateSelects = document.querySelectorAll('select[name="estado"]');
+      
+      // Atajos de teclado
+      document.addEventListener('keydown', function(e){
+        const map = { 
+          'a':'ASIGNADO', 
+          'c':'EN_CAMINO', 
+          'e':'ENTREGADO', 
+          'f':'FALLIDO' 
+        };
+        const val = map[e.key.toLowerCase()];
+        if (!val) return;
+        stateSelects.forEach(sel => { sel.value = val; });
+      });
+      
+      // Persistir último código y estado
+      const codeInputs = document.querySelectorAll('input[name="codigo_despacho"]');
+      const savedCode = localStorage.getItem('mov_last_code') || '';
+      codeInputs.forEach(inp => { 
+        if(savedCode && !inp.value) inp.value = savedCode; 
+        inp.addEventListener('change', () => localStorage.setItem('mov_last_code', inp.value)); 
+      });
+      
+      const savedEstado = localStorage.getItem('mov_last_estado') || '';
+      stateSelects.forEach(sel => { 
+        if(savedEstado && !sel.value) sel.value = savedEstado; 
+        sel.addEventListener('change', () => localStorage.setItem('mov_last_estado', sel.value)); 
+      });
+      
+      // Control de ayuda persistente
+      const help = document.querySelector('.help-banner');
+      const hideBtn = document.getElementById('hide-help-mov');
+      if (localStorage.getItem('hide_help_mov') === '1' && help) {
+        help.style.display = 'none';
+      }
+      if (hideBtn) {
+        hideBtn.onclick = function() { 
+          localStorage.setItem('hide_help_mov', '1'); 
+          if(help) help.style.display = 'none'; 
+        };
+      }
+      
+      // Inicializar tooltips
+      const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tooltipTriggerList.map(function (el) { 
+        return new bootstrap.Tooltip(el); 
+      });
+    })();
+  </script>
+</body>
+</html>

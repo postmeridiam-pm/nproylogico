@@ -1,0 +1,491 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Eliminar Moto - LOGICO</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+  <link rel="stylesheet" href="{% static 'css/motos_form.css' %}">
+  <style>
+    :root {
+      --primary-color: #0066cc;
+      --secondary-color: #00a3e0;
+      --success-color: #00c853;
+      --warning-color: #ffa726;
+      --danger-color: #ef5350;
+      --dark-bg: #1a1d29;
+      --dark-surface: #252837;
+      --dark-card: #2d3142;
+      --dark-border: #3a3f5c;
+      --dark-text: #e8eaed;
+      --dark-text-secondary: #9aa0b3;
+      --light-bg: #f5f7fa;
+      --light-surface: #ffffff;
+      --light-card: #ffffff;
+      --light-border: #e1e4e8;
+      --light-text: #1a1d29;
+      --light-text-secondary: #586069;
+    }
+
+    * {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .theme-light {
+      --bg-primary: var(--light-bg);
+      --bg-surface: var(--light-surface);
+      --bg-card: var(--light-card);
+      --border-color: var(--light-border);
+      --text-primary: var(--light-text);
+      --text-secondary: var(--light-text-secondary);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .theme-dark {
+      --bg-primary: var(--dark-bg);
+      --bg-surface: var(--dark-surface);
+      --bg-card: var(--dark-card);
+      --border-color: var(--dark-border);
+      --text-primary: var(--dark-text);
+      --text-secondary: var(--dark-text-secondary);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      min-height: 100vh;
+    }
+
+    .navbar-custom {
+      background: linear-gradient(135deg, var(--danger-color), #d32f2f);
+      padding: 1rem 0;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+
+    .navbar-custom .navbar-brand {
+      color: white;
+      font-weight: 600;
+      font-size: 1.5rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .navbar-custom .btn-nav {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      width: 45px;
+      height: 45px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .navbar-custom .btn-nav:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .theme-toggle {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .theme-btn {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      width: 45px;
+      height: 45px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1.25rem;
+    }
+
+    .theme-btn:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .theme-btn.active {
+      background-color: rgba(255, 255, 255, 0.95);
+      border-color: white;
+      color: var(--danger-color);
+    }
+
+    .card-custom {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-header-custom {
+      background: linear-gradient(135deg, var(--danger-color), #d32f2f);
+      color: white;
+      padding: 1.25rem 1.5rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-body-custom {
+      padding: 2rem;
+    }
+
+    .alert {
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 1.5rem;
+    }
+
+    .alert-danger {
+      background-color: rgba(239, 83, 80, 0.1);
+      color: var(--danger-color);
+      border-left: 4px solid var(--danger-color);
+    }
+
+    .warning-box {
+      background-color: rgba(255, 167, 38, 0.1);
+      border: 2px solid var(--warning-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .warning-box i {
+      color: var(--warning-color);
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+
+    .warning-box-content h5 {
+      color: var(--text-primary);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .warning-box-content p {
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .info-list {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    .info-list-item {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .info-list-item:last-child {
+      border-bottom: none;
+    }
+
+    .info-list-item strong {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .info-list-item span {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .form-label {
+      color: var(--text-primary);
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .form-control {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      border-radius: 8px;
+      padding: 0.625rem 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+      background-color: var(--bg-surface);
+      border-color: var(--danger-color);
+      color: var(--text-primary);
+      box-shadow: 0 0 0 0.2rem rgba(239, 83, 80, 0.25);
+    }
+
+    .form-control::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .btn-custom {
+      border-radius: 8px;
+      padding: 0.625rem 1.5rem;
+      font-weight: 500;
+      border: none;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-danger-custom {
+      background-color: var(--danger-color);
+      color: white;
+    }
+
+    .btn-danger-custom:hover {
+      background-color: #d32f2f;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(239, 83, 80, 0.4);
+    }
+
+    .btn-outline-custom {
+      background-color: transparent;
+      border: 2px solid var(--border-color);
+      color: var(--text-primary);
+    }
+
+    .btn-outline-custom:hover {
+      background-color: var(--bg-surface);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    .modal-content {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, var(--danger-color), #d32f2f);
+      color: white;
+      border-bottom: none;
+      border-radius: 12px 12px 0 0;
+    }
+
+    .modal-header .btn-close {
+      filter: brightness(0) invert(1);
+    }
+
+    .modal-body {
+      color: var(--text-primary);
+      padding: 2rem;
+    }
+
+    .modal-footer {
+      border-top: 1px solid var(--border-color);
+      padding: 1rem 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .card-body-custom {
+        padding: 1.5rem;
+      }
+
+      .navbar-custom .navbar-brand {
+        font-size: 1.25rem;
+      }
+
+      .btn-nav,
+      .theme-btn {
+        width: 40px;
+        height: 40px;
+      }
+    }
+  </style>
+</head>
+<body class="theme-light">
+  <nav class="navbar-custom">
+    <div class="container-fluid">
+      <div class="d-flex align-items-center gap-2">
+        <a class="btn-nav" href="{% url 'home' %}" title="Inicio">
+          <i class="bi bi-house-door"></i>
+        </a>
+        <a class="btn-nav" href="{% url 'listado_motos' %}" title="Volver al listado">
+          <i class="bi bi-arrow-left"></i>
+        </a>
+        <span class="navbar-brand">
+          <i class="bi bi-trash"></i> Eliminar Moto
+        </span>
+      </div>
+      <div class="theme-toggle">
+        <button id="btn-light" class="theme-btn active" type="button" title="Modo claro">
+          <i class="bi bi-sun-fill"></i>
+        </button>
+        <button id="btn-dark" class="theme-btn" type="button" title="Modo oscuro">
+          <i class="bi bi-moon-stars-fill"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container pb-5">
+    {% if messages %}
+      {% for m in messages %}
+        <div class="alert alert-{{ m.tags|default:'danger' }}">
+          <i class="bi bi-exclamation-triangle"></i> {{ m }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <div class="warning-box">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <div class="warning-box-content">
+        <h5>Acción Irreversible</h5>
+        <p>Estás a punto de eliminar permanentemente esta motocicleta del sistema. Esta acción no se puede deshacer.</p>
+      </div>
+    </div>
+
+    <div class="card-custom">
+      <div class="card-header-custom">
+        <i class="bi bi-info-circle"></i>
+        Confirmar Eliminación
+      </div>
+      <div class="card-body-custom">
+        <h5 class="mb-3" style="color: var(--text-primary);">Información de la moto a eliminar:</h5>
+        
+        <div class="info-list">
+          <div class="info-list-item">
+            <strong><i class="bi bi-card-text"></i> Patente:</strong>
+            <span>{{ moto.patente }}</span>
+          </div>
+          <div class="info-list-item">
+            <strong><i class="bi bi-tag"></i> Marca:</strong>
+            <span>{{ moto.marca }}</span>
+          </div>
+          <div class="info-list-item">
+            <strong><i class="bi bi-gear"></i> Modelo:</strong>
+            <span>{{ moto.modelo }}</span>
+          </div>
+          <div class="info-list-item">
+            <strong><i class="bi bi-calendar"></i> Año:</strong>
+            <span>{{ moto.anio }}</span>
+          </div>
+        </div>
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-4">
+            <label class="form-label">
+              <i class="bi bi-journal-text"></i> Motivo de eliminación (opcional)
+            </label>
+            <textarea class="form-control" name="motivo" rows="3" 
+                      placeholder="Describe el motivo de la eliminación para mantener un registro..."></textarea>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2">
+            <a class="btn btn-outline-custom btn-custom" href="{% url 'detalle_moto' moto.id %}">
+              <i class="bi bi-x-lg"></i> Cancelar
+            </a>
+            <button class="btn btn-danger-custom btn-custom" type="button" data-bs-toggle="modal" data-bs-target="#confirmModal">
+              <i class="bi bi-trash"></i> Eliminar Moto
+            </button>
+          </div>
+
+          <!-- Modal de confirmación -->
+          <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle"></i> Confirmar Eliminación
+                  </h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <p class="mb-3">
+                    <strong>¿Estás completamente seguro de que deseas eliminar la moto {{ moto.patente }}?</strong>
+                  </p>
+                  <p class="text-muted mb-0">
+                    Esta acción eliminará permanentemente todos los datos asociados y no se puede deshacer.
+                  </p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-outline-custom" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg"></i> Cancelar
+                  </button>
+                  <button type="submit" class="btn btn-danger-custom btn-custom">
+                    <i class="bi bi-check-lg"></i> Sí, Eliminar Definitivamente
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function(){
+      const root = document.documentElement;
+      const btnLight = document.getElementById('btn-light');
+      const btnDark = document.getElementById('btn-dark');
+      
+      const saved = localStorage.getItem('motos_theme') || 'light';
+      root.classList.remove('theme-dark', 'theme-light');
+      root.classList.add(saved === 'dark' ? 'theme-dark' : 'theme-light');
+      
+      if (saved === 'dark') {
+        btnDark.classList.add('active');
+        btnLight.classList.remove('active');
+      } else {
+        btnLight.classList.add('active');
+        btnDark.classList.remove('active');
+      }
+      
+      btnLight.onclick = function(){
+        root.classList.remove('theme-dark');
+        root.classList.add('theme-light');
+        localStorage.setItem('motos_theme', 'light');
+        btnLight.classList.add('active');
+        btnDark.classList.remove('active');
+      };
+      
+      btnDark.onclick = function(){
+        root.classList.remove('theme-light');
+        root.classList.add('theme-dark');
+        localStorage.setItem('motos_theme', 'dark');
+        btnDark.classList.add('active');
+        btnLight.classList.remove('active');
+      };
+    })();
+  </script>
+</body>
+</html>

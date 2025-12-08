@@ -1,0 +1,12 @@
+[
+  {"motorista":"María Torres","farmacia":"186","fecha_asignacion":"2025-11-22T08:00:00","activa":1},
+  {"motorista":"José Pérez","farmacia":"5289","fecha_asignacion":"2025-11-22T08:30:00","activa":1},
+  {"motorista":"Thom Yorke","farmacia":"3585","fecha_asignacion":"2025-11-22T09:00:00","activa":1},
+  {"motorista":"John Lennon","farmacia":"3645","fecha_asignacion":"2025-11-22T10:00:00","activa":1},
+  {"motorista":"Hayley Addams","farmacia":"93","fecha_asignacion":"2025-11-22T10:30:00","activa":1},
+  {"motorista":"Ramiro González","farmacia":"94","fecha_asignacion":"2025-11-22T11:00:00","activa":1},
+  {"motorista":"Tania Tapia","farmacia":"95","fecha_asignacion":"2025-11-22T11:30:00","activa":1},
+  {"motorista":"Rodrigo Quiroz","farmacia":"96","fecha_asignacion":"2025-11-22T12:00:00","activa":1},
+  {"motorista":"Camila Rivas","farmacia":"98","fecha_asignacion":"2025-11-22T12:30:00","activa":1},
+  {"motorista":"Diego Araya","farmacia":"99","fecha_asignacion":"2025-11-22T13:00:00","activa":0}
+]

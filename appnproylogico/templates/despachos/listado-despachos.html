@@ -1,0 +1,737 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Despachos - LOGICO</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+  <style>
+    :root {
+      --primary-color: #2ecc71;
+      --secondary-color: #27ae60;
+      --success-color: #00c853;
+      --warning-color: #ffa726;
+      --danger-color: #ef5350;
+      --info-color: #29b6f6;
+      --dark-bg: #1a1d29;
+      --dark-surface: #252837;
+      --dark-card: #2d3142;
+      --dark-border: #3a3f5c;
+      --dark-text: #e8eaed;
+      --dark-text-secondary: #9aa0b3;
+      --light-bg: #f5f7fa;
+      --light-surface: #ffffff;
+      --light-card: #ffffff;
+      --light-border: #e1e4e8;
+      --light-text: #1a1d29;
+      --light-text-secondary: #586069;
+    }
+
+    * {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* Tema Claro */
+    .theme-light {
+      --bg-primary: var(--light-bg);
+      --bg-surface: var(--light-surface);
+      --bg-card: var(--light-card);
+      --border-color: var(--light-border);
+      --text-primary: var(--light-text);
+      --text-secondary: var(--light-text-secondary);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Tema Oscuro */
+    .theme-dark {
+      --bg-primary: var(--dark-bg);
+      --bg-surface: var(--dark-surface);
+      --bg-card: var(--dark-card);
+      --border-color: var(--dark-border);
+      --text-primary: var(--dark-text);
+      --text-secondary: var(--dark-text-secondary);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* Header/Navbar - NEGRO con mejor organización */
+    .navbar-custom {
+      background-color: #212529;
+      padding: 0.75rem 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+    }
+
+    .navbar-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .navbar-custom .navbar-brand {
+      color: white;
+      font-weight: 600;
+      font-size: 1.25rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .navbar-custom .btn-nav {
+      background-color: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .navbar-custom .btn-nav:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+      color: white;
+    }
+
+    .navbar-custom .btn-success-nav {
+      background-color: var(--primary-color);
+      border: none;
+      color: white;
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .navbar-custom .btn-success-nav:hover {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+
+    /* Theme Toggle */
+    .theme-toggle {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .theme-btn {
+      background-color: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 1rem;
+    }
+
+    .theme-btn:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .theme-btn.active {
+      background-color: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    /* Search and Filter Toolbar in Navbar */
+    .search-toolbar {
+      background-color: #f2fff5;
+      border-radius: 8px;
+      padding: 0.75rem;
+      box-shadow: var(--shadow);
+    }
+
+    .search-toolbar .form-control,
+    .search-toolbar .form-select {
+      background-color: #ffffff;
+      border: 1px solid var(--light-border);
+      color: var(--light-text);
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.9rem;
+    }
+
+    .search-toolbar .form-control:focus,
+    .search-toolbar .form-select:focus {
+      background-color: #ffffff;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.15);
+      color: var(--light-text);
+    }
+
+    .search-toolbar .form-control::placeholder {
+      color: var(--light-text-secondary);
+    }
+
+    .search-toolbar .form-select {
+      color: var(--light-text);
+    }
+
+    .search-toolbar .form-select option {
+      background-color: #ffffff;
+      color: var(--light-text);
+    }
+
+    .search-toolbar .btn-apply {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 0.5rem 1.25rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
+      width: 100%;
+    }
+
+    .search-toolbar .btn-apply:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(46, 204, 113, 0.3);
+    }
+
+    /* Quick Filter Chips */
+    .chips-container {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      background-color: var(--bg-surface);
+      border: 2px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .chip:hover {
+      border-color: var(--primary-color);
+      background-color: var(--bg-card);
+    }
+
+    .chip.active {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      color: white;
+    }
+
+    .chip i {
+      font-size: 1rem;
+    }
+
+    /* Help Banner */
+    .help-banner {
+      background: linear-gradient(135deg, rgba(46, 204, 113, 0.1), rgba(39, 174, 96, 0.1));
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      color: var(--text-primary);
+    }
+
+    .help-banner .btn {
+      border-radius: 8px;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      background-color: transparent;
+      padding: 0;
+      margin-bottom: 1.5rem;
+    }
+
+    .breadcrumb-item a {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .breadcrumb-item a:hover {
+      text-decoration: underline;
+    }
+
+    .breadcrumb-item.active {
+      color: var(--text-secondary);
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+      color: var(--text-secondary);
+    }
+
+    /* Card */
+    .card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    .card-footer {
+      background-color: var(--bg-surface);
+      border-top: 1px solid var(--border-color);
+      padding: 1rem 1.5rem;
+    }
+
+    /* Table Controls */
+    .btn-outline-secondary {
+      background-color: transparent;
+      border: 2px solid var(--border-color);
+      color: var(--text-primary);
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-outline-secondary:hover {
+      background-color: var(--bg-surface);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    /* Table */
+    .table-responsive {
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .table {
+      color: var(--text-primary);
+      margin-bottom: 0;
+    }
+
+    .table thead {
+      background-color: var(--bg-surface);
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .table thead th {
+      color: var(--text-primary);
+      font-weight: 600;
+      padding: 1rem;
+      border: none;
+      white-space: nowrap;
+    }
+
+    .table tbody tr {
+      border-bottom: 1px solid var(--border-color);
+      transition: background-color 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+      background-color: var(--bg-surface);
+    }
+
+    .table tbody td {
+      padding: 1rem;
+      vertical-align: middle;
+      border: none;
+    }
+
+    /* Simple mode - hide optional columns */
+    .simple-mode .col-optional {
+      display: none;
+    }
+
+    /* Badges */
+    .badge {
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    .badge.bg-success {
+      background-color: var(--success-color) !important;
+    }
+
+    .badge.bg-secondary {
+      background-color: var(--text-secondary) !important;
+    }
+
+    .badge.bg-info {
+      background-color: var(--info-color) !important;
+    }
+
+    .badge.bg-warning {
+      background-color: var(--warning-color) !important;
+      color: #1a1d29 !important;
+    }
+
+    /* Action Buttons */
+    .btn-group {
+      gap: 0.25rem;
+      display: flex;
+    }
+
+    .btn-sm {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: all 0.3s ease;
+    }
+
+    .btn-outline-primary {
+      border: 2px solid var(--primary-color);
+      color: var(--primary-color);
+      background-color: transparent;
+    }
+
+    .btn-outline-primary:hover {
+      background-color: var(--primary-color);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .btn-outline-warning {
+      border: 2px solid var(--warning-color);
+      color: var(--warning-color);
+      background-color: transparent;
+    }
+
+    .btn-outline-warning:hover {
+      background-color: var(--warning-color);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    /* Pagination */
+    .card-footer .btn-outline-secondary {
+      margin-bottom: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .navbar-custom .navbar-brand {
+        font-size: 1.1rem;
+      }
+
+      .navbar-top-row {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .btn-nav,
+      .theme-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 0.85rem;
+      }
+
+      .btn-success-nav {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+      }
+
+      .search-toolbar {
+        padding: 0.5rem;
+      }
+
+      .table thead th,
+      .table tbody td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.9rem;
+      }
+
+      .btn-sm {
+        width: 32px;
+        height: 32px;
+      }
+
+      .help-banner {
+        font-size: 0.9rem;
+      }
+
+      .chip {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body class="theme-light">
+  <nav class="navbar-custom">
+    <div class="container-fluid">
+      <!-- Fila superior: Logo y botones -->
+      <div class="navbar-top-row">
+        <div class="d-flex align-items-center gap-2">
+          <a class="btn-nav" href="{% url 'home' %}">
+            <i class="bi bi-house"></i> Volver al inicio
+          </a>
+          <a class="btn-nav" href="{% url 'panel_operadora' %}">
+            <i class="bi bi-grid"></i> Operadora
+          </a>
+          <span class="navbar-brand">
+            <i class="bi bi-truck"></i> Despachos
+          </span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <a class="btn-success-nav" href="{% url 'agregar_despacho' %}">
+            <i class="bi bi-plus-lg"></i> Nuevo
+          </a>
+        </div>
+      </div>
+
+      <!-- Fila inferior: Búsqueda y filtros -->
+      <div class="search-toolbar">
+        <form class="row g-2" method="get" id="form-desp-list">
+          <div class="col-md-6">
+            <input class="form-control placeholder-white" type="text" name="search" value="{{ search }}" placeholder="Buscar por código, cliente o farmacia">
+          </div>
+          <div class="col-md-2">
+            <select class="form-select" name="receta">
+              <option value="">Receta: Todas</option>
+              <option value="si" {% if receta == 'si' %}selected{% endif %}>Sí</option>
+              <option value="no" {% if receta == 'no' %}selected{% endif %}>No</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <select class="form-select" name="requiere">
+              <option value="">Devolución: Todas</option>
+              <option value="si" {% if requiere == 'si' %}selected{% endif %}>Sí</option>
+              <option value="no" {% if requiere == 'no' %}selected{% endif %}>No</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <button class="btn btn-apply" type="submit">
+              <i class="bi bi-funnel"></i> Aplicar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container pb-5">
+    <div class="help-banner">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>Consejo: usa los chips de filtro rápido para ver solo despachos con receta retenida o que requieren devolución. La "Vista simple" oculta columnas opcionales.</div>
+        <button id="hide-help-desp" class="btn btn-sm btn-outline-secondary">No mostrar</button>
+      </div>
+    </div>
+
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Inicio</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Despachos</li>
+      </ol>
+    </nav>
+
+    <div class="chips-container">
+      <span class="chip" id="chip-ret">
+        <i class="bi bi-file-medical"></i> Solo retenidas
+      </span>
+      <span class="chip" id="chip-req">
+        <i class="bi bi-arrow-return-left"></i> Solo con devolución
+      </span>
+      <button class="chip" id="btn-filter-local-d">
+        <i class="bi bi-funnel-fill"></i> Filtrar en tabla
+      </button>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <button class="btn btn-outline-secondary" id="btn-simple-d">
+          <i class="bi bi-eye"></i> Vista simple
+        </button>
+        <div class="table-responsive" id="tbl-wrap-d">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th class="col-optional">Estado</th>
+                <th class="col-optional">Tipo</th>
+                <th class="col-optional">Prioridad</th>
+                <th>Farmacia</th>
+                <th>Cliente</th>
+                <th>Receta</th>
+                <th class="col-optional">Registro</th>
+                <th class="text-end">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for d in page_obj.object_list %}
+              <tr data-receta="{% if d.tiene_receta_retenida %}si{% else %}no{% endif %}" data-requiere="{% if d.requiere_devolucion_receta %}si{% else %}no{% endif %}">
+                <td><strong>{{ d.codigo_despacho }}</strong></td>
+                <td class="col-optional">{{ d.estado }}</td>
+                <td class="col-optional">{{ d.tipo_despacho }}</td>
+                <td class="col-optional">{{ d.prioridad }}</td>
+                <td>{{ d.farmacia_origen_local_id }}</td>
+                <td>{{ d.cliente_nombre|default:'-' }}</td>
+                <td>
+                  {% if d.tiene_receta_retenida %}
+                    <span class="badge bg-warning text-dark" title="Receta retenida"><i class="bi bi-file-medical"></i> Receta retenida</span>
+                    {% if d.requiere_devolucion_receta %}<span class="badge bg-info" title="Requiere devolución"><i class="bi bi-arrow-return-left"></i> Devolver</span>{% endif %}
+                  {% else %}
+                    <span class="badge bg-secondary" title="Sin receta">No</span>
+                  {% endif %}
+                </td>
+                <td class="col-optional">{{ d.fecha_registro|date:'d/m/Y H:i' }}</td>
+                <td class="text-end">
+                  <div class="btn-group">
+                    <a class="btn btn-sm btn-outline-primary" href="{% url 'detalle_despacho' d.id %}" title="Ver detalles">
+                      <i class="bi bi-eye"></i>
+                    </a>
+                    <a class="btn btn-sm btn-outline-warning" href="{% url 'actualizar_despacho' d.id %}" title="Editar">
+                      <i class="bi bi-pencil"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="9" class="text-center text-muted py-4">
+                  <i class="bi bi-inbox" style="font-size: 2rem; opacity: 0.5;"></i>
+                  <div>Sin resultados</div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card-footer d-flex justify-content-between align-items-center">
+        {% if page_obj.has_previous %}
+          <a class="btn btn-outline-secondary" href="?page={{ page_obj.previous_page_number }}&search={{ search }}&receta={{ receta }}&requiere={{ requiere }}">
+            <i class="bi bi-chevron-left"></i> Anterior
+          </a>
+        {% else %}
+          <span></span>
+        {% endif %}
+        <span class="text-secondary">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a class="btn btn-outline-secondary" href="?page={{ page_obj.next_page_number }}&search={{ search }}&receta={{ receta }}&requiere={{ requiere }}">
+            Siguiente <i class="bi bi-chevron-right"></i>
+          </a>
+        {% else %}
+          <span></span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function(){
+
+      // Ayuda persistente
+      const help = document.querySelector('.help-banner');
+      const hideBtn = document.getElementById('hide-help-desp');
+      if (localStorage.getItem('hide_help_desp') === '1' && help) {
+        help.style.display = 'none';
+      }
+      if (hideBtn) {
+        hideBtn.onclick = function(){
+          localStorage.setItem('hide_help_desp', '1');
+          if (help) help.style.display = 'none';
+        };
+      }
+
+      // Vista simple
+      const tblWrap = document.getElementById('tbl-wrap-d');
+      const btnSimple = document.getElementById('btn-simple-d');
+      const simpleSaved = localStorage.getItem('desp_simple') === '1';
+      
+      if (simpleSaved && tblWrap) {
+        tblWrap.classList.add('simple-mode');
+        btnSimple.innerHTML = '<i class="bi bi-eye-fill"></i> Vista completa';
+      }
+      
+      if (btnSimple) {
+        btnSimple.onclick = function(){
+          if (!tblWrap) return;
+          tblWrap.classList.toggle('simple-mode');
+          const isSimple = tblWrap.classList.contains('simple-mode');
+          localStorage.setItem('desp_simple', isSimple ? '1' : '0');
+          btnSimple.innerHTML = isSimple 
+            ? '<i class="bi bi-eye-fill"></i> Vista completa'
+            : '<i class="bi bi-eye"></i> Vista simple';
+        };
+      }
+
+      // Filtro en tabla con select
+      const btn = document.getElementById('btn-filter-local-d');
+      if (btn) {
+        btn.onclick = function(){
+          const rc = document.querySelector('#form-desp-list select[name="receta"]').value.trim();
+          const rq = document.querySelector('#form-desp-list select[name="requiere"]').value.trim();
+          const rows = document.querySelectorAll('tbody tr[data-receta]');
+          rows.forEach(r => {
+            const okRc = !rc || (r.getAttribute('data-receta')||'') === rc;
+            const okRq = !rq || (r.getAttribute('data-requiere')||'') === rq;
+            r.style.display = (okRc && okRq) ? '' : 'none';
+          });
+        };
+      }
+
+      // Chips de filtro rápido
+      const chipR = document.getElementById('chip-ret');
+      const chipQ = document.getElementById('chip-req');
+      
+      function applyChips(){
+        const rows = document.querySelectorAll('tbody tr[data-receta]');
+        rows.forEach(r=>{
+          const hasRet = (r.getAttribute('data-receta')||'')==='si';
+          const hasReq = (r.getAttribute('data-requiere')||'')==='si';
+          const ok = (!chipR.classList.contains('active') || hasRet) && (!chipQ.classList.contains('active') || hasReq);
+          r.style.display = ok ? '' : 'none';
+        });
+      }
+      
+      [chipR, chipQ].forEach(c=>{ 
+        if(!c) return; 
+        c.onclick=function(){ 
+          this.classList.toggle('active'); 
+          applyChips(); 
+        }; 
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+:root {
+  --mot-primary: #2ecc71;
+  --mot-secondary: #27ae60;
+  --mot-dark: #1a1d29;
+  --mot-light: #ffffff;
+  --mot-border: #e1e4e8;
+}
+
+.navbar-custom { background-color:#212529; padding:0.75rem 0; box-shadow:0 2px 4px rgba(0,0,0,0.1); margin-bottom:2rem }
+.page-title { color:#fff; font-weight:600 }
+.btn-nav { background:transparent; border:1px solid rgba(255,255,255,.2); color:#fff; padding:.4rem .8rem; border-radius:6px; display:inline-flex; align-items:center; gap:.5rem; text-decoration:none; font-size:.9rem }
+.btn-success-nav { background-color:var(--mot-primary); border:none; color:#fff; padding:.5rem 1rem; border-radius:6px; display:inline-flex; align-items:center; gap:.5rem; font-weight:500 }
+
+.card { background-color:var(--mot-light); border:1px solid var(--mot-border); border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08) }
+.card-header { background-color:var(--mot-light); border-bottom:1px solid var(--mot-border); font-weight:600 }
+
+.table thead { background-color:var(--mot-light); border-bottom:2px solid var(--mot-border) }
+.table tbody tr { background-color:var(--mot-light) }
+.table .btn { border-radius:8px }
+
+.badge { padding:.4rem .6rem; border-radius:6px; font-weight:500 }

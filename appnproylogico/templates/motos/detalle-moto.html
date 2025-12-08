@@ -1,0 +1,671 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Detalle Moto - LOGICO</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+  <style>
+    :root {
+      --primary-color: #0066cc;
+      --secondary-color: #00a3e0;
+      --success-color: #00c853;
+      --warning-color: #ffa726;
+      --danger-color: #ef5350;
+      --info-color: #29b6f6;
+      --dark-bg: #1a1d29;
+      --dark-surface: #252837;
+      --dark-card: #2d3142;
+      --dark-border: #3a3f5c;
+      --dark-text: #e8eaed;
+      --dark-text-secondary: #9aa0b3;
+      --light-bg: #f5f7fa;
+      --light-surface: #ffffff;
+      --light-card: #ffffff;
+      --light-border: #e1e4e8;
+      --light-text: #1a1d29;
+      --light-text-secondary: #586069;
+    }
+
+    * {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .theme-light {
+      --bg-primary: var(--light-bg);
+      --bg-surface: var(--light-surface);
+      --bg-card: var(--light-card);
+      --border-color: var(--light-border);
+      --text-primary: var(--light-text);
+      --text-secondary: var(--light-text-secondary);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .theme-dark {
+      --bg-primary: var(--dark-bg);
+      --bg-surface: var(--dark-surface);
+      --bg-card: var(--dark-card);
+      --border-color: var(--dark-border);
+      --text-primary: var(--dark-text);
+      --text-secondary: var(--dark-text-secondary);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      min-height: 100vh;
+    }
+
+    .header-section {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      padding: 2rem 0;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow);
+    }
+
+    .header-section h1 {
+      color: white;
+      font-weight: 600;
+      margin: 0;
+      font-size: 1.75rem;
+    }
+
+    .header-section .breadcrumb {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .header-section .breadcrumb-item a {
+      color: rgba(255, 255, 255, 0.9);
+      text-decoration: none;
+    }
+
+    .header-section .breadcrumb-item.active {
+      color: white;
+    }
+
+    .header-section .breadcrumb-item + .breadcrumb-item::before {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .btn-nav {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      width: 45px;
+      height: 45px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .btn-nav:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+      color: white;
+    }
+
+    .theme-toggle {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .theme-btn {
+      background-color: var(--bg-card);
+      border: 2px solid var(--border-color);
+      color: var(--text-primary);
+      width: 45px;
+      height: 45px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1.25rem;
+    }
+
+    .theme-btn:hover {
+      border-color: var(--primary-color);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .theme-btn.active {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border-color: var(--primary-color);
+      color: white;
+    }
+
+    .card-custom {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+
+    .card-header-custom {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 1rem 1.5rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-body-custom {
+      padding: 2rem;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .info-item {
+      background-color: var(--bg-surface);
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .info-item-label {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .info-item-value {
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .section-title {
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-title i {
+      color: var(--primary-color);
+    }
+
+    .list-group-custom {
+      border: none;
+    }
+
+    .list-group-item-custom {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .list-group-item-custom:last-child {
+      margin-bottom: 0;
+    }
+
+    .assignment-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .assignment-user {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .assignment-user i {
+      color: var(--primary-color);
+    }
+
+    .assignment-date {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .badge-custom {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: 500;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-active {
+      background-color: var(--success-color);
+      color: white;
+    }
+
+    .badge-inactive {
+      background-color: var(--danger-color);
+      color: white;
+    }
+
+    .btn-custom {
+      border-radius: 8px;
+      padding: 0.625rem 1.5rem;
+      font-weight: 500;
+      border: none;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary-custom {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+    }
+
+    .btn-primary-custom:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4);
+    }
+
+    .btn-warning-custom {
+      background-color: var(--warning-color);
+      color: white;
+    }
+
+    .btn-warning-custom:hover {
+      background-color: #fb8c00;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 167, 38, 0.4);
+    }
+
+    .btn-danger-custom {
+      background-color: var(--danger-color);
+      color: white;
+    }
+
+    .btn-danger-custom:hover {
+      background-color: #d32f2f;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(239, 83, 80, 0.4);
+    }
+
+    .btn-outline-custom {
+      background-color: transparent;
+      border: 2px solid var(--border-color);
+      color: var(--text-primary);
+    }
+
+    .btn-outline-custom:hover {
+      background-color: var(--bg-surface);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-secondary);
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .stat-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: rgba(255, 255, 255, 0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      color: white;
+      font-weight: 600;
+      margin-left: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .header-section h1 {
+        font-size: 1.5rem;
+      }
+
+      .card-body-custom {
+        padding: 1.5rem;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+
+      .action-buttons .btn-custom {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .stat-badge {
+        margin-left: 0;
+        margin-top: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body class="theme-light">
+  <div class="header-section">
+    <div class="container">
+      <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item">
+            <a href="{% url 'home' %}"><i class="bi bi-house-door"></i> Inicio</a>
+          </li>
+          <li class="breadcrumb-item">
+            <a href="{% url 'listado_motos' %}">Motos</a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">{{ moto.patente }}</li>
+        </ol>
+      </nav>
+      
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+          <h1>
+            <i class="bi bi-motorcycle"></i> Moto {{ moto.patente }}
+            {% if moto.estado %}
+            <span class="stat-badge">
+              <i class="bi bi-info-circle"></i>
+              {{ moto.estado }}
+            </span>
+            {% endif %}
+          </h1>
+        </div>
+        
+        <div class="d-flex gap-2 align-items-center">
+          <a class="btn-nav" href="{% url 'home' %}" title="Inicio">
+            <i class="bi bi-house-door"></i>
+          </a>
+          <a class="btn-nav" href="{% url 'listado_motos' %}" title="Volver al listado">
+            <i class="bi bi-arrow-left"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container pb-5">
+    <!-- Información Principal -->
+    <div class="card-custom">
+      <div class="card-header-custom">
+        <div class="card-header-left">
+          <i class="bi bi-info-circle-fill"></i>
+          Información del Vehículo
+        </div>
+      </div>
+      <div class="card-body-custom">
+        <!-- Datos Básicos -->
+        <div class="section-title">
+          <i class="bi bi-card-text"></i>
+          Identificación
+        </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-item-label">
+              <i class="bi bi-card-text"></i>
+              Patente
+            </div>
+            <div class="info-item-value">{{ moto.patente }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label">
+              <i class="bi bi-tag"></i>
+              Marca
+            </div>
+            <div class="info-item-value">{{ moto.marca }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label">
+              <i class="bi bi-gear"></i>
+              Modelo
+            </div>
+            <div class="info-item-value">{{ moto.modelo }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label">
+              <i class="bi bi-calendar"></i>
+              Año
+            </div>
+            <div class="info-item-value">{{ moto.anio|default:"-" }}</div>
+          </div>
+        </div>
+
+        <!-- Especificaciones -->
+        <div class="section-title mt-4">
+          <i class="bi bi-wrench"></i>
+          Especificaciones
+        </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-item-label">
+              <i class="bi bi-palette"></i>
+              Color
+            </div>
+            <div class="info-item-value">{{ moto.color|default:"-" }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label">
+              <i class="bi bi-fuel-pump"></i>
+              Combustible
+            </div>
+            <div class="info-item-value">{{ moto.tipo_combustible|default:"-" }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label">
+              <i class="bi bi-speedometer"></i>
+              Cilindrada
+            </div>
+            <div class="info-item-value">{{ moto.cilindrada_cc|default:"-" }} cc</div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label">
+              <i class="bi bi-geo"></i>
+              Kilometraje
+            </div>
+            <div class="info-item-value">{{ moto.kilometraje_actual|default:"-" }} km</div>
+          </div>
+        </div>
+
+        <!-- Propietario -->
+        <div class="section-title mt-4">
+          <i class="bi bi-person-circle"></i>
+          Propietario
+        </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-item-label">
+              <i class="bi bi-person"></i>
+              Nombre
+            </div>
+            <div class="info-item-value">{{ moto.propietario_nombre|default:"-" }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label">
+              <i class="bi bi-card-heading"></i>
+              Tipo Documento
+            </div>
+            <div class="info-item-value">{{ moto.propietario_tipo_documento|default:"-" }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label">
+              <i class="bi bi-hash"></i>
+              Documento
+            </div>
+            <div class="info-item-value">{{ moto.propietario_documento|default:"-" }}</div>
+          </div>
+        </div>
+
+        <!-- Números de Serie -->
+        <div class="section-title mt-4">
+          <i class="bi bi-fingerprint"></i>
+          Identificadores Únicos
+        </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-item-label">
+              <i class="bi bi-cpu"></i>
+              Número de Motor
+            </div>
+            <div class="info-item-value">{{ moto.numero_motor|default:"-" }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label">
+              <i class="bi bi-upc"></i>
+              Número de Chasis
+            </div>
+            <div class="info-item-value">{{ moto.numero_chasis|default:"-" }}</div>
+          </div>
+        </div>
+
+        <!-- Documentación -->
+        <div class="section-title mt-4">
+          <i class="bi bi-calendar-check"></i>
+          Documentación y Vencimientos
+        </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-item-label">
+              <i class="bi bi-calendar-plus"></i>
+              Inscripción
+            </div>
+            <div class="info-item-value">{{ moto.fecha_inscripcion|date:"d/m/Y"|default:"-" }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label">
+              <i class="bi bi-clipboard-check"></i>
+              Revisión Técnica
+            </div>
+            <div class="info-item-value">{% if moto.activo %}Al día{% else %}No al día{% endif %}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label">
+              <i class="bi bi-file-text"></i>
+              Permiso Circulación
+            </div>
+            <div class="info-item-value">{{ moto.fecha_venc_permiso_circulacion|date:"d/m/Y"|default:"-" }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label">
+              <i class="bi bi-shield-check"></i>
+              Seguro SOAP
+            </div>
+            <div class="info-item-value">{{ moto.fecha_venc_seguro_soap|date:"d/m/Y"|default:"-" }}</div>
+          </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="mt-4 pt-3 border-top" style="border-color: var(--border-color) !important;">
+          <div class="action-buttons">
+            <a class="btn btn-primary-custom btn-custom" href="{% url 'actualizar_moto' moto.id %}">
+              <i class="bi bi-pencil-square"></i> Editar Información
+            </a>
+            <a class="btn btn-danger-custom btn-custom" href="{% url 'remover_moto' moto.id %}">
+              <i class="bi bi-trash"></i> Eliminar Moto
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Asignaciones -->
+    <div class="card-custom">
+      <div class="card-header-custom">
+        <div class="card-header-left">
+          <i class="bi bi-person-check-fill"></i>
+          Historial de Asignaciones
+        </div>
+        <span class="badge bg-light text-dark">{{ asignaciones|length }}</span>
+      </div>
+      <div class="card-body-custom">
+        {% if asignaciones %}
+          <div class="list-group-custom">
+            {% for a in asignaciones %}
+            <div class="list-group-item-custom">
+              <div class="assignment-info">
+                <div class="assignment-user">
+                  <i class="bi bi-person-circle"></i>
+                  <strong>{{ a.motorista.usuario.nombre }} {{ a.motorista.usuario.apellido }}</strong>
+                </div>
+                <div class="assignment-date">
+                  <i class="bi bi-calendar-event"></i>
+                  {{ a.fecha_asignacion|date:"d/m/Y H:i" }}
+                </div>
+              </div>
+              <span class="{% if a.activa %}badge-active{% else %}badge-inactive{% endif %} badge-custom">
+                {% if a.activa %}
+                <i class="bi bi-check-circle"></i> Activa
+                {% else %}
+                <i class="bi bi-x-circle"></i> Inactiva
+                {% endif %}
+              </span>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty-state">
+            <i class="bi bi-inbox"></i>
+            <p class="mb-0">No hay asignaciones registradas para esta moto</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+</body>
+</html>

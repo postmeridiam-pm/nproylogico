@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Geolocalización</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1 class="h5 mb-0">Geolocalización de farmacias</h1>
+      <a class="btn btn-outline-secondary btn-sm" href="{% url 'listado_farmacias' %}">Volver</a>
+    </div>
+    <div class="row g-3 mb-3">
+      <div class="col-md-4"><div class="card"><div class="card-body">
+        <div class="fw-bold">Total</div><div>{{ total }}</div>
+      </div></div></div>
+      <div class="col-md-4"><div class="card"><div class="card-body">
+        <div class="fw-bold">Pendientes</div><div class="text-danger">{{ pendientes }}</div>
+      </div></div></div>
+      <div class="col-md-4"><div class="card"><div class="card-body">
+        <div class="fw-bold">Validadas</div><div class="text-success">{{ ok }}</div>
+      </div></div></div>
+    </div>
+    <div class="d-flex gap-2 mb-3">
+      <a class="btn btn-success btn-sm" href="{% url 'geolocalizar_farmacias' %}?limite=10">Geolocalizar 10</a>
+      <a class="btn btn-outline-success btn-sm" href="{% url 'geolocalizar_farmacias' %}?limite=50">Geolocalizar 50</a>
+    </div>
+    <div class="table-responsive bg-white rounded p-3 shadow-sm">
+      <table class="table table-hover align-middle">
+        <thead><tr>
+          <th>Local</th><th>Nombre</th><th>Lat</th><th>Lng</th><th>Fecha</th>
+        </tr></thead>
+        <tbody>
+          {% for f in ultimas %}
+            <tr>
+              <td>{{ f.local_id }}</td>
+              <td>{{ f.local_nombre }}</td>
+              <td>{{ f.local_lat }}</td>
+              <td>{{ f.local_lng }}</td>
+              <td>{{ f.fecha_geolocalizacion|date:"Y-m-d H:i" }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="5" class="text-center text-muted">Sin datos</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

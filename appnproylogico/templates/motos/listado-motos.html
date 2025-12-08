@@ -1,0 +1,839 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Motos - LOGICO</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+  <link rel="stylesheet" href="{% static 'css/motos_list.css' %}">
+  <style>
+    :root {
+      --primary-color: #2ecc71;
+      --secondary-color: #27ae60;
+      --success-color: #00c853;
+      --warning-color: #ffa726;
+      --danger-color: #ef5350;
+      --info-color: #29b6f6;
+      --dark-bg: #1a1d29;
+      --dark-surface: #252837;
+      --dark-card: #2d3142;
+      --dark-border: #3a3f5c;
+      --dark-text: #e8eaed;
+      --dark-text-secondary: #9aa0b3;
+      --light-bg: #f5f7fa;
+      --light-surface: #ffffff;
+      --light-card: #ffffff;
+      --light-border: #e1e4e8;
+      --light-text: #1a1d29;
+      --light-text-secondary: #586069;
+    }
+
+    .theme-light {
+      --bg-primary: var(--light-bg);
+      --bg-surface: var(--light-surface);
+      --bg-card: var(--light-card);
+      --border-color: var(--light-border);
+      --text-primary: var(--light-text);
+      --text-secondary: var(--light-text-secondary);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .theme-dark {
+      --bg-primary: var(--dark-bg);
+      --bg-surface: var(--dark-surface);
+      --bg-card: var(--dark-card);
+      --border-color: var(--dark-border);
+      --text-primary: var(--dark-text);
+      --text-secondary: var(--dark-text-secondary);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      min-height: 100vh;
+    }
+
+    .header-section {
+      background: #212529;
+      padding: 1rem 0;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    }
+
+    .header-section h1 {
+      color: white;
+      font-weight: 600;
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    .stat-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: rgba(255, 255, 255, 0.2);
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      color: white;
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-left: 0.5rem;
+    }
+
+    .theme-toggle {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .theme-btn {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1.1rem;
+      border: none;
+    }
+
+    .theme-btn:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .theme-btn.active {
+      background-color: rgba(255, 255, 255, 0.95);
+      color: var(--primary-color);
+    }
+
+    .search-bar {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .search-wrapper {
+      position: relative;
+    }
+
+    .search-wrapper i {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .search-wrapper input {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      border-radius: 8px;
+      padding: 0.625rem 1rem 0.625rem 2.5rem;
+      width: 100%;
+    }
+
+    .search-wrapper input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25);
+      background-color: var(--bg-surface);
+      color: var(--text-primary);
+      outline: none;
+    }
+
+    .search-wrapper input::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .btn-custom {
+      border-radius: 8px;
+      padding: 0.625rem 1rem;
+      font-weight: 500;
+      border: none;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .btn-primary-custom {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+    }
+
+    .btn-primary-custom:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4);
+    }
+
+    .btn-success-custom {
+      background-color: var(--success-color);
+      color: white;
+      text-decoration: none;
+    }
+
+    .btn-success-custom:hover {
+      background-color: #00b248;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 200, 83, 0.4);
+      color: white;
+    }
+
+    /* Moto Card */
+    .moto-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: all 0.3s ease;
+    }
+
+    .moto-card:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-2px);
+    }
+
+    .moto-card-header {
+      padding: 1rem 1.25rem;
+      background-color: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .moto-card-header:hover { background-color: var(--bg-card); }
+
+    .moto-main-info {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+      flex: 1;
+      flex-wrap: wrap;
+    }
+
+    .moto-patente {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .moto-brand {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .moto-estado {
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      background-color: var(--info-color);
+      color: white;
+    }
+
+    .expand-icon {
+      color: var(--text-secondary);
+      font-size: 1.5rem;
+      transition: transform 0.3s ease;
+      display: flex;
+      align-items: center;
+    }
+
+    .moto-card.expanded .expand-icon {
+      transform: rotate(180deg);
+    }
+
+    .moto-card-body {
+      display: none;
+    }
+
+    .moto-card.expanded .moto-card-body {
+      display: block;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .moto-details {
+      padding: 1.25rem;
+    }
+
+    .detail-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .detail-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .detail-section-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .detail-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .detail-value {
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .moto-actions {
+      padding: 1rem 1.25rem;
+      background-color: var(--bg-surface);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+    }
+
+    .btn-info-custom {
+      background-color: var(--info-color);
+      color: white;
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      text-decoration: none;
+    }
+
+    .btn-info-custom:hover {
+      background-color: #039be5;
+      color: white;
+    }
+
+    .pagination-custom {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .pagination-custom .page-info {
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .btn-outline-custom {
+      background-color: transparent;
+      border: 2px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      text-decoration: none;
+    }
+
+    .btn-outline-custom:hover {
+      background-color: var(--bg-surface);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-secondary);
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    @media (max-width: 768px) {
+      .header-section h1 {
+        font-size: 1.25rem;
+      }
+
+      .moto-main-info {
+        gap: 0.75rem;
+      }
+
+      .stat-badge {
+        margin-left: 0;
+        margin-top: 0.5rem;
+        display: flex;
+        width: 100%;
+        justify-content: center;
+      }
+
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .moto-actions {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body class="theme-light">
+  <nav class="navbar-custom">
+    <div class="container-fluid">
+      <div class="d-flex align-items-center gap-2">
+        <a class="btn-nav" href="{% url 'home' %}" title="Inicio">
+          <i class="bi bi-house-door"></i>
+        </a>
+        <span class="navbar-brand">
+          <i class="bi bi-motorcycle"></i> Motos
+        </span>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <a class="btn-success-nav" href="{% url 'agregar_moto' %}">
+          <i class="bi bi-plus-lg"></i> Nueva
+        </a>
+      </div>
+    </div>
+  </nav>
+  <div class="header-section">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+          <h1>
+            <i class="bi bi-motorcycle"></i> Motos
+            <span class="stat-badge">
+              <i class="bi bi-list-ul"></i>
+              {{ page_obj.paginator.count }}
+            </span>
+          </h1>
+        </div>
+        
+        <div class="d-flex gap-2 align-items-center">
+          
+          <a class="btn btn-success-custom btn-custom" href="{% url 'agregar_moto' %}">
+            <i class="bi bi-plus-lg"></i> Nueva
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container pb-5">
+    <!-- Search Bar -->
+    <div class="search-bar">
+      <form method="get" action="" id="form-motos">
+        <div class="row g-2 align-items-center">
+          <div class="col-md-7">
+            <div class="search-wrapper">
+              <i class="bi bi-search"></i>
+              <input class="form-control" type="text" name="search" list="dl-motos" 
+                     value="{{ search_query }}" placeholder="Buscar por patente, marca o modelo...">
+              <datalist id="dl-motos"></datalist>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="dropdown w-100">
+              <button class="btn btn-outline-secondary w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-sliders"></i> Búsqueda avanzada
+              </button>
+              <div class="dropdown-menu p-3 w-100" style="max-width:420px">
+                <div class="mb-2">
+                  <label class="form-label">Texto libre</label>
+                  <input type="text" class="form-control" id="adv-text-mo" placeholder="Escribe para buscar">
+                </div>
+                <div class="mb-2">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="estado_opt_mo" id="estado_activa_mo" value="activa" {% if estado == 'activa' %}checked{% endif %}>
+                    <label class="form-check-label" for="estado_activa_mo">Solo activas</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="estado_opt_mo" id="estado_inactiva_mo" value="inactiva" {% if estado == 'inactiva' %}checked{% endif %}>
+                    <label class="form-check-label" for="estado_inactiva_mo">Solo inactivas</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="estado_opt_mo" id="estado_todas_mo" value="" {% if not estado %}checked{% endif %}>
+                    <label class="form-check-label" for="estado_todas_mo">Todas</label>
+                  </div>
+                </div>
+                <div class="d-grid">
+                  <button class="btn btn-primary-custom btn-custom" type="button" id="btn-apply-mo"><i class="bi bi-funnel"></i> Aplicar</button>
+                </div>
+              </div>
+            </div>
+            <input type="hidden" name="estado" id="estado-mo" value="{{ estado }}">
+          </div>
+          <div class="col-md-2">
+            <button class="btn btn-primary-custom btn-custom w-100" type="submit">
+              <i class="bi bi-search"></i> Buscar
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Motos List -->
+    <div class="motos-list">
+      {% for mo in page_obj.object_list %}
+      <div class="moto-card" role="button" style="cursor:pointer" data-href="{% url 'detalle_moto' mo.id %}">
+        <div class="moto-card-header" onclick="event.stopPropagation(); this.parentElement.classList.toggle('expanded')">
+          <div class="moto-main-info">
+            <div class="moto-patente">
+              <i class="bi bi-motorcycle"></i>
+              {{ mo.patente }}
+            </div>
+            <div class="moto-brand">
+              {{ mo.marca }} {{ mo.modelo }}
+            </div>
+            {% if mo.estado %}
+            <div class="moto-estado">{{ mo.estado }}</div>
+            {% endif %}
+          </div>
+          <div class="expand-icon">
+            <i class="bi bi-chevron-down"></i>
+          </div>
+        </div>
+        
+        <div class="moto-card-body">
+          <div class="moto-details">
+            <!-- Especificaciones -->
+            <div class="detail-section">
+              <div class="detail-section-title">
+                <i class="bi bi-wrench"></i>
+                Especificaciones
+              </div>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <div class="detail-label">Año</div>
+                  <div class="detail-value">{{ mo.anio|default:"-" }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">Color</div>
+                  <div class="detail-value">{{ mo.color|default:"-" }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">Combustible</div>
+                  <div class="detail-value">{{ mo.tipo_combustible|default:"-" }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">Cilindrada</div>
+                  <div class="detail-value">{{ mo.cilindrada_cc|default:"-" }} cc</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">Kilometraje</div>
+                  <div class="detail-value">{{ mo.kilometraje_actual|default:"-" }} km</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Propietario -->
+            <div class="detail-section">
+              <div class="detail-section-title">
+                <i class="bi bi-person-circle"></i>
+                Propietario
+              </div>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <div class="detail-label">Nombre</div>
+                  <div class="detail-value">{{ mo.propietario_nombre|default:"-" }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">Tipo propietario</div>
+                  <div class="detail-value">{{ mo.propietario_tipo|default:"-" }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">Tipo Doc.</div>
+                  <div class="detail-value">{{ mo.propietario_tipo_documento|default:"-" }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">Documento</div>
+                  <div class="detail-value">{{ mo.propietario_documento|default:"-" }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">Motorista</div>
+                  <div class="detail-value">{% if mo.motorista_propietario %}{{ mo.motorista_propietario.usuario.nombre }} {{ mo.motorista_propietario.usuario.apellido }}{% else %}-{% endif %}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Identificación -->
+            <div class="detail-section">
+              <div class="detail-section-title">
+                <i class="bi bi-fingerprint"></i>
+                Identificación
+              </div>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <div class="detail-label">Número Motor</div>
+                  <div class="detail-value">{{ mo.numero_motor|default:"-" }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">Número Chasis</div>
+                  <div class="detail-value">{{ mo.numero_chasis|default:"-" }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Documentación -->
+            <div class="detail-section">
+              <div class="detail-section-title">
+                <i class="bi bi-journal-check"></i>
+                Documentación
+              </div>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <div class="detail-label">Permiso Circulación (año)</div>
+                  <div class="detail-value">{{ mo.permiso_circulacion_anio|default:"-" }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">Seguro Obligatorio (año)</div>
+                  <div class="detail-value">{{ mo.seguro_obligatorio_anio|default:"-" }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">Revisión Técnica (año)</div>
+                  <div class="detail-value">{{ mo.revision_tecnica_anio|default:"-" }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Documentación -->
+            <div class="detail-section">
+              <div class="detail-section-title">
+                <i class="bi bi-calendar-check"></i>
+                Documentación
+              </div>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <div class="detail-label">Inscripción</div>
+                  <div class="detail-value">{{ mo.fecha_inscripcion|date:'d/m/Y'|default:"-" }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">Revisión Técnica</div>
+                  <div class="detail-value">{% if mo.activo %}Al día{% else %}No al día{% endif %}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">Permiso Circulación</div>
+                  <div class="detail-value">{{ mo.fecha_venc_permiso_circulacion|date:'d/m/Y'|default:"-" }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">SOAP</div>
+                  <div class="detail-value">{{ mo.fecha_venc_seguro_soap|date:'d/m/Y'|default:"-" }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="moto-actions">
+            <a class="btn btn-info-custom btn-custom" href="{% url 'actualizar_moto' mo.id %}" title="Editar" data-bs-toggle="tooltip">
+              <i class="bi bi-pencil-square"></i> Editar
+            </a>
+            <a class="btn btn-outline-custom btn-custom" href="{% url 'detalle_moto' mo.id %}" title="Ver detalle" data-bs-toggle="tooltip">
+              <i class="bi bi-eye"></i> Ver
+            </a>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      {% for s in samples %}
+      <div class="moto-card">
+        <div class="moto-card-header">
+          <div class="moto-main-info">
+            <div class="moto-patente">
+              <i class="bi bi-motorcycle"></i>
+              {{ s.patente }}
+            </div>
+            <div class="moto-brand">
+              {{ s.marca }} {{ s.modelo }}
+            </div>
+            <div class="moto-estado">{{ s.estado }}</div>
+          </div>
+          <span class="text-muted" style="font-size: 0.85rem;">Ejemplo</span>
+        </div>
+      </div>
+      {% endfor %}
+      {% if not samples and not page_obj.object_list %}
+      <div class="empty-state">
+        <i class="bi bi-inbox"></i>
+        <p class="mb-2">No se encontraron motos</p>
+        <a class="btn btn-success-custom btn-custom" href="{% url 'agregar_moto' %}"><i class="bi bi-plus-lg"></i> Agregar moto</a>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-custom">
+      {% if page_obj.has_previous %}
+        <a class="btn btn-outline-custom" href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}&estado={{ estado }}">
+          <i class="bi bi-chevron-left"></i> Anterior
+        </a>
+      {% else %}
+        <span></span>
+      {% endif %}
+      
+      <span class="page-info">
+        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+      </span>
+      
+      {% if page_obj.has_next %}
+        <a class="btn btn-outline-custom" href="?page={{ page_obj.next_page_number }}&search={{ search_query }}&estado={{ estado }}">
+          Siguiente <i class="bi bi-chevron-right"></i>
+        </a>
+      {% else %}
+        <span></span>
+      {% endif %}
+    </div>
+    </div>
+
+  <script>
+      (function(){
+        document.querySelectorAll('.moto-card[data-href]').forEach(function(card){
+          card.addEventListener('click', function(e){
+            const target = e.target.closest('a');
+            if (target) return;
+            const href = this.getAttribute('data-href');
+            if (href) window.location.href = href;
+          });
+        });
+      })();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    
+      // Autocompletar motos
+      const dl = document.getElementById('dl-motos');
+      const inp = document.querySelector('input[name="search"]');
+      let t;
+      function suggestMotos(q){
+        if (!dl) return; 
+        dl.innerHTML='';
+        fetch('/api/motos/?search=' + encodeURIComponent(q))
+          .then(function(r){ return r.json(); })
+          .then(function(items){
+            const results = items.results || items;
+            results.slice(0,10).forEach(function(it){
+              const opt = document.createElement('option');
+              opt.value = it.patente + ' · ' + it.marca + ' ' + it.modelo;
+              dl.appendChild(opt);
+            });
+          })
+          .catch(function(){});
+      }
+      if (inp){
+        inp.addEventListener('input', function(){
+          const v = this.value.trim();
+          clearTimeout(t); 
+          t = setTimeout(function(){ 
+            if (v.length >= 2) suggestMotos(v); 
+          }, 250);
+        });
+      }
+
+      (function(){
+        const modalEl = document.getElementById('detailModal');
+        const frame = document.getElementById('detailFrame');
+        if (modalEl && frame){
+          document.querySelectorAll('a[href*="/motos/"]')
+            .forEach(function(a){
+              if (a.getAttribute('href').includes('/actualizar/')) return;
+              a.addEventListener('click', function(ev){
+                const href = this.getAttribute('href');
+                if (!href) return;
+                ev.preventDefault();
+                frame.src = href;
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+              });
+            });
+        }
+        const adv = document.getElementById('adv-text-mo');
+        const estadoH = document.getElementById('estado-mo');
+        const form = document.getElementById('form-motos');
+        const applyBtn = document.getElementById('btn-apply-mo');
+        document.querySelectorAll('input[name="estado_opt_mo"]').forEach(function(r){
+          r.addEventListener('change', function(){ if (estadoH) estadoH.value = this.value; });
+        });
+        const inp = document.querySelector('input[name="search"]');
+        if (adv && inp){
+          adv.addEventListener('input', function(){ inp.value = this.value; });
+          adv.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); if (form) form.submit(); }});
+        }
+        if (applyBtn){ applyBtn.onclick = function(){ if (adv && inp) inp.value = adv.value; if (form) form.submit(); }; }
+        if (window.bootstrap){
+          document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el){
+            new bootstrap.Tooltip(el);
+          });
+        }
+      })();
+    })();
+  </script>
+
+  <div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Detalle</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body p-0">
+          <iframe id="detailFrame" style="width:100%; height:70vh; border:0" title="Detalle"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

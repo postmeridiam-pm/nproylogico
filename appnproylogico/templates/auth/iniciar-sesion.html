@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Acceso Operaciones Farmacéuticas</title>
+  <style>
+    body { margin:0; font-family: system-ui, Arial, sans-serif; background:#0b1b2b; color:#eaf0f6; }
+    .wrap { min-height:100vh; display:grid; place-items:center; padding:24px; }
+    .card { width:100%; max-width:420px; background:#11263b; border-radius:12px; padding:24px; box-shadow:0 10px 30px rgba(0,0,0,0.3); }
+    h1 { margin:0 0 8px; font-size:22px; }
+    p.sub { margin:0 0 16px; color:#b8c6d9; font-size:14px; }
+    label { display:block; font-size:13px; margin:12px 0 6px; color:#cfe3ff; }
+    input { width:100%; padding:10px 12px; border-radius:8px; border:1px solid #2a4365; background:#0e2236; color:#eaf0f6; }
+    .actions { margin-top:16px; display:flex; gap:12px; align-items:center; }
+    button { background:#00b37e; border:none; color:#08212f; font-weight:600; padding:10px 14px; border-radius:8px; cursor:pointer; }
+    a { color:#74c0ff; text-decoration:none; }
+    .brand { display:flex; align-items:center; gap:8px; margin-bottom:12px; color:#9cd2ff; font-weight:600; }
+  </style>
+  {% if messages %}
+  <style>.msg{background:#1b2f46;padding:10px 12px;border-radius:8px;margin-bottom:8px;color:#ffcccb;}</style>
+  {% endif %}
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="brand">Logística Farmacéutica · Acceso</div>
+      <h1>Inicia sesión</h1>
+      <p class="sub">Operadores, supervisores y motoristas autorizados.</p>
+      {% for message in messages %}
+        <div class="msg">{{ message }}</div>
+      {% endfor %}
+      <form method="post">
+        {% csrf_token %}
+        <label>Usuario</label>
+        {{ form.username }}
+        <label>Contraseña</label>
+        {{ form.password }}
+        <div class="actions">
+          <button type="submit">Entrar</button>
+          <a href="/registro/">Crear cuenta</a>
+        </div>
+      </form>
+    </div>
+  </div>
+  </body>
+</html>

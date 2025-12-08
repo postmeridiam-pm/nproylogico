@@ -1,0 +1,541 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agregar Motorista - LOGICO</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+  <link rel="stylesheet" href="{% static 'css/motoristas_form.css' %}">
+  <style>
+    :root {
+      --primary-color: #0066cc;
+      --secondary-color: #00a3e0;
+      --success-color: #00c853;
+      --warning-color: #ffa726;
+      --danger-color: #ef5350;
+      --dark-bg: #1a1d29;
+      --dark-surface: #252837;
+      --dark-card: #2d3142;
+      --dark-border: #3a3f5c;
+      --dark-text: #e8eaed;
+      --dark-text-secondary: #9aa0b3;
+      --light-bg: #f5f7fa;
+      --light-surface: #ffffff;
+      --light-card: #ffffff;
+      --light-border: #e1e4e8;
+      --light-text: #1a1d29;
+      --light-text-secondary: #586069;
+    }
+
+    * {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* Tema Claro */
+    .theme-light {
+      --bg-primary: var(--light-bg);
+      --bg-surface: var(--light-surface);
+      --bg-card: var(--light-card);
+      --border-color: var(--light-border);
+      --text-primary: var(--light-text);
+      --text-secondary: var(--light-text-secondary);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Tema Oscuro */
+    .theme-dark {
+      --bg-primary: var(--dark-bg);
+      --bg-surface: var(--dark-surface);
+      --bg-card: var(--dark-card);
+      --border-color: var(--dark-border);
+      --text-primary: var(--dark-text);
+      --text-secondary: var(--dark-text-secondary);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* Header/Navbar */
+    .navbar-custom {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      padding: 1rem 0;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+
+    .navbar-custom .navbar-brand {
+      color: white;
+      font-weight: 600;
+      font-size: 1.5rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .navbar-custom .btn-nav {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      width: 45px;
+      height: 45px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .navbar-custom .btn-nav:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+      color: white;
+    }
+
+    /* Theme Toggle */
+    .theme-toggle {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .theme-btn {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      width: 45px;
+      height: 45px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1.25rem;
+    }
+
+    .theme-btn:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .theme-btn.active {
+      background-color: rgba(255, 255, 255, 0.95);
+      border-color: white;
+      color: var(--primary-color);
+    }
+
+    /* Card */
+    .card-custom {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-header-custom {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 1.25rem 1.5rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-body-custom {
+      padding: 2rem;
+    }
+
+    /* Form styling */
+    .form-label {
+      color: var(--text-primary);
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .form-control,
+    .form-select {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      border-radius: 8px;
+      padding: 0.625rem 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+      background-color: var(--bg-surface);
+      border-color: var(--primary-color);
+      color: var(--text-primary);
+      box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25);
+    }
+
+    .form-control::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .form-check {
+      padding-top: 0.5rem;
+    }
+
+    .form-check-input {
+      background-color: var(--bg-surface);
+      border: 2px solid var(--border-color);
+      width: 1.5rem;
+      height: 1.5rem;
+      cursor: pointer;
+    }
+
+    .form-check-input:checked {
+      background-color: var(--success-color);
+      border-color: var(--success-color);
+    }
+
+    .form-check-input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25);
+    }
+
+    .form-check-label {
+      color: var(--text-primary);
+      margin-left: 0.5rem;
+      cursor: pointer;
+    }
+
+    /* Section headers */
+    .section-divider {
+      border-top: 2px solid var(--border-color);
+      margin: 2rem 0 1.5rem 0;
+      padding-top: 1.5rem;
+    }
+
+    .section-title {
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-title i {
+      color: var(--primary-color);
+    }
+
+    /* Buttons */
+    .btn-custom {
+      border-radius: 8px;
+      padding: 0.625rem 1.5rem;
+      font-weight: 500;
+      border: none;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-success-custom {
+      background-color: var(--success-color);
+      color: white;
+    }
+
+    .btn-success-custom:hover {
+      background-color: #00b248;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 200, 83, 0.4);
+    }
+
+    .btn-outline-custom {
+      background-color: transparent;
+      border: 2px solid var(--border-color);
+      color: var(--text-primary);
+    }
+
+    .btn-outline-custom:hover {
+      background-color: var(--bg-surface);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    /* Form sections visual grouping */
+    .form-section {
+      background-color: var(--bg-surface);
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--border-color);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .card-body-custom {
+        padding: 1.5rem;
+      }
+
+      .navbar-custom .navbar-brand {
+        font-size: 1.25rem;
+      }
+
+      .btn-nav,
+      .theme-btn {
+        width: 40px;
+        height: 40px;
+      }
+    }
+
+    /* Validation states */
+    .is-invalid {
+      border-color: var(--danger-color) !important;
+    }
+
+    .invalid-feedback {
+      color: var(--danger-color);
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+
+    /* Helper text */
+    .form-text {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    /* Form field wrapper */
+    .field-wrapper {
+      margin-bottom: 1rem;
+    }
+
+    .field-wrapper label {
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .field-wrapper input,
+    .field-wrapper select,
+    .field-wrapper textarea {
+      width: 100%;
+    }
+
+    .field-wrapper .helptext {
+      display: block;
+      margin-top: 0.25rem;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body class="theme-light">
+  <nav class="navbar-custom">
+    <div class="container-fluid">
+      <div class="d-flex align-items-center gap-2">
+        <a class="btn-nav" href="{% url 'home' %}" title="Inicio">
+          <i class="bi bi-house-door"></i>
+        </a>
+        <a class="btn-nav" href="{% url 'listado_motoristas' %}" title="Volver al listado">
+          <i class="bi bi-arrow-left"></i>
+        </a>
+        <span class="navbar-brand">
+          <i class="bi bi-plus-circle"></i> Nuevo Motorista
+        </span>
+      </div>
+      
+    </div>
+  </nav>
+
+  <div class="container pb-5">
+    <div class="card-custom">
+      <div class="card-header-custom">
+        <i class="bi bi-person-badge"></i>
+        Información del Motorista
+      </div>
+      <div class="card-body-custom">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          
+          <!-- Información del usuario -->
+          <div class="section-title">
+            <i class="bi bi-person-circle"></i>
+            Datos Personales
+          </div>
+          <div class="form-section">
+            <div class="row g-3">
+              {% for field in form %}
+                {% if field.name == 'usuario' or field.name == 'disponible_hoy' %}
+                  <div class="col-md-12 field-wrapper">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.help_text %}
+                      <small class="helptext">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% if field.errors %}
+                      <div class="invalid-feedback d-block">
+                        {{ field.errors }}
+                      </div>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Licencia de conducir -->
+          <div class="section-title">
+            <i class="bi bi-card-heading"></i>
+            Licencia de Conducir
+          </div>
+          <div class="form-section">
+            <div class="row g-3">
+              <div class="col-md-6 field-wrapper">
+                <label>Archivo licencia vigente</label>
+                <input class="form-control" type="file" name="licencia_archivo" accept=".pdf,image/*" />
+                <small class="form-text">PDF o imagen; máximo 10MB.</small>
+              </div>
+              <div class="col-md-6 field-wrapper">
+                <label>Archivo permiso de circulación</label>
+                <input class="form-control" type="file" name="permiso_circulacion_archivo" accept=".pdf,image/*" />
+                <small class="form-text">PDF o imagen; máximo 10MB.</small>
+              </div>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="row g-3">
+              {% for field in form %}
+                {% if 'licencia' in field.name %}
+                  <div class="col-md-{% if field.name == 'licencia_numero' or field.name == 'licencia_clase' %}6{% else %}12{% endif %} field-wrapper">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.help_text %}
+                      <small class="helptext">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% if field.errors %}
+                      <div class="invalid-feedback d-block">
+                        {{ field.errors }}
+                      </div>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Información de emergencia -->
+          <div class="section-title">
+            <i class="bi bi-telephone"></i>
+            Contacto de Emergencia
+          </div>
+          <div class="form-section">
+            <div class="row g-3">
+              {% for field in form %}
+                {% if 'emergencia' in field.name %}
+                  <div class="col-md-{% if field.name == 'emergencia_telefono' %}6{% else %}12{% endif %} field-wrapper">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.help_text %}
+                      <small class="helptext">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% if field.errors %}
+                      <div class="invalid-feedback d-block">
+                        {{ field.errors }}
+                      </div>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Estadísticas de rendimiento -->
+          <div class="section-title">
+            <i class="bi bi-graph-up"></i>
+            Estadísticas de Rendimiento
+          </div>
+          <div class="form-section">
+            <div class="row g-3">
+              {% for field in form %}
+                {% if 'total_entregas' in field.name %}
+                  <div class="col-md-6 field-wrapper">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.help_text %}
+                      <small class="helptext">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% if field.errors %}
+                      <div class="invalid-feedback d-block">
+                        {{ field.errors }}
+                      </div>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Estado de disponibilidad -->
+          <div class="form-section">
+            <div class="row">
+              <div class="col-md-12">
+                {% for field in form %}
+                  {% if field.name == 'disponible_hoy' %}
+                    <div class="form-check">
+                      {{ field }}
+                      {{ field.label_tag }}
+                      {% if field.help_text %}
+                        <small class="form-text d-block">{{ field.help_text }}</small>
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Botones de acción -->
+          <div class="d-flex justify-content-end gap-2 mt-4">
+            <a class="btn btn-outline-custom btn-custom" href="{% url 'listado_motoristas' %}">
+              <i class="bi bi-x-lg"></i> Cancelar
+            </a>
+            <button class="btn btn-success-custom btn-custom" type="submit">
+              <i class="bi bi-check-lg"></i> Guardar Motorista
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+      // Añadir clase a checkboxes
+      document.querySelectorAll('input[type="checkbox"]').forEach(function(el){
+        if (!el.classList.contains('form-check-input')) {
+          el.classList.add('form-check-input');
+        }
+      });
+
+      // Añadir clase a labels de checkboxes
+      document.querySelectorAll('.form-check input[type="checkbox"] + label').forEach(function(el){
+        if (!el.classList.contains('form-check-label')) {
+          el.classList.add('form-check-label');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

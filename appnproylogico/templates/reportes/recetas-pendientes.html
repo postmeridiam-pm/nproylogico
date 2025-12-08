@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Recetas pendientes de devolución</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+  <div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-2">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Inicio</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Reportes · Recetas pendientes</li>
+      </ol>
+    </nav>
+    <h1 class="h4 mb-3">Recetas pendientes de devolución</h1>
+    <div class="d-flex mb-3 gap-2">
+      <a class="btn btn-outline-dark btn-pill" href="{% url 'home' %}"><i class="bi bi-house"></i> Volver al inicio</a>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead><tr><th>Código</th><th>Receta</th><th>Farmacia</th><th>Motorista</th><th>Cliente</th><th>Estado</th><th>Días</th><th>Alerta</th></tr></thead>
+        <tbody>
+          {% for r in rows %}
+          <tr>
+            <td>{{ r.1 }}</td><td>{{ r.2 }}</td><td>{{ r.7 }}</td><td>{{ r.10 }}</td><td>{{ r.12 }}</td><td>{{ r.14 }}</td><td>{{ r.6 }}</td><td>{{ r.15 }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="8" class="text-center text-muted">Sin datos</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+</body>
+</html>

@@ -1,0 +1,160 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panel de Supervisor</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+</head>
+<body class="has-topbar">
+  <nav class="navbar navbar-expand fixed-top" role="navigation" aria-label="Barra superior">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'home' %}" aria-label="Inicio">
+        <i class="bi bi-house"></i>
+        <span>Inicio</span>
+      </a>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a href="{% url 'home' %}">Inicio</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Supervisor</li>
+        </ol>
+      </nav>
+      <div class="d-flex align-items-center gap-2">
+        <a class="btn btn-outline-warning btn-pill" href="{% url 'feed_avisos_operadora' %}">
+          <i class="bi bi-exclamation-triangle"></i> Ver incidencias
+          {% if avisos_no_leidos and avisos_no_leidos > 0 %}
+          <span class="badge bg-danger ms-1">{{ avisos_no_leidos }}</span>
+          {% endif %}
+        </a>
+        <a class="btn btn-outline-secondary btn-pill" href="{% url 'perfil' %}"><i class="bi bi-person"></i> Perfil</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-4">
+    <div class="help-banner">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          Bienvenido al Panel de Supervisor. Accede rápido a tus funciones clave.
+        </div>
+        <div class="d-inline-flex gap-2">
+          <a class="btn btn-sm btn-outline-secondary" href="{% url 'mis_permisos' %}">Mis permisos</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="bi bi-diagram-3"></i>
+              <strong>Asignaciones Motorista–Farmacia</strong>
+            </div>
+            <div class="text-muted mb-3">Total: {{ total_asignaciones }}</div>
+            <div class="d-grid gap-2">
+              <a class="btn btn-outline-primary" href="{% url 'listado_asignaciones_mf' %}"><i class="bi bi-list"></i> Listar</a>
+              <a class="btn btn-outline-success" href="{% url 'agregar_asignacion_mf' %}"><i class="bi bi-plus-lg"></i> Agregar</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="bi bi-person-badge"></i>
+              <strong>Motoristas</strong>
+            </div>
+            <div class="text-muted mb-3">Total: {{ total_motoristas }}</div>
+            <div class="d-grid gap-2">
+              <a class="btn btn-outline-primary" href="{% url 'listado_motoristas' %}"><i class="bi bi-list"></i> Listar</a>
+              <a class="btn btn-outline-success" href="{% url 'agregar_motorista' %}"><i class="bi bi-plus-lg"></i> Agregar</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="bi bi-truck"></i>
+              <strong>Despachos activos</strong>
+            </div>
+            <div class="text-muted mb-3">Monitorea estado, incidencias y receta retenida</div>
+            <div class="d-grid gap-2">
+              <a class="btn btn-outline-primary" href="{% url 'despachos_activos' %}"><i class="bi bi-activity"></i> Ver tabla</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3 mt-1">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="bi bi-shop"></i>
+              <strong>Farmacias</strong>
+            </div>
+            <div class="text-muted mb-3">Total: {{ total_farmacias }}</div>
+            <div class="d-grid gap-2">
+              <a class="btn btn-outline-primary" href="{% url 'listado_farmacias' %}"><i class="bi bi-list"></i> Listar</a>
+              <a class="btn btn-outline-success" href="{% url 'agregar_farmacia' %}"><i class="bi bi-plus-lg"></i> Agregar</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="bi bi-bicycle"></i>
+              <strong>Motos</strong>
+            </div>
+            <div class="text-muted mb-3">Total: {{ total_motos }}</div>
+            <div class="d-grid gap-2">
+              <a class="btn btn-outline-primary" href="{% url 'listado_motos' %}"><i class="bi bi-list"></i> Listar</a>
+              <a class="btn btn-outline-success" href="{% url 'agregar_moto' %}"><i class="bi bi-plus-lg"></i> Agregar</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="bi bi-exclamation-triangle"></i>
+              <strong>IA · Sugerencias</strong>
+            </div>
+            <div class="text-muted mb-3">Analiza fallidos y pendientes críticos</div>
+            <div class="d-grid gap-2">
+              <a class="btn btn-outline-primary" href="{% url 'ia_sugerencias' %}?estado=FALLIDO&limit=50"><i class="bi bi-activity"></i> Ver fallidos</a>
+            </div>
+            {% if ia_sugerencias_preview %}
+            <div class="table-responsive mt-3">
+              <table class="table table-sm">
+                <thead><tr><th>Código</th><th>Estado</th><th>Prioridad</th><th>Cliente</th><th>Sugerencia</th></tr></thead>
+                <tbody>
+                  {% for r in ia_sugerencias_preview %}
+                  <tr><td>{{ r.codigo }}</td><td>{{ r.estado }}</td><td>{{ r.prioridad }}</td><td>{{ r.cliente }}</td><td>{{ r.sugerencia }}</td></tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
