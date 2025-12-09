@@ -481,6 +481,12 @@
           <a class="btn-success-nav" href="{% url 'agregar_farmacia' %}">
             <i class="bi bi-plus-lg"></i> Nueva
           </a>
+          <a class="btn-success-nav" href="{% url 'geolocalizar_farmacias' %}?limite=10">
+            <i class="bi bi-geo-alt"></i> Geolocalizar 10
+          </a>
+          <a class="btn-success-nav" href="{% url 'geolocalizar_farmacias' %}?limite=50">
+            <i class="bi bi-geo-alt"></i> Geolocalizar 50
+          </a>
         </div>
       </div>
 
@@ -550,7 +556,7 @@
   <div class="container pb-5">
     <div class="help-banner">
       <div class="d-flex justify-content-between align-items-center">
-        <div>Consejo: ordena por nombre o comuna. Si tienes un archivo Excel, puedes importarlo desde el menú Farmacias → Importar (o desde Admin).</div>
+        <div>Consejo: Puedes ordenar por nombre o comuna. Si tienes un archivo Excel, puedes importarlo desde el menú Farmacias → Importa.</div>
         <button id="hide-help-far" class="btn btn-sm btn-outline-secondary">No mostrar</button>
       </div>
     </div>

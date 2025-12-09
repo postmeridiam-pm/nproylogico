@@ -29,7 +29,6 @@
       <a class="navbar-brand text-white" href="{% url 'home' %}"><i class="bi bi-grid-3x3-gap-fill"></i> Panel Operadora</a>
       <div class="d-flex gap-2">
         <a class="btn btn-success" href="{% url 'despachos_activos' %}"><i class="bi bi-activity"></i> Despachos activos</a>
-        <a class="btn btn-success" href="{% url 'geolocalizar_farmacias' %}?limite=10"><i class="bi bi-geo-alt"></i> Geolocalizar 10</a>
       </div>
     </div>
   </nav>
@@ -107,17 +106,7 @@
           </div></div>
         </a>
       </div>
-      <div class="col-12 col-md-6 col-lg-3">
-        <a class="text-decoration-none" href="{% url 'geolocalizacion_panel' %}">
-          <div class="card h-100 card-hover section-card"><div class="card-body">
-            <div class="d-flex align-items-center gap-2 mb-2">
-              <i class="bi bi-geo-alt fs-3 text-success"></i>
-              <h3 class="h6 mb-0">Geolocalización</h3>
-            </div>
-            <p class="text-muted mb-0">Ver pendientes y últimos validados</p>
-          </div></div>
-        </a>
-      </div>
+      
     </div>
   </div>
 

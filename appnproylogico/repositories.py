@@ -3,9 +3,12 @@ from django.utils import timezone
 from .models import Despacho, Localfarmacia
 
 def fetchall(sql, params=None):
-    with connection.cursor() as cur:
-        cur.execute(sql, params or [])
-        return cur.fetchall()
+    try:
+        with connection.cursor() as cur:
+            cur.execute(sql, params or [])
+            return cur.fetchall()
+    except Exception:
+        return []
 
 def get_despachos_activos():
     sql = (

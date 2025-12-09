@@ -560,7 +560,7 @@
               {% empty %}
               {% for s in samples %}
               <tr>
-                <td>{% if s.usuario_nombre %}{{ s.usuario_nombre }} {{ s.usuario_apellido }}{% else %}Usuario ID {{ s.usuario_id }}{% endif %}</td>
+                <td>{% if s.usuario_nombre %}{{ s.usuario_nombre }} {{ s.usuario_apellido }}{% else %}Usuario ID {{ s.codigo_motorista }}{% endif %}</td>
                 <td class="col-optional">{{ s.licencia_numero }} {{ s.licencia_clase }}</td>
                 <td class="col-optional">{{ s.emergencia_telefono }}</td>
                 <td>

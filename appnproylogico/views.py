@@ -2317,7 +2317,7 @@ def consulta_rapida(request):
     results = []
     with connection.cursor() as cur:
         cur.execute(
-            "SELECT d.codigo_despacho, lf.local_nombre, CONCAT(u.nombre,' ',u.apellido) AS motorista, d.cliente_nombre, d.estado, d.tipo_despacho, d.prioridad, d.fecha_registro FROM despacho d JOIN localfarmacia lf ON d.farmacia_origen_local_id = lf.local_id JOIN motorista mot ON d.motorista_id = mot.id JOIN usuario u ON mot.usuario_id = u.id WHERE (lf.local_nombre LIKE %s OR %s = '') AND (CONCAT(u.nombre,' ',u.apellido) LIKE %s OR %s = '') AND (d.cliente_nombre LIKE %s OR %s = '') ORDER BY d.fecha_registro DESC LIMIT 200",
+            "SELECT d.codigo_despacho, lf.local_nombre, CONCAT(u.nombre,' ',u.apellido) AS motorista, d.cliente_nombre, d.estado, d.tipo_despacho, d.prioridad, d.fecha_registro FROM despacho d JOIN localfarmacia lf ON d.farmacia_origen_local_id = lf.local_id JOIN motorista mot ON d.motorista_id = mot.id JOIN usuario u ON mot.codigo_motorista = u.id WHERE (lf.local_nombre LIKE %s OR %s = '') AND (CONCAT(u.nombre,' ',u.apellido) LIKE %s OR %s = '') AND (d.cliente_nombre LIKE %s OR %s = '') ORDER BY d.fecha_registro DESC LIMIT 200",
             [f"%{local}%", local, f"%{motorista}%", motorista, f"%{cliente}%", cliente]
         )
         results = cur.fetchall()
