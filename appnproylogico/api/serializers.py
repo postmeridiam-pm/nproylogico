@@ -1,15 +1,6 @@
 from rest_framework import serializers
-from ..models import Despacho, MovimientoDespacho, Localfarmacia, Motorista, Moto
+from ..models import Localfarmacia, Motorista, Moto
 
-class DespachoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Despacho
-        fields = ('id','codigo_despacho','estado','tipo_despacho','prioridad','farmacia_origen_local_id','motorista','cliente_nombre','destino_direccion','tiene_receta_retenida','hubo_incidencia','fecha_registro')
-
-class MovimientoDespachoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MovimientoDespacho
-        fields = ('id','despacho','estado_anterior','estado_nuevo','fecha_movimiento','observacion')
 
 class LocalfarmaciaSerializer(serializers.ModelSerializer):
     class Meta:

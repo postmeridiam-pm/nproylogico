@@ -1,21 +1,7 @@
 from rest_framework import generics, filters
 from rest_framework.permissions import IsAuthenticated
-from ..models import Despacho, MovimientoDespacho, Localfarmacia, Motorista, Moto
-from .serializers import DespachoSerializer, MovimientoDespachoSerializer, LocalfarmaciaSerializer, MotoristaSerializer, MotoSerializer
-
-class DespachoList(generics.ListAPIView):
-    queryset = Despacho.objects.all().order_by('-fecha_registro')
-    serializer_class = DespachoSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['codigo_despacho','cliente_nombre','farmacia_origen_local_id']
-    permission_classes = [IsAuthenticated]
-
-class MovimientoList(generics.ListAPIView):
-    queryset = MovimientoDespacho.objects.select_related('despacho').order_by('-fecha_movimiento')
-    serializer_class = MovimientoDespachoSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['despacho__codigo_despacho','estado_nuevo','observacion']
-    permission_classes = [IsAuthenticated]
+from ..models import Localfarmacia, Motorista, Moto
+from .serializers import LocalfarmaciaSerializer, MotoristaSerializer, MotoSerializer
 
 class FarmaciaList(generics.ListAPIView):
     queryset = Localfarmacia.objects.all().order_by('local_nombre')

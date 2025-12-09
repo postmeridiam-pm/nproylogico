@@ -43,6 +43,16 @@ def _cliente_normalizado(nombre: str):
     }
     return f"Cliente {mapa.get(n, 'uno')}"
 
+def _estado_normalizado(s: str):
+    v = (s or '').strip().upper()
+    if v in {'ENTREGADO', 'COMPLETADO'}:
+        return 'ENTREGADO'
+    if v in {'FALLIDO', 'ERROR'}:
+        return 'FALLIDO'
+    if v in {'PENDIENTE', 'EN_CAMINO', 'ASIGNADO', 'EN_RUTA'}:
+        return 'PENDIENTE'
+    return v or 'PENDIENTE'
+
 def _ingestar_motos_json():
     try:
         from .models import Moto
@@ -1893,28 +1903,109 @@ def export_resumen_operativo(request):
         except Exception:
             rows = []
     elif tipo == 'diario' and detalle:
-        from .models import Despacho
-        from django.utils import timezone
-        hoy = timezone.now().date()
-        qs = Despacho.objects.filter(fecha_registro__date=hoy).order_by('-fecha_registro')
-        headers = ['Local','Despacho','Estado','Fecha']
+        from .models import Despacho, Localfarmacia
+        fecha_arg = (request.GET.get('fecha') or timezone.now().strftime('%Y-%m-%d'))
+        headers = ['Local','Despacho','Estado','Tipo','Prioridad','Motorista','Cliente','Dirección','Con receta','Incidencia','Fecha']
         filename = 'movimientos_diario'
-        rows = [[d.farmacia_origen_local_id, d.codigo_despacho or d.id, d.estado, d.fecha_registro.strftime('%Y-%m-%d %H:%M')] for d in qs]
+        rows = []
+        try:
+            y, m, d = [int(x) for x in fecha_arg.split('-')]
+        except Exception:
+            y, m, d = timezone.now().year, timezone.now().month, timezone.now().day
+        qs = Despacho.objects.filter(fecha_registro__year=y, fecha_registro__month=m, fecha_registro__day=d).order_by('fecha_registro')
+        for obj in qs:
+            try:
+                farm = Localfarmacia.objects.filter(local_id=obj.farmacia_origen_local_id).first()
+                u = getattr(obj.motorista, 'usuario', None)
+                mot_name = f"{getattr(u,'nombre','')} {getattr(u,'apellido','')}".strip()
+                estado_norm = _estado_normalizado(obj.estado)
+                if estado_norm not in {'ENTREGADO','FALLIDO','PENDIENTE'}:
+                    continue
+                rows.append([
+                    getattr(farm,'local_id', obj.farmacia_origen_local_id) or '',
+                    obj.codigo_despacho or obj.id,
+                    estado_norm,
+                    obj.tipo_despacho or '',
+                    obj.prioridad or '',
+                    mot_name,
+                    _cliente_normalizado(obj.cliente_nombre),
+                    obj.destino_direccion or '',
+                    'Sí' if obj.tiene_receta_retenida else 'No',
+                    'Sí' if obj.hubo_incidencia else 'No',
+                    obj.fecha_registro.strftime('%Y-%m-%d %H:%M') if obj.fecha_registro else '',
+                ])
+            except Exception:
+                continue
     elif tipo == 'mensual' and detalle:
-        from .models import Despacho
+        from .models import Despacho, Localfarmacia
         y = int(anio) if anio else None
         m = int(mes) if mes else None
-        qs = Despacho.objects.all().order_by('-fecha_registro')
+        qs = Despacho.objects.all().order_by('fecha_registro')
         if y: qs = qs.filter(fecha_registro__year=y)
         if m: qs = qs.filter(fecha_registro__month=m)
-        headers = ['Local','Despacho','Estado','Fecha']
+        headers = ['Local','Despacho','Estado','Tipo','Prioridad','Motorista','Cliente','Dirección','Con receta','Incidencia','Fecha']
         filename = f'movimientos_mensual_{anio or "todos"}_{mes or "todos"}'
-        rows = [[d.farmacia_origen_local_id, d.codigo_despacho or d.id, d.estado, d.fecha_registro.strftime('%Y-%m-%d %H:%M')] for d in qs]
+        rows = []
+        for obj in qs:
+            try:
+                farm = Localfarmacia.objects.filter(local_id=obj.farmacia_origen_local_id).first()
+                u = getattr(obj.motorista, 'usuario', None)
+                mot_name = f"{getattr(u,'nombre','')} {getattr(u,'apellido','')}".strip()
+                estado_norm = _estado_normalizado(obj.estado)
+                if estado_norm not in {'ENTREGADO','FALLIDO','PENDIENTE'}:
+                    continue
+                rows.append([
+                    getattr(farm,'local_id', obj.farmacia_origen_local_id) or '',
+                    obj.codigo_despacho or obj.id,
+                    estado_norm,
+                    obj.tipo_despacho or '',
+                    obj.prioridad or '',
+                    mot_name,
+                    _cliente_normalizado(obj.cliente_nombre),
+                    obj.destino_direccion or '',
+                    'Sí' if obj.tiene_receta_retenida else 'No',
+                    'Sí' if obj.hubo_incidencia else 'No',
+                    obj.fecha_registro.strftime('%Y-%m-%d %H:%M') if obj.fecha_registro else '',
+                ])
+            except Exception:
+                continue
     else:
-        rows = get_resumen_operativo_anual(anio=anio)
-        headers = ['Año','Farmacia','Comuna','Total despachos','Entregados','Fallidos','Directo','Reenvío receta','Intercambio','Error despacho','Con receta','Con incidencias']
-        filename = f'resumen_anual_{anio or "todos"}'
-        rows = [[r[0], r[2], r[3], r[4], r[5], r[13], r[14], r[15], r[16], r[10], r[11]] for r in rows]
+        if detalle:
+            from .models import Despacho, Localfarmacia
+            y = int(anio) if anio else None
+            qs = Despacho.objects.all().order_by('fecha_registro')
+            if y: qs = qs.filter(fecha_registro__year=y)
+            headers = ['Local','Despacho','Estado','Tipo','Prioridad','Motorista','Cliente','Dirección','Con receta','Incidencia','Fecha']
+            filename = f'movimientos_anual_{anio or "todos"}'
+            rows = []
+            for obj in qs:
+                try:
+                    farm = Localfarmacia.objects.filter(local_id=obj.farmacia_origen_local_id).first()
+                    u = getattr(obj.motorista, 'usuario', None)
+                    mot_name = f"{getattr(u,'nombre','')} {getattr(u,'apellido','')}".strip()
+                    estado_norm = _estado_normalizado(obj.estado)
+                    if estado_norm not in {'ENTREGADO','FALLIDO','PENDIENTE'}:
+                        continue
+                    rows.append([
+                        getattr(farm,'local_id', obj.farmacia_origen_local_id) or '',
+                        obj.codigo_despacho or obj.id,
+                        estado_norm,
+                        obj.tipo_despacho or '',
+                        obj.prioridad or '',
+                        mot_name,
+                        _cliente_normalizado(obj.cliente_nombre),
+                        obj.destino_direccion or '',
+                        'Sí' if obj.tiene_receta_retenida else 'No',
+                        'Sí' if obj.hubo_incidencia else 'No',
+                        obj.fecha_registro.strftime('%Y-%m-%d %H:%M') if obj.fecha_registro else '',
+                    ])
+                except Exception:
+                    continue
+        else:
+            rows = get_resumen_operativo_anual(anio=anio)
+            headers = ['Año','Farmacia','Comuna','Total despachos','Entregados','Fallidos','Directo','Reenvío receta','Intercambio','Error despacho','Con receta','Con incidencias']
+            filename = f'resumen_anual_{anio or "todos"}'
+            rows = [[r[0], r[2], r[3], r[4], r[5], r[13], r[14], r[15], r[16], r[10], r[11]] for r in rows]
 
     if not rows and tipo != 'despachos_activos':
         try:
@@ -2164,6 +2255,43 @@ def despachos_activos(request):
         'receta': receta,
         'incidencia': incidencia,
     })
+
+
+@permiso_requerido('movimientos', 'view')
+def api_despachos_activos(request):
+    rows = get_despachos_activos()
+    rol = obtener_rol_usuario(request.user)
+    data = []
+    for r in rows:
+        item = {
+            'id': r[0],
+            'codigo_despacho': r[1],
+            'estado': r[2],
+            'tipo_despacho': r[3],
+            'prioridad': r[4],
+            'farmacia_origen': r[5],
+            'motorista': r[6],
+            'moto_patente': r[7],
+            'cliente_nombre': r[8],
+            'cliente_telefono': r[9],
+            'destino_direccion': r[10],
+            'tiene_receta_retenida': bool(r[11]),
+            'requiere_aprobacion_operadora': bool(r[12]),
+            'aprobado_por_operadora': bool(r[13]),
+            'fecha_registro': str(r[14]),
+            'fecha_asignacion': str(r[15]),
+            'fecha_salida_farmacia': str(r[16]),
+            'minutos_en_ruta': r[17],
+            'hubo_incidencia': bool(r[18]),
+            'tipo_incidencia': r[19],
+            'coordenadas_destino': r[20],
+        }
+        if rol != 'admin':
+            s = str(item['cliente_telefono'] or '').strip()
+            item['cliente_telefono'] = '***' if not s else ('***' + s[-3:] if len(s) > 3 else '***')
+        data.append(item)
+    from django.http import JsonResponse
+    return JsonResponse({'items': data, 'count': len(data)})
 
 
 @permiso_requerido('movimientos', 'view')

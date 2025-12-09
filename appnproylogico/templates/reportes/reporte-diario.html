@@ -459,7 +459,7 @@
             </div>
           </div>
           <div class="col-12">
-            <a class="btn btn-success w-100" href="{% url 'export_resumen_operativo' %}?tipo={{ request.GET.tipo_reporte|default:'diario' }}&formato=pdf&detalle=1">
+            <a class="btn btn-success w-100" href="{% url 'export_resumen_operativo' %}?tipo={{ request.GET.tipo_reporte|default:'diario' }}&formato=pdf&detalle=1{% if form.fecha.value %}&fecha={{ form.fecha.value }}{% endif %}">
               <i class="bi bi-file-earmark-pdf"></i> Descargar PDF
             </a>
           </div>
