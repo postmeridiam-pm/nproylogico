@@ -41,6 +41,7 @@ urlpatterns = [
     path('configuracion/', views_configuration.configuracion, name='panel_configuracion'),
     path('configuracion/mis-permisos/', views_configuration.mis_permisos, name='mis_permisos'),
     path('configuracion/gestionar-usuarios/', views_configuration.gestionar_usuarios, name='gestionar_usuarios'),
+    path('configuracion/preferencias/', views_configuration.preferencias, name='preferencias'),
     
     path('configuracion/asignar-rol/<int:user_id>/', views_configuration.asignar_rol, name='asignar_rol'),
     path('configuracion/cambiar-contrasena/', views_configuration.cambiar_contrasena, name='cambiar_contrasena'),
@@ -76,6 +77,7 @@ urlpatterns = [
     path('motorista/despachos/<int:despacho_id>/estado/', views.motorista_despacho_estado, name='motorista_despacho_estado'),
 
     path('motos/', views.listado_motos, name='listado_motos'),
+    path('motos/buscar/', views.buscar_moto, name='buscar_moto'),
     path('motos/agregar/', views.agregar_moto, name='agregar_moto'),
     path('motos/<int:pk>/', views.detalle_moto, name='detalle_moto'),
     path('motos/<int:pk>/actualizar/', views.actualizar_moto, name='actualizar_moto'),

@@ -2011,8 +2011,8 @@ def export_resumen_operativo(request):
         try:
             from django.db.models import Count, Q, Avg, Sum
             from .models import Despacho, Localfarmacia
-            from django.utils import timezone
-            hoy = timezone.now().date()
+            from django.utils import timezone as _tz
+            hoy = _tz.now().date()
             qs = Despacho.objects.all()
             if tipo == 'diario':
                 qs = qs.filter(fecha_registro__date=hoy)

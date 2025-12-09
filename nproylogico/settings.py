@@ -15,7 +15,6 @@ import os
 import pymysql
 pymysql.install_as_MySQLdb()
 
-#IA 
 from dotenv import load_dotenv
 load_dotenv()
 

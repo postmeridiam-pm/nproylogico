@@ -11,243 +11,89 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='despacho',
-            name='medico_nombre',
+        migrations.SeparateDatabaseAndState(
+            database_operations=[],
+            state_operations=[
+                migrations.RemoveField(model_name='despacho', name='medico_nombre'),
+                migrations.RemoveField(model_name='despacho', name='medico_rut'),
+                migrations.RemoveField(model_name='despacho', name='paciente_codigo_anonimo'),
+                migrations.RemoveField(model_name='despacho', name='paciente_nombre'),
+                migrations.RemoveField(model_name='usuario', name='consiente_datos_salud'),
+                migrations.RemoveField(model_name='usuario', name='fecha_consentimiento_salud'),
+            ],
         ),
-        migrations.RemoveField(
-            model_name='despacho',
-            name='medico_rut',
+        migrations.SeparateDatabaseAndState(
+            database_operations=[],
+            state_operations=[
+                migrations.AddField(
+                    model_name='asignacionmotomotorista',
+                    name='moto',
+                    field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.moto'),
+                ),
+                migrations.AddField(
+                    model_name='asignacionmotomotorista',
+                    name='motorista',
+                    field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.motorista'),
+                ),
+            ],
         ),
-        migrations.RemoveField(
-            model_name='despacho',
-            name='paciente_codigo_anonimo',
+        migrations.SeparateDatabaseAndState(
+            database_operations=[],
+            state_operations=[
+                migrations.AddField(
+                    model_name='asignacionmotoristafarmacia',
+                    name='farmacia',
+                    field=models.ForeignKey(blank=True, db_column='farmacia_id', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.localfarmacia'),
+                ),
+                migrations.AddField(
+                    model_name='asignacionmotoristafarmacia',
+                    name='motorista',
+                    field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.motorista'),
+                ),
+            ],
         ),
-        migrations.RemoveField(
-            model_name='despacho',
-            name='paciente_nombre',
-        ),
-        migrations.RemoveField(
-            model_name='usuario',
-            name='consiente_datos_salud',
-        ),
-        migrations.RemoveField(
-            model_name='usuario',
-            name='fecha_consentimiento_salud',
-        ),
-        migrations.AddField(
-            model_name='asignacionmotomotorista',
-            name='moto',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.moto'),
-        ),
-        migrations.AddField(
-            model_name='asignacionmotomotorista',
-            name='motorista',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.motorista'),
-        ),
-        migrations.AddField(
-            model_name='asignacionmotoristafarmacia',
-            name='farmacia',
-            field=models.ForeignKey(blank=True, db_column='farmacia_id', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.localfarmacia'),
-        ),
-        migrations.AddField(
-            model_name='asignacionmotoristafarmacia',
-            name='motorista',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.motorista'),
-        ),
-        migrations.AddField(
-            model_name='auditoriageneral',
-            name='usuario',
-            field=models.ForeignKey(blank=True, db_comment='Usuario que realizó la acción (NULL si es acción del sistema)', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.usuario'),
-        ),
-        migrations.AddField(
-            model_name='comuna',
-            name='region',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.region'),
-        ),
-        migrations.AddField(
-            model_name='despacho',
-            name='motorista',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.motorista'),
-        ),
-        migrations.AddField(
-            model_name='despacho',
-            name='usuario_aprobador',
-            field=models.ForeignKey(blank=True, db_comment='Supervisor que aprobó', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.usuario'),
-        ),
-        migrations.AddField(
-            model_name='despacho',
-            name='usuario_modificacion',
-            field=models.ForeignKey(blank=True, db_comment='Último usuario que modificó', null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='despacho_usuario_modificacion_set', to='appnproylogico.usuario'),
-        ),
-        migrations.AddField(
-            model_name='despacho',
-            name='usuario_registro',
-            field=models.ForeignKey(blank=True, db_comment='Operadora que registró', null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='despacho_usuario_registro_set', to='appnproylogico.usuario'),
-        ),
-        migrations.AddField(
-            model_name='localfarmacia',
-            name='fk_comuna',
-            field=models.ForeignKey(blank=True, db_column='fk_comuna', db_comment='Opcional: se asigna después de carga', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.comuna'),
-        ),
-        migrations.AddField(
-            model_name='localfarmacia',
-            name='fk_localidad',
-            field=models.ForeignKey(blank=True, db_column='fk_localidad', db_comment='Opcional: se asigna después de carga', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.localidad'),
-        ),
-        migrations.AddField(
-            model_name='localfarmacia',
-            name='fk_region',
-            field=models.ForeignKey(blank=True, db_column='fk_region', db_comment='Opcional: se asigna después de carga', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.region'),
-        ),
-        migrations.AddField(
-            model_name='localfarmacia',
-            name='usuario_modificacion',
-            field=models.ForeignKey(blank=True, db_comment='ID del usuario que modificó por última vez', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.usuario'),
-        ),
-        migrations.AddField(
-            model_name='localidad',
-            name='comuna',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.comuna'),
-        ),
-        migrations.AddField(
-            model_name='moto',
-            name='motorista_propietario',
-            field=models.ForeignKey(blank=True, db_comment='Si propietario es MOTORISTA, referencia a la persona', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.motorista'),
-        ),
-        migrations.AddField(
-            model_name='moto',
-            name='permiso_circulacion_anio',
-            field=models.PositiveSmallIntegerField(blank=True, db_comment='Año del permiso de circulación vigente', null=True),
-        ),
-        migrations.AddField(
-            model_name='moto',
-            name='propietario_tipo',
-            field=models.CharField(blank=True, db_comment='EMPRESA o MOTORISTA', max_length=9, null=True),
-        ),
-        migrations.AddField(
-            model_name='moto',
-            name='revision_tecnica_anio',
-            field=models.PositiveSmallIntegerField(blank=True, db_comment='Año de la revisión técnica vigente', null=True),
-        ),
-        migrations.AddField(
-            model_name='moto',
-            name='seguro_obligatorio_anio',
-            field=models.PositiveSmallIntegerField(blank=True, db_comment='Año del seguro obligatorio vigente', null=True),
-        ),
-        migrations.AddField(
-            model_name='moto',
-            name='usuario_modificacion',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.usuario'),
-        ),
-        migrations.AddField(
-            model_name='motorista',
-            name='apellido_materno',
-            field=models.CharField(blank=True, max_length=50, null=True),
-        ),
-        migrations.AddField(
-            model_name='motorista',
-            name='apellido_paterno',
-            field=models.CharField(blank=True, max_length=50, null=True),
-        ),
-        migrations.AddField(
-            model_name='motorista',
-            name='codigo_motorista',
-            field=models.CharField(blank=True, db_comment='Código interno del motorista', max_length=20, null=True, unique=True),
-        ),
-        migrations.AddField(
-            model_name='motorista',
-            name='comuna_nombre',
-            field=models.CharField(blank=True, max_length=80, null=True),
-        ),
-        migrations.AddField(
-            model_name='motorista',
-            name='direccion',
-            field=models.CharField(blank=True, max_length=200, null=True),
-        ),
-        migrations.AddField(
-            model_name='motorista',
-            name='email',
-            field=models.EmailField(blank=True, max_length=254, null=True),
-        ),
-        migrations.AddField(
-            model_name='motorista',
-            name='emergencias',
-            field=models.JSONField(blank=True, db_comment='Lista de contactos de emergencia adicionales (1–5)', null=True),
-        ),
-        migrations.AddField(
-            model_name='motorista',
-            name='fecha_nacimiento',
-            field=models.DateField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='motorista',
-            name='incluye_moto_personal',
-            field=models.BooleanField(db_comment='El motorista posee moto propia', default=False),
-        ),
-        migrations.AddField(
-            model_name='motorista',
-            name='licencia_archivo_path',
-            field=models.CharField(blank=True, db_comment='Ruta del archivo de licencia almacenado en MEDIA', max_length=200, null=True),
-        ),
-        migrations.AddField(
-            model_name='motorista',
-            name='licencia_fecha_control',
-            field=models.DateField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='motorista',
-            name='licencia_fecha_ultimo_control',
-            field=models.DateField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='motorista',
-            name='nombres',
-            field=models.CharField(blank=True, max_length=100, null=True),
-        ),
-        migrations.AddField(
-            model_name='motorista',
-            name='provincia_nombre',
-            field=models.CharField(blank=True, max_length=80, null=True),
-        ),
-        migrations.AddField(
-            model_name='motorista',
-            name='region_nombre',
-            field=models.CharField(blank=True, max_length=80, null=True),
-        ),
-        migrations.AddField(
-            model_name='motorista',
-            name='telefono',
-            field=models.CharField(blank=True, max_length=15, null=True),
-        ),
-        migrations.AddField(
-            model_name='motorista',
-            name='usuario',
-            field=models.OneToOneField(blank=True, db_comment='Herencia 1:1 con usuario', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.usuario'),
-        ),
-        migrations.AddField(
-            model_name='motorista',
-            name='usuario_modificacion',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='motorista_usuario_modificacion_set', to='appnproylogico.usuario'),
-        ),
-        migrations.AddField(
-            model_name='movimientodespacho',
-            name='despacho',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.despacho'),
-        ),
-        migrations.AddField(
-            model_name='movimientodespacho',
-            name='usuario',
-            field=models.ForeignKey(blank=True, db_comment='Quien registró el cambio (operadora por radio)', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.usuario'),
-        ),
-        migrations.AddField(
-            model_name='usuario',
-            name='rol',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.rol'),
-        ),
-        migrations.AddField(
-            model_name='usuario',
-            name='usuario_modificacion',
-            field=models.ForeignKey(blank=True, db_comment='ID del usuario que modificó por última vez', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.usuario'),
+        migrations.SeparateDatabaseAndState(
+            database_operations=[],
+            state_operations=[
+                migrations.AddField(model_name='auditoriageneral', name='usuario', field=models.ForeignKey(blank=True, db_comment='Usuario que realizó la acción (NULL si es acción del sistema)', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.usuario')),
+                migrations.AddField(model_name='comuna', name='region', field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.region')),
+                migrations.AddField(model_name='despacho', name='motorista', field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.motorista')),
+                migrations.AddField(model_name='despacho', name='usuario_aprobador', field=models.ForeignKey(blank=True, db_comment='Supervisor que aprobó', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.usuario')),
+                migrations.AddField(model_name='despacho', name='usuario_modificacion', field=models.ForeignKey(blank=True, db_comment='Último usuario que modificó', null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='despacho_usuario_modificacion_set', to='appnproylogico.usuario')),
+                migrations.AddField(model_name='despacho', name='usuario_registro', field=models.ForeignKey(blank=True, db_comment='Operadora que registró', null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='despacho_usuario_registro_set', to='appnproylogico.usuario')),
+                migrations.AddField(model_name='localfarmacia', name='fk_comuna', field=models.ForeignKey(blank=True, db_column='fk_comuna', db_comment='Opcional: se asigna después de carga', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.comuna')),
+                migrations.AddField(model_name='localfarmacia', name='fk_localidad', field=models.ForeignKey(blank=True, db_column='fk_localidad', db_comment='Opcional: se asigna después de carga', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.localidad')),
+                migrations.AddField(model_name='localfarmacia', name='fk_region', field=models.ForeignKey(blank=True, db_column='fk_region', db_comment='Opcional: se asigna después de carga', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.region')),
+                migrations.AddField(model_name='localfarmacia', name='usuario_modificacion', field=models.ForeignKey(blank=True, db_comment='ID del usuario que modificó por última vez', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.usuario')),
+                migrations.AddField(model_name='localidad', name='comuna', field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.comuna')),
+                migrations.AddField(model_name='moto', name='motorista_propietario', field=models.ForeignKey(blank=True, db_comment='Si propietario es MOTORISTA, referencia a la persona', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.motorista')),
+                migrations.AddField(model_name='moto', name='permiso_circulacion_anio', field=models.PositiveSmallIntegerField(blank=True, db_comment='Año del permiso de circulación vigente', null=True)),
+                migrations.AddField(model_name='moto', name='propietario_tipo', field=models.CharField(blank=True, db_comment='EMPRESA o MOTORISTA', max_length=9, null=True)),
+                migrations.AddField(model_name='moto', name='revision_tecnica_anio', field=models.PositiveSmallIntegerField(blank=True, db_comment='Año de la revisión técnica vigente', null=True)),
+                migrations.AddField(model_name='moto', name='seguro_obligatorio_anio', field=models.PositiveSmallIntegerField(blank=True, db_comment='Año del seguro obligatorio vigente', null=True)),
+                migrations.AddField(model_name='moto', name='usuario_modificacion', field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.usuario')),
+                migrations.AddField(model_name='motorista', name='apellido_materno', field=models.CharField(blank=True, max_length=50, null=True)),
+                migrations.AddField(model_name='motorista', name='apellido_paterno', field=models.CharField(blank=True, max_length=50, null=True)),
+                migrations.AddField(model_name='motorista', name='codigo_motorista', field=models.CharField(blank=True, db_comment='Código interno del motorista', max_length=20, null=True, unique=True)),
+                migrations.AddField(model_name='motorista', name='comuna_nombre', field=models.CharField(blank=True, max_length=80, null=True)),
+                migrations.AddField(model_name='motorista', name='direccion', field=models.CharField(blank=True, max_length=200, null=True)),
+                migrations.AddField(model_name='motorista', name='email', field=models.EmailField(blank=True, max_length=254, null=True)),
+                migrations.AddField(model_name='motorista', name='emergencias', field=models.JSONField(blank=True, db_comment='Lista de contactos de emergencia adicionales (1–5)', null=True)),
+                migrations.AddField(model_name='motorista', name='fecha_nacimiento', field=models.DateField(blank=True, null=True)),
+                migrations.AddField(model_name='motorista', name='incluye_moto_personal', field=models.BooleanField(db_comment='El motorista posee moto propia', default=False)),
+                migrations.AddField(model_name='motorista', name='licencia_archivo_path', field=models.CharField(blank=True, db_comment='Ruta del archivo de licencia almacenado en MEDIA', max_length=200, null=True)),
+                migrations.AddField(model_name='motorista', name='licencia_fecha_control', field=models.DateField(blank=True, null=True)),
+                migrations.AddField(model_name='motorista', name='licencia_fecha_ultimo_control', field=models.DateField(blank=True, null=True)),
+                migrations.AddField(model_name='motorista', name='nombres', field=models.CharField(blank=True, max_length=100, null=True)),
+                migrations.AddField(model_name='motorista', name='provincia_nombre', field=models.CharField(blank=True, max_length=80, null=True)),
+                migrations.AddField(model_name='motorista', name='region_nombre', field=models.CharField(blank=True, max_length=80, null=True)),
+                migrations.AddField(model_name='motorista', name='telefono', field=models.CharField(blank=True, max_length=15, null=True)),
+                migrations.AddField(model_name='motorista', name='usuario', field=models.OneToOneField(blank=True, db_comment='Herencia 1:1 con usuario', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.usuario')),
+                migrations.AddField(model_name='motorista', name='usuario_modificacion', field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='motorista_usuario_modificacion_set', to='appnproylogico.usuario')),
+                migrations.AddField(model_name='movimientodespacho', name='despacho', field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.despacho')),
+                migrations.AddField(model_name='movimientodespacho', name='usuario', field=models.ForeignKey(blank=True, db_comment='Quien registró el cambio (operadora por radio)', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.usuario')),
+                migrations.AddField(model_name='usuario', name='rol', field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.rol')),
+                migrations.AddField(model_name='usuario', name='usuario_modificacion', field=models.ForeignKey(blank=True, db_comment='ID del usuario que modificó por última vez', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='appnproylogico.usuario')),
+            ],
         ),
     ]
