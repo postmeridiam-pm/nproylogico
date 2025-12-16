@@ -12,3 +12,4 @@ whitenoise==6.7.0
 argon2-cffi==23.1.0
 django-location-field==2.7.3
 pymysql==1.1.1
+django-oauth-toolkit==3.1.0
