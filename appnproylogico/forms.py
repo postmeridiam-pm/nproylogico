@@ -615,7 +615,8 @@ class AsignacionMotoristaFarmaciaForm(forms.ModelForm):
             pass
         self.fields['motorista'].widget.attrs.update({'required': 'required', 'class': 'form-select'})
         self.fields['farmacia'].widget.attrs.update({'required': 'required', 'class': 'form-select'})
-        self.fields['fecha_asignacion'].widget = forms.DateTimeInput(attrs={'type': 'datetime-local', 'required': 'required', 'class': 'form-control'})
+        self.fields['fecha_asignacion'].widget = forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'})
+        self.fields['fecha_asignacion'].required = False
         try:
             self.fields['fecha_asignacion'].initial = timezone.now().replace(microsecond=0)
         except Exception:
@@ -636,6 +637,16 @@ class AsignacionMotoristaFarmaciaForm(forms.ModelForm):
         cleaned = super().clean()
         fa = cleaned.get('fecha_asignacion')
         fd = cleaned.get('fecha_desasignacion')
+        try:
+            from django.utils import timezone as tz
+            if not fa:
+                if getattr(self, 'instance', None) and getattr(self.instance, 'pk', None):
+                    cleaned['fecha_asignacion'] = getattr(self.instance, 'fecha_asignacion')
+                else:
+                    cleaned['fecha_asignacion'] = tz.now()
+                fa = cleaned['fecha_asignacion']
+        except Exception:
+            pass
         if fd and fa and fd < fa:
             self.add_error('fecha_desasignacion', 'La fecha de desasignación no puede ser anterior a la de asignación')
         try:

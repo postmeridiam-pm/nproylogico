@@ -653,13 +653,15 @@
             </div>
             <div>
               <strong>Teléfono:</strong> 
-              {% if despacho.cliente_telefono %}
-                <a href="tel:{{ despacho.cliente_telefono }}" style="color: var(--primary-color);">
-                  <i class="bi bi-telephone"></i> {{ despacho.cliente_telefono }}
-                </a>
-              {% else %}
-                <em class="text-muted">No especificado</em>
-              {% endif %}
+              {% with tel=despacho.cliente_telefono|default:'' %}
+                {% if tel and tel|length >= 9 %}
+                  <a href="tel:{{ tel }}" style="color: var(--primary-color);">
+                    <i class="bi bi-telephone"></i> {{ tel }}
+                  </a>
+                {% else %}
+                  <em class="text-muted">Sin información</em>
+                {% endif %}
+              {% endwith %}
             </div>
             <div>
               <strong>Dirección de destino:</strong> 

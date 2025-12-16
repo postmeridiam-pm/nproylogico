@@ -325,9 +325,14 @@
         font-size: 0.9rem;
       }
     }
+    .embed .navbar-custom,
+    .embed nav.breadcrumb,
+    .embed .btn-success-nav {
+      display: none !important;
+    }
   </style>
 </head>
-<body class="theme-light">
+<body class="{% if embed %}embed theme-light{% else %}theme-light{% endif %}">
   <nav class="navbar-custom">
     <div class="container-fluid">
       <div class="navbar-top-row">
@@ -379,11 +384,11 @@
             </div>
             <div class="mb-3">
               <div class="text-muted">Teléfono</div>
-              <div class="fw-semibold">{{ motorista.usuario.telefono|default:'-' }}</div>
+              <div class="fw-semibold">{% with tel=motorista.usuario.telefono|default:'' %}{% if tel and tel|length >= 9 %}{{ tel }}{% else %}Sin información{% endif %}{% endwith %}</div>
             </div>
             <div class="mb-3">
               <div class="text-muted">Contacto Emergencia</div>
-              <div class="fw-semibold">{{ motorista.emergencia_nombre|default:'-' }} · {{ motorista.emergencia_telefono|default:'-' }}</div>
+              <div class="fw-semibold">{{ motorista.emergencia_nombre|default:'-' }} · {% with tel=motorista.emergencia_telefono|default:'' %}{% if tel and tel|length >= 9 %}{{ tel }}{% else %}Sin información{% endif %}{% endwith %}</div>
             </div>
           </div>
           <div class="col-md-6">
@@ -459,6 +464,9 @@
               <tr>
                 <th>Origen</th>
                 <th>Destino</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Entrega</th>
                 <th>Tipo</th>
                 <th>Receta retenida</th>
                 <th>En ruta (min)</th>
@@ -478,6 +486,27 @@
                   {% endif %}
                 </td>
                 <td>{{ d.destino_direccion }}</td>
+                <td>{% if d.fecha_registro %}{{ d.fecha_registro|date:'d/m/Y H:i' }}{% else %}-{% endif %}</td>
+                <td><span class="badge bg-info">{{ d.estado|default:'-' }}</span></td>
+                <td>
+                  {% if d.estado and d.estado|upper == 'ENTREGADO' %}
+                    {% if d.fecha_completado %}
+                      <span class="badge bg-success">{{ d.fecha_completado|date:'d/m/Y H:i' }}</span>
+                    {% elif d.fecha_llegada_destino %}
+                      <span class="badge bg-success">{{ d.fecha_llegada_destino|date:'d/m/Y H:i' }}</span>
+                    {% else %}
+                      <span class="badge bg-success">Entregado</span>
+                    {% endif %}
+                  {% elif d.estado and d.estado|upper == 'FALLIDO' %}
+                    {% if d.fecha_llegada_destino %}
+                      <span class="badge bg-danger">{{ d.fecha_llegada_destino|date:'d/m/Y H:i' }}</span>
+                    {% else %}
+                      <span class="badge bg-danger">No entregado</span>
+                    {% endif %}
+                  {% else %}
+                    -
+                  {% endif %}
+                </td>
                 <td>
                   {% if d.tipo_despacho == 'DOMICILIO' %}
                     <span class="badge bg-info">Domicilio</span>

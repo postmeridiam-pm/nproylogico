@@ -483,7 +483,7 @@
                 <td>{{ mot.usuario.nombre }} {{ mot.usuario.apellido }}</td>
                 <td class="col-optional">{{ mot.licencia_numero }} {{ mot.licencia_clase }}</td>
                 <td class="col-optional">{{ mot.usuario.tipo_documento }} · {{ mot.usuario.documento_identidad }}</td>
-                <td class="col-optional">{{ mot.emergencia_telefono }}</td>
+                <td class="col-optional">{% with tel=mot.emergencia_telefono|default:'' %}{% if tel and tel|length >= 9 %}{{ tel }}{% else %}Sin información{% endif %}{% endwith %}</td>
                 <td>
                   {% if mot.disponible_hoy %}
                     <span class="badge bg-success">Disponible</span>
@@ -562,7 +562,7 @@
               <tr>
                 <td>{% if s.usuario_nombre %}{{ s.usuario_nombre }} {{ s.usuario_apellido }}{% else %}Usuario ID {{ s.codigo_motorista }}{% endif %}</td>
                 <td class="col-optional">{{ s.licencia_numero }} {{ s.licencia_clase }}</td>
-                <td class="col-optional">{{ s.emergencia_telefono }}</td>
+                <td class="col-optional">{% with tel=s.emergencia_telefono|default:'' %}{% if tel and tel|length >= 9 %}{{ tel }}{% else %}Sin información{% endif %}{% endwith %}</td>
                 <td>
                   {% if s.disponible_hoy %}
                     <span class="badge bg-success" data-bs-toggle="tooltip" title="Listo para operar">Disponible</span>
@@ -642,7 +642,7 @@
             const href = this.getAttribute('href');
             if (!href) return;
             ev.preventDefault();
-            frame.src = href;
+            frame.src = href + (href.indexOf('?')>=0 ? '&' : '?') + 'embed=1';
             const modal = new bootstrap.Modal(modalEl);
             modal.show();
           });

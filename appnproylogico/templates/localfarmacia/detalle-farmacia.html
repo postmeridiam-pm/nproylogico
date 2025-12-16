@@ -544,7 +544,7 @@
             <i class="bi bi-telephone"></i>
             <div class="info-content">
               <div class="info-label">Teléfono</div>
-              <div class="info-value">{{ farmacia.local_telefono|default:"Sin información actualizada" }}</div>
+              <div class="info-value">{% with tel=farmacia.local_telefono|default:'' %}{% if tel and tel|length >= 9 %}{{ tel }}{% else %}Sin información{% endif %}{% endwith %}</div>
             </div>
           </div>
 
@@ -679,10 +679,7 @@
             <label class="form-label">
               <i class="bi bi-calendar-plus"></i> Fecha de Asignación
             </label>
-            {{ asignacion_mf_form.fecha_asignacion }}
-            {% for e in asignacion_mf_form.fecha_asignacion.errors %}
-              <div class="text-danger small">{{ e }}</div>
-            {% endfor %}
+            <input type="text" class="form-control" value="Automática (fecha actual)" disabled>
           </div>
           
           <div class="col-md-6">
@@ -780,31 +777,29 @@
     (function(){
       const {useState, useEffect} = React;
       
-      function App(){
-        const [errors, setErrors] = useState([]);
-        const [q, setQ] = useState('');
-        const [open, setOpen] = useState(false);
-        const [items, setItems] = useState([]);
-        const [active, setActive] = useState(0);
-        const [busy, setBusy] = useState(false);
-        
-        useEffect(function(){
-          const form = document.getElementById('form-asignar-farmacia');
-          if(!form) return;
-          
-          form.addEventListener('submit', function(ev){
-            const errs = [];
-            const motorista = form.querySelector('[name="motorista"]');
-            const fechaAsig = form.querySelector('[name="fecha_asignacion"]');
-            const activa = form.querySelector('[name="activa"]');
-            const obs = form.querySelector('[name="observaciones"]');
+          function App(){
+            const [errors, setErrors] = useState([]);
+            const [q, setQ] = useState('');
+            const [open, setOpen] = useState(false);
+            const [items, setItems] = useState([]);
+            const [active, setActive] = useState(0);
+            const [busy, setBusy] = useState(false);
             
-            if(!motorista || !motorista.value.trim()) errs.push('Selecciona un motorista');
-            if(!fechaAsig || !fechaAsig.value.trim()) errs.push('Ingresa fecha de asignación');
-            if(obs && obs.value && obs.value.length>500) errs.push('Observaciones supera 500 caracteres');
-            
-            if(errs.length){
-              ev.preventDefault();
+            useEffect(function(){
+              const form = document.getElementById('form-asignar-farmacia');
+              if(!form) return;
+              
+              form.addEventListener('submit', function(ev){
+                const errs = [];
+                const motorista = form.querySelector('[name="motorista"]');
+                const activa = form.querySelector('[name="activa"]');
+                const obs = form.querySelector('[name="observaciones"]');
+                
+                if(!motorista || !motorista.value.trim()) errs.push('Selecciona un motorista');
+                if(obs && obs.value && obs.value.length>500) errs.push('Observaciones supera 500 caracteres');
+                
+                if(errs.length){
+                  ev.preventDefault();
               setErrors(errs);
               window.scrollTo({top: 0, behavior: 'smooth'});
             } else {

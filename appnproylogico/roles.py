@@ -63,7 +63,7 @@ def obtener_permisos_usuario(user):
         return {
             'farmacias': {'view'},
             'motoristas': {'view'},
-            'motos': {'view'},
+            'motos': {'view', 'add'},
             'asignaciones': {'view'},
             'movimientos': {'view'},
             'despachos': {'view'},

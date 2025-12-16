@@ -93,6 +93,8 @@ urlpatterns = [
     path('api/farmacias/', api_views.FarmaciaList.as_view(), name='api_farmacias'),
     path('api/motoristas/', api_views.MotoristaList.as_view(), name='api_motoristas'),
     path('api/motos/', api_views.MotoList.as_view(), name='api_motos'),
+    path('api/comunas/', views.comunas_por_region, name='api_comunas'),
+    path('api/localidades/', views.localidades_por_comuna, name='api_localidades'),
 
     path('reportes/movimientos/', views.reporte_movimientos, name='reporte_movimientos'),
     path('reportes/resumen-operativo/', views.resumen_operativo_hoy, name='resumen_operativo_hoy'),

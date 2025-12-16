@@ -435,6 +435,7 @@
           </div>
           <div class="col-md-3">
             <label class="form-label">Farmacia</label>
+            <input type="text" class="form-control mb-1" id="rep-farmacia-q" placeholder="Filtrar farmacia…">
             {{ form.farmacia }}
           </div>
           <div class="col-md-3">
@@ -500,9 +501,7 @@
               {% for m in movimientos %}
               <tr data-date="{{ m.fecha_movimiento|date:'Y-m-d'|default:m.fecha_movimiento }}" data-local="{{ m.despacho.farmacia_origen_local_id }}">
                 <td>{{ m.despacho.farmacia_origen_local_id }}</td>
-                <td>
-                  <span class="badge bg-info">{{ m.despacho.id }}</span>
-                </td>
+                <td><span class="badge bg-info">{{ m.despacho.codigo_despacho }}</span></td>
                 <td>
                   {% if m.estado_nuevo == 'EN_CAMINO' %}
                     <span class="badge bg-info">{{ m.estado_nuevo }}</span>
@@ -591,6 +590,22 @@
           if (help) help.style.display = 'none';
         };
       }
+
+      // Búsqueda libre en dropdown de Farmacia
+      var fq = document.getElementById('rep-farmacia-q');
+      var fs = document.getElementById('id_farmacia');
+      function filterSelect(qInput, select){
+        var q = (qInput && qInput.value || '').toLowerCase();
+        var firstMatch = null;
+        Array.prototype.forEach.call(select.options, function(opt){
+          if(!opt.value){ opt.hidden = false; return; }
+          var show = !q || (opt.textContent || '').toLowerCase().indexOf(q) !== -1;
+          opt.hidden = !show;
+          if(show && !firstMatch) firstMatch = opt.value;
+        });
+        if(firstMatch) select.value = firstMatch; else if(q) select.value = '';
+      }
+      if(fq && fs){ fq.addEventListener('input', function(){ filterSelect(fq, fs); }); }
     })();
   </script>
 </body>

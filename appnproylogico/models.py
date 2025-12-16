@@ -140,6 +140,13 @@ class Despacho(models.Model):
         managed = True
         db_table = 'despacho'
         db_table_comment = 'CORE: Entregas farmacéuticas. Datos salud encriptados. Geolocalización activa.'
+        indexes = [
+            models.Index(fields=['codigo_despacho']),
+            models.Index(fields=['fecha_registro']),
+            models.Index(fields=['estado']),
+            models.Index(fields=['tipo_despacho']),
+            models.Index(fields=['farmacia_origen_local_id', 'fecha_registro']),
+        ]
 
 
  
@@ -301,6 +308,11 @@ class MovimientoDespacho(models.Model):
         managed = True
         db_table = 'movimiento_despacho'  
         db_table_comment = 'INMUTABLE: Historial completo de cambios de estado. Geolocalización activa.'
+        indexes = [
+            models.Index(fields=['fecha_movimiento']),
+            models.Index(fields=['estado_nuevo']),
+            models.Index(fields=['despacho', 'fecha_movimiento']),
+        ]
 
 
  

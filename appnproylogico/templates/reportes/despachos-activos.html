@@ -551,6 +551,37 @@
                     {% csrf_token %}
                     <input type="hidden" name="metodo" value="boton">
                     <input type="hidden" name="codigo_despacho" value="{{ r.1 }}">
+                    <input type="hidden" name="estado" value="PREPARANDO">
+                    <button class="btn btn-sm btn-outline-warning text-dark" type="submit">
+                      <i class="bi bi-hourglass-split"></i> En preparación
+                    </button>
+                  </form>
+                  <form method="post" action="{% url 'registrar_movimiento' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="metodo" value="boton">
+                    <input type="hidden" name="codigo_despacho" value="{{ r.1 }}">
+                    <input type="hidden" name="estado" value="PREPARADO">
+                    <button class="btn btn-sm btn-outline-info" type="submit">
+                      <i class="bi bi-bag-check"></i> Listo para recoger
+                    </button>
+                  </form>
+                {% endif %}
+                {% if r.2 == 'PREPARANDO' %}
+                  <form method="post" action="{% url 'registrar_movimiento' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="metodo" value="boton">
+                    <input type="hidden" name="codigo_despacho" value="{{ r.1 }}">
+                    <input type="hidden" name="estado" value="PREPARADO">
+                    <button class="btn btn-sm btn-outline-info" type="submit">
+                      <i class="bi bi-bag-check"></i> Listo para recoger
+                    </button>
+                  </form>
+                {% endif %}
+                {% if r.2 == 'PREPARADO' %}
+                  <form method="post" action="{% url 'registrar_movimiento' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="metodo" value="boton">
+                    <input type="hidden" name="codigo_despacho" value="{{ r.1 }}">
                     <input type="hidden" name="estado" value="EN_CAMINO">
                     <button class="btn btn-sm btn-outline-success" type="submit">
                       <i class="bi bi-truck"></i> En camino
@@ -573,7 +604,17 @@
                     <input type="hidden" name="codigo_despacho" value="{{ r.1 }}">
                     <input type="hidden" name="estado" value="FALLIDO">
                     <button class="btn btn-sm btn-outline-danger" type="submit">
-                      <i class="bi bi-x-circle"></i> Fallido
+                      <i class="bi bi-x-circle"></i> No entregado
+                    </button>
+                  </form>
+                  <form method="post" action="{% url 'registrar_movimiento' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="metodo" value="boton">
+                    <input type="hidden" name="codigo_despacho" value="{{ r.1 }}">
+                    <input type="hidden" name="estado" value="FALLIDO">
+                    <input type="hidden" name="mensaje" value="Problema con la entrega">
+                    <button class="btn btn-sm btn-outline-danger" type="submit">
+                      <i class="bi bi-exclamation-diamond"></i> Problema con la entrega
                     </button>
                   </form>
                 {% endif %}

@@ -493,9 +493,36 @@
       <!-- Fila inferior: Búsqueda y filtros -->
       <div class="search-toolbar">
         <form class="row g-2" method="get" id="form-farmacias">
-          <div class="col-md-4 col-lg-4">
+          <div class="col-md-3 col-lg-3">
             <input class="form-control" type="text" name="search" list="dl-farmacias" value="{{ search_query }}" placeholder="Buscar por nombre, dirección o comuna">
             <datalist id="dl-farmacias"></datalist>
+          </div>
+          <div class="col-md-3 col-lg-3">
+            <input class="form-control mb-1" type="text" id="f-region-q" placeholder="Filtrar región" value="">
+            <select class="form-select" name="region" id="f-region">
+              <option value="">Región</option>
+              {% for r in regiones %}
+                <option value="{{ r.id }}" {% if r.id|stringformat:'s' == region_id %}selected{% endif %}>{{ r.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3 col-lg-3">
+            <input class="form-control mb-1" type="text" id="f-comuna-q" placeholder="Filtrar comuna" value="" {% if not region_id %}disabled{% endif %}>
+            <select class="form-select" name="comuna" id="f-comuna" {% if not region_id %}disabled{% endif %}>
+              <option value="">Comuna</option>
+              {% for c in comunas %}
+                <option value="{{ c.id }}" {% if c.id|stringformat:'s' == comuna_id %}selected{% endif %}>{{ c.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3 col-lg-3">
+            <input class="form-control mb-1" type="text" id="f-localidad-q" placeholder="Filtrar localidad" value="" {% if not comuna_id %}disabled{% endif %}>
+            <select class="form-select" name="localidad" id="f-localidad" {% if not comuna_id %}disabled{% endif %}>
+              <option value="">Localidad</option>
+              {% for l in localidades %}
+                <option value="{{ l.id }}" {% if l.id|stringformat:'s' == localidad_id %}selected{% endif %}>{{ l.nombre }}</option>
+              {% endfor %}
+            </select>
           </div>
           <div class="col-md-3 col-lg-3">
             <div class="dropdown w-100">
@@ -520,6 +547,18 @@
                     <input class="form-check-input" type="radio" name="estado_opt_f" id="estado_todas_f" value="" {% if not estado %}checked{% endif %}>
                     <label class="form-check-label" for="estado_todas_f">Todas</label>
                   </div>
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Fecha (día)</label>
+                  <input type="date" class="form-control" name="fecha_dia" id="f-fecha-dia" value="{{ fecha_dia|default:'' }}">
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Fecha (mes)</label>
+                  <input type="month" class="form-control" name="fecha_mes" id="f-fecha-mes" value="{{ fecha_mes|default:'' }}">
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Fecha (año)</label>
+                  <input type="number" class="form-control" name="fecha_anio" id="f-fecha-anio" min="1984" max="9999" step="1" value="{% if fecha_anio %}{{ fecha_anio }}{% endif %}">
                 </div>
                 <div class="d-grid">
                   <button class="btn btn-apply" type="button" id="btn-apply-f"><i class="bi bi-funnel"></i> Aplicar</button>
@@ -554,6 +593,13 @@
   </nav>
 
   <div class="container pb-5">
+    {% if messages %}
+      <div class="message-toast-container">
+        {% for m in messages %}
+          <div class="message-toast {% if 'error' in m.tags %}error{% endif %}">{{ m }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
     <div class="help-banner">
       <div class="d-flex justify-content-between align-items-center">
         <div>Consejo: Puedes ordenar por nombre o comuna. Si tienes un archivo Excel, puedes importarlo desde el menú Farmacias → Importa.</div>
@@ -600,7 +646,7 @@
                   {% endif %}
                 </td>
                 <td class="col-optional">{{ f.funcionamiento_dia|default:'Sin información actualizada' }}</td>
-                <td class="col-optional">{{ f.local_telefono|default:'Sin información actualizada' }}</td>
+                <td class="col-optional">{% with tel=f.local_telefono|default:'' %}{% if tel and tel|length >= 9 %}{{ tel }}{% else %}Sin información{% endif %}{% endwith %}</td>
                 <td class="col-optional">
                   {% if f.geolocalizacion_validada %}
                     <span class="badge bg-success"><i class="bi bi-geo-alt"></i> OK</span>
@@ -643,7 +689,7 @@
                   {% endif %}
                 </td>
                 <td class="col-optional">{{ s.funcionamiento_dia|default:'-' }}</td>
-                <td class="col-optional">{{ s.local_telefono|default:'-' }}</td>
+                <td class="col-optional">{% with tel=s.local_telefono|default:'' %}{% if tel and tel|length >= 9 %}{{ tel }}{% else %}Sin información{% endif %}{% endwith %}</td>
                 <td class="col-optional">
                   {% if s.local_lat and s.local_lng %}
                     <span class="badge bg-success"><i class="bi bi-geo-alt"></i> OK</span>
@@ -716,7 +762,7 @@
             const href = this.getAttribute('href');
             if (!href) return;
             ev.preventDefault();
-            frame.src = href;
+            frame.src = href + (href.indexOf('?')>=0 ? '&' : '?') + 'embed=1';
             const modal = new bootstrap.Modal(modalEl);
             modal.show();
           });
@@ -782,8 +828,65 @@
           if (help) help.style.display = 'none';
         };
       }
+      var msgC = document.querySelector('.message-toast-container');
+      if (msgC){ setTimeout(function(){ msgC.style.display='none'; }, 4000); }
 
       // Vista simple eliminada: se mantiene vista completa por claridad
+
+      var r = document.getElementById('f-region');
+      var c = document.getElementById('f-comuna');
+      var l = document.getElementById('f-localidad');
+      var rq = document.getElementById('f-region-q');
+      var cq = document.getElementById('f-comuna-q');
+      var lq = document.getElementById('f-localidad-q');
+      function loadComunas(regionId){
+        c.innerHTML = '<option value="">Comuna</option>';
+        l.innerHTML = '<option value="">Localidad</option>';
+        l.disabled = true;
+        if(!regionId){ c.disabled = true; return; }
+        c.disabled = false;
+        fetch('/api/comunas/?region_id=' + encodeURIComponent(regionId))
+          .then(function(res){ return res.json(); })
+          .then(function(data){
+            (data.items || []).forEach(function(it){
+              var opt = document.createElement('option');
+              opt.value = it.id; opt.textContent = it.nombre;
+              c.appendChild(opt);
+            });
+          })
+          .catch(function(){});
+      }
+      function loadLocalidades(comunaId){
+        l.innerHTML = '<option value="">Localidad</option>';
+        if(!comunaId){ l.disabled = true; return; }
+        l.disabled = false;
+        fetch('/api/localidades/?comuna_id=' + encodeURIComponent(comunaId))
+          .then(function(res){ return res.json(); })
+          .then(function(data){
+            (data.items || []).forEach(function(it){
+              var opt = document.createElement('option');
+              opt.value = it.id; opt.textContent = it.nombre;
+              l.appendChild(opt);
+            });
+          })
+          .catch(function(){});
+      }
+      function filterSelect(qInput, select){
+        var q = (qInput && qInput.value || '').toLowerCase();
+        var firstMatch = null;
+        Array.prototype.forEach.call(select.options, function(opt){
+          if(!opt.value){ opt.hidden = false; return; }
+          var show = !q || (opt.textContent || '').toLowerCase().indexOf(q) !== -1;
+          opt.hidden = !show;
+          if(show && !firstMatch) firstMatch = opt.value;
+        });
+        if(firstMatch) select.value = firstMatch; else if(q) select.value = '';
+      }
+      if(rq && r) rq.addEventListener('input', function(){ filterSelect(rq, r); });
+      if(cq && c) cq.addEventListener('input', function(){ filterSelect(cq, c); });
+      if(lq && l) lq.addEventListener('input', function(){ filterSelect(lq, l); });
+      if(r) r.addEventListener('change', function(){ loadComunas(r.value); });
+      if(c) c.addEventListener('change', function(){ loadLocalidades(c.value); });
     })();
   </script>
 </body>

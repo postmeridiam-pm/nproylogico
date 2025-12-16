@@ -10,6 +10,105 @@ def fetchall(sql, params=None):
     except Exception:
         return []
 
+
+def diagnostico_consistencia(max_items=50):
+    from django.db.models import Count, Max, Q, F, Subquery, OuterRef
+    from .models import (
+        Despacho,
+        Localfarmacia,
+        MovimientoDespacho,
+        Moto,
+        Motorista,
+        Usuario,
+    )
+    resultado = {}
+
+    # Duplicados (valores que deberían ser únicos)
+    def duplicados(model, field):
+        from django.db.models import CharField, TextField
+        fld = model._meta.get_field(field)
+        qs = model.objects.exclude(**{field: None})
+        if isinstance(fld, (CharField, TextField)):
+            qs = qs.exclude(**{field: ''})
+        qs = qs.values(field).annotate(c=Count('id')).filter(c__gt=1)
+        return list(qs.values_list(field, 'c')[:max_items])
+
+    resultado['duplicados'] = {
+        'Despacho.codigo_despacho': duplicados(Despacho, 'codigo_despacho'),
+        'Localfarmacia.local_id': duplicados(Localfarmacia, 'local_id'),
+        'Moto.patente': duplicados(Moto, 'patente'),
+        'Moto.numero_motor': duplicados(Moto, 'numero_motor'),
+        'Moto.numero_chasis': duplicados(Moto, 'numero_chasis'),
+        'Usuario.documento_identidad': duplicados(Usuario, 'documento_identidad'),
+        'Usuario.django_user_id': duplicados(Usuario, 'django_user_id'),
+        'Motorista.codigo_motorista': duplicados(Motorista, 'codigo_motorista'),
+    }
+
+    # Consistencia de FK y datos desnormalizados
+    # Despachos con farmacia_origen_local_id inexistente
+    existentes = set(Localfarmacia.objects.values_list('local_id', flat=True))
+    invalid_farm = list(
+        Despacho.objects.exclude(farmacia_origen_local_id__in=existentes)
+        .values_list('id', 'codigo_despacho', 'farmacia_origen_local_id')[:max_items]
+    )
+    resultado['farmacias_origen_inexistentes'] = invalid_farm
+
+    # Estados válidos y normalizados
+    estados_validos = {'PENDIENTE','ASIGNADO','PREPARANDO','PREPARADO','EN_CAMINO','ENTREGADO','FALLIDO','ANULADO'}
+    estados_invalidos = list(
+        Despacho.objects.exclude(estado__in=estados_validos)
+        .values_list('id', 'codigo_despacho', 'estado')[:max_items]
+    )
+    resultado['estados_invalidos'] = estados_invalidos
+
+    # Movimiento sin despacho asociado
+    mov_sin_desp = list(
+        MovimientoDespacho.objects.filter(despacho__isnull=True)
+        .values_list('id', 'estado_nuevo', 'fecha_movimiento')[:max_items]
+    )
+    resultado['movimientos_sin_despacho'] = mov_sin_desp
+
+    # Duplicidad de movimientos por misma (despacho, estado_nuevo, fecha)
+    mov_dups = list(
+        MovimientoDespacho.objects.values('despacho_id','estado_nuevo','fecha_movimiento')
+        .annotate(c=Count('id')).filter(c__gt=1)
+        .values_list('despacho_id','estado_nuevo','fecha_movimiento','c')[:max_items]
+    )
+    resultado['movimientos_duplicados'] = mov_dups
+
+    # Estado actual del despacho vs último movimiento registrado
+    ultimos = (
+        MovimientoDespacho.objects.values('despacho_id')
+        .annotate(ultima=Max('fecha_movimiento'))
+    )
+    # Mapear desp_id -> fecha_ultima
+    mapa_ult = {r['despacho_id']: r['ultima'] for r in ultimos if r['despacho_id'] is not None}
+    inconsistencias = []
+    if mapa_ult:
+        # Buscar último estado por despacho y comparar
+        ult_mov = MovimientoDespacho.objects.filter(
+            despacho_id=OuterRef('pk'), fecha_movimiento=Subquery(
+                MovimientoDespacho.objects.filter(despacho_id=OuterRef('pk'))
+                .order_by('-fecha_movimiento')
+                .values('fecha_movimiento')[:1]
+            )
+        )
+        dqs = Despacho.objects.annotate(ultimo_estado=Subquery(ult_mov.values('estado_nuevo')[:1]))
+        inconsistentes_qs = dqs.exclude(ultimo_estado=F('estado')).values_list('id','codigo_despacho','estado','ultimo_estado')
+        inconsistencias = list(inconsistentes_qs[:max_items])
+    resultado['despachos_estado_inconsistente'] = inconsistencias
+
+    # Resumen de conteos
+    resultado['resumen'] = {
+        'Despachos': Despacho.objects.count(),
+        'Movimientos': MovimientoDespacho.objects.count(),
+        'Farmacias': Localfarmacia.objects.count(),
+        'Motos': Moto.objects.count(),
+        'Motoristas': Motorista.objects.count(),
+        'Usuarios': Usuario.objects.count(),
+    }
+    return resultado
+
 def get_despachos_activos():
     sql = (
         "SELECT id, codigo_despacho, estado, tipo_despacho, prioridad, farmacia_origen, motorista, "

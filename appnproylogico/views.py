@@ -363,11 +363,15 @@ def listado_farmacias(request):
     farmacias = Farmacia.objects.all()
     filtro_estado = (request.GET.get('estado') or '').strip().lower()
 
-    # Si es farmacia, solo muestra su propia farmacia según grupo
-    if rol == 'farmacia':
-        farmacia_usuario = request.user.groups.first()
-        if farmacia_usuario:
-            farmacias = farmacias.filter(local_nombre__icontains=farmacia_usuario.name)
+    region_id = (request.GET.get('region') or '').strip()
+    comuna_id = (request.GET.get('comuna') or '').strip()
+    localidad_id = (request.GET.get('localidad') or '').strip()
+    fecha_dia = (request.GET.get('fecha_dia') or '').strip()
+    fecha_mes = (request.GET.get('fecha_mes') or '').strip()
+    try:
+        fecha_anio = int((request.GET.get('fecha_anio') or '').strip()) if (request.GET.get('fecha_anio') or '').strip() else None
+    except Exception:
+        fecha_anio = None
 
     if search_query:
         farmacias = farmacias.filter(
@@ -376,6 +380,44 @@ def listado_farmacias(request):
             Q(local_telefono__icontains=search_query) |
             Q(comuna_nombre__icontains=search_query)
         )
+
+    if region_id:
+        try:
+            farmacias = farmacias.filter(fk_region_id=int(region_id))
+        except Exception:
+            farmacias = farmacias.filter(fk_region__codigo__icontains=region_id) | farmacias.filter(fk_region__nombre__icontains=region_id)
+
+    if comuna_id:
+        try:
+            farmacias = farmacias.filter(fk_comuna_id=int(comuna_id))
+        except Exception:
+            farmacias = farmacias.filter(fk_comuna__codigo__icontains=comuna_id) | farmacias.filter(fk_comuna__nombre__icontains=comuna_id)
+
+    if localidad_id:
+        try:
+            farmacias = farmacias.filter(fk_localidad_id=int(localidad_id))
+        except Exception:
+            farmacias = farmacias.filter(localidad_nombre__icontains=localidad_id)
+
+    if fecha_dia:
+        try:
+            from django.utils import timezone
+            import datetime as _dt
+            d = _dt.date.fromisoformat(fecha_dia)
+            farmacias = farmacias.filter(fecha=d)
+        except Exception:
+            pass
+    elif fecha_mes:
+        try:
+            a, m = [int(x) for x in fecha_mes.split('-')]
+            farmacias = farmacias.filter(fecha__year=a, fecha__month=m)
+        except Exception:
+            pass
+    elif fecha_anio is not None:
+        try:
+            farmacias = farmacias.filter(fecha__year=fecha_anio)
+        except Exception:
+            pass
 
     if filtro_estado == 'activa':
         farmacias = farmacias.filter(activo=True)
@@ -407,6 +449,15 @@ def listado_farmacias(request):
                 samples = json.load(f)
         except Exception:
             samples = []
+    try:
+        from .models import Region, Comuna, Localidad
+        regiones = Region.objects.filter(activo=True).order_by('nombre')
+        comunas = Comuna.objects.filter(region_id=int(region_id)).order_by('nombre') if region_id else Comuna.objects.none()
+        localidades = Localidad.objects.filter(comuna_id=int(comuna_id)).order_by('nombre') if comuna_id else Localidad.objects.none()
+    except Exception:
+        regiones = []
+        comunas = []
+        localidades = []
     context = {
         'page_obj': page_obj,
         'search_query': search_query,
@@ -414,9 +465,48 @@ def listado_farmacias(request):
         'dir': direccion,
         'estado': filtro_estado,
         'samples': samples,
+        'regiones': regiones,
+        'comunas': comunas,
+        'localidades': localidades,
+        'region_id': region_id,
+        'comuna_id': comuna_id,
+        'localidad_id': localidad_id,
+        'fecha_dia': fecha_dia,
+        'fecha_mes': fecha_mes,
+        'fecha_anio': fecha_anio,
     }
 
     return render(request, 'localfarmacia/listar-farmacias.html', context)
+
+@login_required(login_url='admin:login')
+def comunas_por_region(request):
+    try:
+        rid = int(request.GET.get('region_id') or '0')
+    except Exception:
+        rid = 0
+    try:
+        from .models import Comuna
+        qs = Comuna.objects.filter(region_id=rid, activo=True).order_by('nombre') if rid else Comuna.objects.none()
+        data = [{'id': c.id, 'nombre': c.nombre} for c in qs]
+    except Exception:
+        data = []
+    from django.http import JsonResponse
+    return JsonResponse({'items': data})
+
+@login_required(login_url='admin:login')
+def localidades_por_comuna(request):
+    try:
+        cid = int(request.GET.get('comuna_id') or '0')
+    except Exception:
+        cid = 0
+    try:
+        from .models import Localidad
+        qs = Localidad.objects.filter(comuna_id=cid, activo=True).order_by('nombre') if cid else Localidad.objects.none()
+        data = [{'id': l.id, 'nombre': l.nombre} for l in qs]
+    except Exception:
+        data = []
+    from django.http import JsonResponse
+    return JsonResponse({'items': data})
 
 @permiso_requerido('farmacias', 'view')
 def geolocalizar_farmacias(request):
@@ -587,9 +677,15 @@ def detalle_farmacia(request, pk):
                 existente.save()
                 messages.success(request, 'Asignación actualizada exitosamente.')
             else:
-                obj = form.save()
+                obj = form.save(commit=False)
+                try:
+                    from django.utils import timezone as _tz
+                    obj.fecha_asignacion = _tz.now()
+                except Exception:
+                    pass
+                obj.save()
                 messages.success(request, 'Motorista asignado a la farmacia exitosamente.')
-            return redirect('listado_asignaciones')
+            return redirect('listado_farmacias')
         else:
             messages.error(request, 'Corrige los errores del formulario de asignación.')
             asignacion_mf_form = form
@@ -604,6 +700,7 @@ def detalle_farmacia(request, pk):
         'farmacia': farmacia,
         'motoristas': motoristas,
         'asignacion_mf_form': asignacion_mf_form,
+        'embed': True if (request.GET.get('embed') == '1') else False,
     }
 
     return render(request, 'localfarmacia/detalle-farmacia.html', context)
@@ -851,7 +948,13 @@ def detalle_motorista(request, pk):
                 existente.save()
                 messages.success(request, 'Asignación actualizada exitosamente.')
             else:
-                obj = form.save()
+                obj = form.save(commit=False)
+                try:
+                    from django.utils import timezone as _tz
+                    obj.fecha_asignacion = _tz.now()
+                except Exception:
+                    pass
+                obj.save()
                 messages.success(request, 'Motorista asignado a farmacia exitosamente.')
             return redirect('listado_asignaciones')
         else:
@@ -888,6 +991,7 @@ def detalle_motorista(request, pk):
         'asignacion_mf_form': asignacion_mf_form,
         'despachos': despachos,
         'origenes': origenes,
+        'embed': True if (request.GET.get('embed') == '1') else False,
     }
 
     return render(request, 'motoristas/detalle-motorista.html', context)
@@ -1318,7 +1422,13 @@ def agregar_asignacion(request):
     if request.method == 'POST':
         form = AsignacionMotoristaFarmaciaForm(request.POST)
         if form.is_valid():
-            obj = form.save()
+            obj = form.save(commit=False)
+            try:
+                from django.utils import timezone as _tz
+                obj.fecha_asignacion = _tz.now()
+            except Exception:
+                pass
+            obj.save()
             messages.success(request, 'Asignación creada exitosamente.')
             return redirect('detalle_asignacion', pk=obj.pk)
         else:
@@ -1380,8 +1490,9 @@ def remover_asignacion(request, pk):
 @rol_requerido('gerente')
 def reporte_movimientos(request):
     form = ReporteMovimientosForm(request.GET or None)
-    movimientos = Movimiento.objects.all().select_related('despacho')
-    farmacias = Farmacia.objects.filter(activo=True)
+    from .models import MovimientoDespacho, Localfarmacia
+    movimientos = MovimientoDespacho.objects.all().select_related('despacho')
+    farmacias = Localfarmacia.objects.filter(activo=True)
 
     template = 'reportes/reporte-diario.html'
     if form.is_valid():
@@ -1759,14 +1870,24 @@ def registrar_movimiento(request):
                             log.info('Bloqueado PREPARADO por receta no devuelta codigo=%s', codigo)
                             context = {'feedback': feedback}
                             return render(request, 'movimientos/registrar-mov.html', context)
-                    MovimientoDespacho.objects.create(
-                        despacho=despacho,
-                        estado_anterior=despacho.estado,
-                        estado_nuevo=nuevo,
-                        fecha_movimiento=timezone.now(),
-                        usuario=usuario,
-                        observacion=(f'modo={metodo}; tipo={tipo_mov or ""}; ' + (mensaje or '')).strip()
-                    )
+                    dup_skip = False
+                    try:
+                        ultimo = MovimientoDespacho.objects.filter(despacho=despacho).order_by('-fecha_movimiento').first()
+                        if ultimo:
+                            delta = abs((timezone.now() - ultimo.fecha_movimiento).total_seconds())
+                            if ultimo.estado_nuevo == nuevo and delta < 60:
+                                dup_skip = True
+                    except Exception:
+                        dup_skip = False
+                    if not dup_skip:
+                        MovimientoDespacho.objects.create(
+                            despacho=despacho,
+                            estado_anterior=despacho.estado,
+                            estado_nuevo=nuevo,
+                            fecha_movimiento=timezone.now(),
+                            usuario=usuario,
+                            observacion=(f'modo={metodo}; tipo={tipo_mov or ""}; ' + (mensaje or '')).strip()
+                        )
                     despacho.estado = nuevo
                 despacho.usuario_modificacion = usuario
                 despacho.fecha_modificacion = timezone.now()
@@ -1787,6 +1908,13 @@ def registrar_movimiento(request):
                     pass
                 feedback = feedback or 'Movimiento registrado'
                 log.info('Movimiento registrado codigo=%s estado=%s usuario=%s ip=%s', codigo, (nuevo or estado), request.user.username, request.META.get('REMOTE_ADDR'))
+                messages.success(request, feedback)
+                ref = request.META.get('HTTP_REFERER') or None
+                if ref:
+                    from django.shortcuts import redirect
+                    return redirect(ref)
+                from django.urls import reverse
+                return redirect(reverse('despachos_activos'))
         except Exception as e:
             feedback = f'Error: {e}'
             log.error('Error movimiento codigo=%s error=%s', codigo, e)
@@ -1903,39 +2031,54 @@ def export_resumen_operativo(request):
         except Exception:
             rows = []
     elif tipo == 'diario' and detalle:
-        from .models import Despacho, Localfarmacia
         fecha_arg = (request.GET.get('fecha') or timezone.now().strftime('%Y-%m-%d'))
         headers = ['Local','Despacho','Estado','Tipo','Prioridad','Motorista','Cliente','Dirección','Con receta','Incidencia','Fecha']
         filename = 'movimientos_diario'
         rows = []
         try:
-            y, m, d = [int(x) for x in fecha_arg.split('-')]
+            import json, pathlib
+            base = pathlib.Path(getattr(settings, 'MEDIA_ROOT', None) or (pathlib.Path(settings.BASE_DIR) / 'media')) / 'reportes'
+            file = base / f'cierre_{fecha_arg}.json'
+            if file.exists():
+                with open(file, 'r', encoding='utf-8') as f:
+                    rows = json.load(f) or []
+                try:
+                    rows = [[r[0], r[1], (_estado_normalizado(r[2]) if ' _estado_normalizado' else (r[2] if r else '')), r[3], r[4], r[5], r[6], r[7], r[8], r[9], r[10]] for r in rows]
+                    rows = [r for r in rows if str(r[2]).strip().upper() in {'ENTREGADO','FALLIDO','PENDIENTE'}]
+                except Exception:
+                    pass
+            else:
+                from .models import Despacho, Localfarmacia
+                try:
+                    y, m, d = [int(x) for x in fecha_arg.split('-')]
+                except Exception:
+                    y, m, d = timezone.now().year, timezone.now().month, timezone.now().day
+                qs = Despacho.objects.filter(fecha_registro__year=y, fecha_registro__month=m, fecha_registro__day=d).order_by('fecha_registro')
+                for obj in qs:
+                    try:
+                        farm = Localfarmacia.objects.filter(local_id=obj.farmacia_origen_local_id).first()
+                        u = getattr(obj.motorista, 'usuario', None)
+                        mot_name = f"{getattr(u,'nombre','')} {getattr(u,'apellido','')}".strip()
+                        estado_norm = _estado_normalizado(obj.estado)
+                        if estado_norm not in {'ENTREGADO','FALLIDO','PENDIENTE'}:
+                            continue
+                        rows.append([
+                            getattr(farm,'local_id', obj.farmacia_origen_local_id) or '',
+                            obj.codigo_despacho or obj.id,
+                            estado_norm,
+                            obj.tipo_despacho or '',
+                            obj.prioridad or '',
+                            mot_name,
+                            _cliente_normalizado(obj.cliente_nombre),
+                            obj.destino_direccion or '',
+                            'Sí' if obj.tiene_receta_retenida else 'No',
+                            'Sí' if obj.hubo_incidencia else 'No',
+                            obj.fecha_registro.strftime('%Y-%m-%d %H:%M') if obj.fecha_registro else '',
+                        ])
+                    except Exception:
+                        continue
         except Exception:
-            y, m, d = timezone.now().year, timezone.now().month, timezone.now().day
-        qs = Despacho.objects.filter(fecha_registro__year=y, fecha_registro__month=m, fecha_registro__day=d).order_by('fecha_registro')
-        for obj in qs:
-            try:
-                farm = Localfarmacia.objects.filter(local_id=obj.farmacia_origen_local_id).first()
-                u = getattr(obj.motorista, 'usuario', None)
-                mot_name = f"{getattr(u,'nombre','')} {getattr(u,'apellido','')}".strip()
-                estado_norm = _estado_normalizado(obj.estado)
-                if estado_norm not in {'ENTREGADO','FALLIDO','PENDIENTE'}:
-                    continue
-                rows.append([
-                    getattr(farm,'local_id', obj.farmacia_origen_local_id) or '',
-                    obj.codigo_despacho or obj.id,
-                    estado_norm,
-                    obj.tipo_despacho or '',
-                    obj.prioridad or '',
-                    mot_name,
-                    _cliente_normalizado(obj.cliente_nombre),
-                    obj.destino_direccion or '',
-                    'Sí' if obj.tiene_receta_retenida else 'No',
-                    'Sí' if obj.hubo_incidencia else 'No',
-                    obj.fecha_registro.strftime('%Y-%m-%d %H:%M') if obj.fecha_registro else '',
-                ])
-            except Exception:
-                continue
+            rows = []
     elif tipo == 'mensual' and detalle:
         from .models import Despacho, Localfarmacia
         y = int(anio) if anio else None
@@ -2755,7 +2898,21 @@ def actualizar_despacho(request, pk):
             obj = form.save(commit=False)
             obj.usuario_modificacion = Usuario.objects.filter(django_user_id=request.user.id).first()
             obj.fecha_modificacion = timezone.now()
+            prev_estado = d.estado
             obj.save()
+            try:
+                if prev_estado != obj.estado:
+                    from .models import MovimientoDespacho
+                    MovimientoDespacho.objects.create(
+                        despacho=obj,
+                        estado_anterior=prev_estado,
+                        estado_nuevo=obj.estado,
+                        fecha_movimiento=timezone.now(),
+                        usuario=obj.usuario_modificacion,
+                        observacion='actualizacion_despacho'
+                    )
+            except Exception:
+                pass
             # Auditoría de actualización
             try:
                 from .models import AuditoriaGeneral, Usuario as U
@@ -2800,7 +2957,8 @@ def remover_despacho(request, pk):
 @permiso_requerido('despachos', 'view')
 def detalle_despacho(request, pk):
     d = get_object_or_404(Despacho, pk=pk)
-    movs = Movimiento.objects.filter(despacho=d).order_by('-fecha_movimiento')
+    from .models import MovimientoDespacho
+    movs = MovimientoDespacho.objects.filter(despacho=d).order_by('-fecha_movimiento')
     return render(request, 'despachos/detalle-despacho.html', {'despacho': d, 'movimientos': movs})
 
 

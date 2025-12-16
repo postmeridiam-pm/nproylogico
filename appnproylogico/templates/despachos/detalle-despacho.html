@@ -92,7 +92,7 @@
         <div class="card">
           <div class="card-header">Cliente y destino</div>
           <div class="card-body">
-            <div><strong>Cliente:</strong> {{ despacho.cliente_nombre|default:'-' }} / {{ despacho.cliente_telefono|default:'-' }}</div>
+            <div><strong>Cliente:</strong> {{ despacho.cliente_nombre|default:'-' }} / {% with tel=despacho.cliente_telefono|default:'' %}{% if tel and tel|length >= 9 %}{{ tel }}{% else %}Sin información{% endif %}{% endwith %}</div>
             <div><strong>Dirección:</strong> {{ despacho.destino_direccion }}</div>
             <div><strong>Referencia:</strong> {{ despacho.destino_referencia|default:'-' }}</div>
           </div>
