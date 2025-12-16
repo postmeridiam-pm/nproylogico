@@ -29,7 +29,7 @@ DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
 SECRET_KEY = os.getenv('SECRET_KEY')
 if not SECRET_KEY:
     raise RuntimeError("The SECRET_KEY environment variable is not set; generate a secure key and set SECRET_KEY in the environment.")
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,nproylogico.onrender.com').split(',')
 
 
 # Application definition
