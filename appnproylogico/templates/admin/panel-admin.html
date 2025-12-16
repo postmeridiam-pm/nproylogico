@@ -362,9 +362,9 @@ Tu archivo completo con los dos fixes: sin condición negada en JS y botón `btn
             </a>
           </div>
           <div class="col-md-3 d-grid">
-            {% if rol == 'motorista' %}
-              <a class="btn btn-outline-success btn-lg" href="{% url 'panel_motorista' %}">
-                <i class="bi bi-person-badge"></i> Panel Motorista
+            {% if rol != 'operador' %}
+              <a class="btn btn-primary btn-lg" href="{% url 'listado_asignaciones' %}">
+                <i class="bi bi-link-45deg"></i> Asignaciones
               </a>
             {% endif %}
           </div>
@@ -383,9 +383,9 @@ Tu archivo completo con los dos fixes: sin condición negada en JS y botón `btn
           </div>
           {% endif %}
           <div class="col-md-3 d-grid">
-            {% if rol != 'operador' %}
-              <a class="btn btn-primary btn-lg" href="{% url 'listado_asignaciones' %}">
-                <i class="bi bi-link-45deg"></i> Asignaciones
+            {% if rol == 'motorista' %}
+              <a class="btn btn-outline-success btn-lg" href="{% url 'panel_motorista' %}">
+                <i class="bi bi-person-badge"></i> Panel Motorista
               </a>
             {% endif %}
           </div>

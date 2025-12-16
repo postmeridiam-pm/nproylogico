@@ -377,22 +377,78 @@
           </div>
           <div class="form-section">
             <div class="row g-3">
-              {% for field in form %}
-                {% if field.name == 'usuario' or field.name == 'disponible_hoy' %}
-                  <div class="col-md-12 field-wrapper">
-                    {{ field.label_tag }}
-                    {{ field }}
-                    {% if field.help_text %}
-                      <small class="helptext">{{ field.help_text }}</small>
-                    {% endif %}
-                    {% if field.errors %}
-                      <div class="invalid-feedback d-block">
-                        {{ field.errors }}
-                      </div>
-                    {% endif %}
-                  </div>
-                {% endif %}
-              {% endfor %}
+              <div class="col-md-12 field-wrapper">
+                {{ form.usuario.label_tag }}
+                {{ form.usuario }}
+                {% if form.usuario.help_text %}<small class="helptext">{{ form.usuario.help_text }}</small>{% endif %}
+                {% if form.usuario.errors %}<div class="invalid-feedback d-block">{{ form.usuario.errors }}</div>{% endif %}
+              </div>
+              <div class="col-md-4 field-wrapper">
+                {{ form.nombres.label_tag }}
+                {{ form.nombres }}
+                {% if form.nombres.help_text %}<small class="helptext">{{ form.nombres.help_text }}</small>{% endif %}
+                {% if form.nombres.errors %}<div class="invalid-feedback d-block">{{ form.nombres.errors }}</div>{% endif %}
+              </div>
+              <div class="col-md-4 field-wrapper">
+                {{ form.apellido_paterno.label_tag }}
+                {{ form.apellido_paterno }}
+                {% if form.apellido_paterno.help_text %}<small class="helptext">{{ form.apellido_paterno.help_text }}</small>{% endif %}
+                {% if form.apellido_paterno.errors %}<div class="invalid-feedback d-block">{{ form.apellido_paterno.errors }}</div>{% endif %}
+              </div>
+              <div class="col-md-4 field-wrapper">
+                {{ form.apellido_materno.label_tag }}
+                {{ form.apellido_materno }}
+                {% if form.apellido_materno.help_text %}<small class="helptext">{{ form.apellido_materno.help_text }}</small>{% endif %}
+                {% if form.apellido_materno.errors %}<div class="invalid-feedback d-block">{{ form.apellido_materno.errors }}</div>{% endif %}
+              </div>
+              <div class="col-md-4 field-wrapper">
+                {{ form.codigo_motorista.label_tag }}
+                {{ form.codigo_motorista }}
+                {% if form.codigo_motorista.help_text %}<small class="helptext">{{ form.codigo_motorista.help_text }}</small>{% endif %}
+                {% if form.codigo_motorista.errors %}<div class="invalid-feedback d-block">{{ form.codigo_motorista.errors }}</div>{% endif %}
+              </div>
+              <div class="col-md-4 field-wrapper">
+                {{ form.fecha_nacimiento.label_tag }}
+                {{ form.fecha_nacimiento }}
+                {% if form.fecha_nacimiento.help_text %}<small class="helptext">{{ form.fecha_nacimiento.help_text }}</small>{% endif %}
+                {% if form.fecha_nacimiento.errors %}<div class="invalid-feedback d-block">{{ form.fecha_nacimiento.errors }}</div>{% endif %}
+              </div>
+              <div class="col-md-4 field-wrapper">
+                {{ form.telefono.label_tag }}
+                {{ form.telefono }}
+                {% if form.telefono.help_text %}<small class="helptext">{{ form.telefono.help_text }}</small>{% endif %}
+                {% if form.telefono.errors %}<div class="invalid-feedback d-block">{{ form.telefono.errors }}</div>{% endif %}
+              </div>
+              <div class="col-md-6 field-wrapper">
+                {{ form.email.label_tag }}
+                {{ form.email }}
+                {% if form.email.help_text %}<small class="helptext">{{ form.email.help_text }}</small>{% endif %}
+                {% if form.email.errors %}<div class="invalid-feedback d-block">{{ form.email.errors }}</div>{% endif %}
+              </div>
+              <div class="col-md-6 field-wrapper">
+                {{ form.direccion.label_tag }}
+                {{ form.direccion }}
+                {% if form.direccion.help_text %}<small class="helptext">{{ form.direccion.help_text }}</small>{% endif %}
+                {% if form.direccion.errors %}<div class="invalid-feedback d-block">{{ form.direccion.errors }}</div>{% endif %}
+              </div>
+              <div class="col-md-4 field-wrapper">
+                {{ form.comuna_nombre.label_tag }}
+                {{ form.comuna_nombre }}
+                {% if form.comuna_nombre.help_text %}<small class="helptext">{{ form.comuna_nombre.help_text }}</small>{% endif %}
+                {% if form.comuna_nombre.errors %}<div class="invalid-feedback d-block">{{ form.comuna_nombre.errors }}</div>{% endif %}
+              </div>
+              <div class="col-md-4 field-wrapper">
+                {{ form.provincia_nombre.label_tag }}
+                {{ form.provincia_nombre }}
+                {% if form.provincia_nombre.help_text %}<small class="helptext">{{ form.provincia_nombre.help_text }}</small>{% endif %}
+                {% if form.provincia_nombre.errors %}<div class="invalid-feedback d-block">{{ form.provincia_nombre.errors }}</div>{% endif %}
+              </div>
+              <div class="col-md-4 field-wrapper">
+                {{ form.region_nombre.label_tag }}
+                {{ form.region_nombre }}
+                {% if form.region_nombre.help_text %}<small class="helptext">{{ form.region_nombre.help_text }}</small>{% endif %}
+                {% if form.region_nombre.errors %}<div class="invalid-feedback d-block">{{ form.region_nombre.errors }}</div>{% endif %}
+              </div>
             </div>
           </div>
 
@@ -522,14 +578,13 @@
   </div>
 
 
-      // Añadir clase a checkboxes
+  <script>
+    (function(){
       document.querySelectorAll('input[type="checkbox"]').forEach(function(el){
         if (!el.classList.contains('form-check-input')) {
           el.classList.add('form-check-input');
         }
       });
-
-      // Añadir clase a labels de checkboxes
       document.querySelectorAll('.form-check input[type="checkbox"] + label').forEach(function(el){
         if (!el.classList.contains('form-check-label')) {
           el.classList.add('form-check-label');

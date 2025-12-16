@@ -282,6 +282,18 @@ class MotoristaForm(forms.ModelForm):
             "activo",
             "disponible_hoy",
         )
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        try:
+            for f in ("nombres", "apellido_paterno", "apellido_materno"):
+                if f in self.fields:
+                    self.fields[f].widget = forms.TextInput(attrs={
+                        "class": "form-control",
+                        "pattern": r"^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{2,}$",
+                        "title": "Solo letras y espacios, mínimo 2 caracteres"
+                    })
+        except Exception:
+            pass
     def clean(self):
         cleaned = super().clean()
         clase = (cleaned.get("licencia_clase") or "").upper().strip()
@@ -321,6 +333,14 @@ class MotoristaForm(forms.ModelForm):
                 if cm is not None and cm != getattr(self.instance, 'codigo_motorista', None):
                     self.add_error('codigo_motorista', 'Este campo no se puede modificar')
                     cleaned['codigo_motorista'] = getattr(self.instance, 'codigo_motorista', None)
+        except Exception:
+            pass
+        try:
+            import re
+            for f in ("nombres", "apellido_paterno", "apellido_materno"):
+                v = (cleaned.get(f) or "").strip()
+                if v and not re.match(r"^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{2,}$", v):
+                    self.add_error(f, "Solo letras y espacios")
         except Exception:
             pass
         return cleaned
