@@ -105,6 +105,11 @@ DATABASES = {
         }
     }
 }
+# Prefer DATABASE_URL if present (Render/Heroku style). Supports Postgres/MySQL.
+_DATABASE_URL = os.getenv('DATABASE_URL')
+if _DATABASE_URL:
+    import dj_database_url  # dj-database-url==2.2.0
+    DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
 
 CACHES = {
     'default': {
