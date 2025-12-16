@@ -11,6 +11,7 @@ class AppnproylogicoConfig(AppConfig):
             args = set(sys.argv or [])
             if any(a in args for a in {'makemigrations','migrate','collectstatic','test'}):
                 return
+            from . import signals
             from django.core.management import call_command
             from django.apps import apps
             from django.db import OperationalError

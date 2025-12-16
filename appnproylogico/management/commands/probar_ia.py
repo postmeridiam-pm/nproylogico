@@ -65,14 +65,7 @@ class Command(BaseCommand):
         parser.add_argument('--limit', type=int, default=200, help='Máximo de registros a analizar')
 
     def handle(self, *args, **options):
-        ai = None
-        try:
-            from appnproylogico.IA_gen import analizar_incidencia as ai
-        except Exception:
-            try:
-                from IA_gen import analizar_incidencia as ai
-            except Exception:
-                ai = _fallback_ai
+        ai = _fallback_ai
         if options.get('examples'):
             estados = ['FALLIDO','EN_CAMINO','EN_PROCESO','PENDIENTE']
             prioridades = ['ALTA','MEDIA','BAJA']

@@ -510,7 +510,7 @@ class DespachoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["prioridad"].widget = forms.Select(choices=(("ALTA","ALTA"),("MEDIA","MEDIA"),("BAJA","BAJA")))
-        self.fields["estado"].widget = forms.Select(choices=(("PENDIENTE","PENDIENTE"),("ASIGNADO","ASIGNADO"),("PREPARANDO","PREPARANDO"),("PREPARADO","PREPARADO"),("EN_PROCESO","EN_PROCESO"),("EN_CAMINO","EN_CAMINO"),("ENTREGADO","ENTREGADO"),("FALLIDO","FALLIDO"),("ANULADO","ANULADO")))
+        self.fields["estado"].widget = forms.Select(choices=(("PENDIENTE","PENDIENTE"),("ASIGNADO","ASIGNADO"),("PREPARANDO","PREPARANDO"),("PREPARADO","PREPARADO"),("EN_CAMINO","EN_CAMINO"),("ENTREGADO","ENTREGADO"),("FALLIDO","FALLIDO"),("ANULADO","ANULADO")))
         self.fields["tipo_despacho"].widget = forms.Select(choices=(("DOMICILIO","DOMICILIO"),("REENVIO_RECETA","REENVIO_RECETA"),("INTERCAMBIO_FARMACIAS","INTERCAMBIO_FARMACIAS"),("ERROR_DESPACHO","ERROR_DESPACHO")))
         self.fields["cliente_telefono"].widget.attrs.update({"pattern": r"^[0-9+\- ]{7,15}$"})
         self.fields["destino_lat"].widget.attrs.update({"step": "0.0000001"})

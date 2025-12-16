@@ -1854,8 +1854,8 @@ def ingestar_normalizacion(request):
                 mensajes.append(f'Error en normalización: {e}')
         except Exception as e:
             mensajes.append(f'Error al procesar: {e}')
-    context = {'mensajes': mensajes, 'creados': creados, 'procesados': procesados}
-    return render(request, 'movimientos/ingestar-staging.html', context)
+    context = {'feedback': '; '.join(mensajes) if mensajes else None}
+    return render(request, 'movimientos/registrar-mov.html', context)
 
 
 @permiso_requerido('movimientos', 'add')
@@ -1906,27 +1906,13 @@ def registrar_movimiento(request):
                         request.session['mov_queue'] = pend
                 except Exception:
                     pass
-                mapa = {
-                    'PENDIENTE': {'ASIGNADO','ANULADO'},
-                    'ASIGNADO': {'PREPARANDO','ANULADO'},
-                    'PREPARANDO': {'PREPARADO','ANULADO'},
-                    'PREPARADO': {'EN_CAMINO','ANULADO'},
-                    'EN_CAMINO': {'ENTREGADO','FALLIDO'},
-                }
-                permitidos = mapa.get(estado_norm, set())
-                if nuevo not in permitidos:
-                    feedback = 'Transición de estado no permitida'
+                ok, msg = _can_transition(estado_norm, nuevo, tipo_d, despacho.tiene_receta_retenida, despacho.receta_devuelta_farmacia)
+                if not ok:
+                    feedback = msg or 'Transición de estado no permitida'
                     log.info('Transición inválida codigo=%s de=%s a=%s', codigo, estado_norm, nuevo)
                     messages.error(request, feedback)
                     context = {'feedback': feedback}
                     return render(request, 'movimientos/registrar-mov.html', context)
-                if tipo_d == 'REENVIO_RECETA' and nuevo == 'PREPARADO':
-                    if not (despacho.tiene_receta_retenida and despacho.receta_devuelta_farmacia):
-                        feedback = 'Receta retenida requiere devolución antes de PREPARADO'
-                        log.info('Bloqueado PREPARADO por receta no devuelta codigo=%s', codigo)
-                        messages.error(request, feedback)
-                        context = {'feedback': feedback}
-                        return render(request, 'movimientos/registrar-mov.html', context)
                 nuevo = (estado or '').strip().upper()
                 tipo_d = (despacho.tipo_despacho or '').strip().upper()
                 if (metodo or '').lower() == 'boton' and confirmado != 'si':
@@ -1963,15 +1949,8 @@ def registrar_movimiento(request):
                                 return render(request, 'movimientos/registrar-mov.html', context)
                     except Exception:
                         pass
-                mapa = {
-                    'PENDIENTE': {'ASIGNADO','ANULADO'},
-                    'ASIGNADO': {'PREPARANDO','ANULADO'},
-                    'PREPARANDO': {'PREPARADO','ANULADO'},
-                    'PREPARADO': {'EN_CAMINO','ANULADO'},
-                    'EN_CAMINO': {'ENTREGADO','FALLIDO'},
-                }
-                permitidos = mapa.get(estado_norm, set())
-                if nuevo not in permitidos:
+                ok2, _msg2 = _can_transition(estado_norm, nuevo, tipo_d, despacho.tiene_receta_retenida, despacho.receta_devuelta_farmacia)
+                if not ok2:
                     feedback = 'Transición de estado no permitida'
                     log.info('Transición inválida codigo=%s de=%s a=%s', codigo, estado_norm, nuevo)
                 else:
@@ -2694,7 +2673,7 @@ def cerrar_dia_operadora(request):
         qs = Despacho.objects.filter(fecha_registro__date=hoy).order_by('fecha_registro')
         rows = []
         if qs.count() == 0:
-            tipos = ['DOMICILIO','REENVIO_RECETA','INTERCAMBIO','ERROR_DESPACHO']
+            tipos = ['DOMICILIO','REENVIO_RECETA','INTERCAMBIO_FARMACIAS','ERROR_DESPACHO']
             estados = ['PENDIENTE','ASIGNADO','EN_CAMINO','ENTREGADO','FALLIDO']
             prioridades = ['ALTA','MEDIA','BAJA']
             farms = list(Farmacia.objects.all())

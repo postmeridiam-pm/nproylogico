@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
+DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
 SECRET_KEY = os.getenv('SECRET_KEY', 'change-me')
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
 
@@ -87,12 +87,11 @@ WSGI_APPLICATION = 'nproylogico.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('MARIADB_USER'),
-        'PASSWORD': os.getenv('MARIADB_ROOT_PASSWORD'),
-        'DATABASE': os.getenv('MARIADB_DATABASE'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT'),
+        'NAME': os.getenv('DB_NAME', os.getenv('MARIADB_DATABASE')),
+        'USER': os.getenv('DB_USER', os.getenv('MARIADB_USER')),
+        'PASSWORD': os.getenv('DB_PASSWORD', os.getenv('MARIADB_PASSWORD', os.getenv('MARIADB_ROOT_PASSWORD'))),
+        'HOST': os.getenv('DB_HOST', os.getenv('DATABASE_HOST', 'localhost')),
+        'PORT': os.getenv('DB_PORT', os.getenv('DATABASE_PORT', '3306')),
         'CONN_MAX_AGE': 60,
         'ATOMIC_REQUESTS': True,
         'OPTIONS': {
@@ -216,7 +215,7 @@ PASSWORD_HASHERS = [
 ARGON2_TIME_COST = 2
 ARGON2_MEMORY_COST = 102400
 ARGON2_PARALLELISM = 8
-SESSION_COOKIE_AGE = 7200
+SESSION_COOKIE_AGE = 1200
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 SESSION_SAVE_EVERY_REQUEST = True

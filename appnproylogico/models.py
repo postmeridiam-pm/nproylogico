@@ -26,6 +26,30 @@ class AsignacionMotoMotorista(models.Model):
         managed = True
         db_table = 'asignacion_moto_motorista'
         db_table_comment = 'Control temporal: qué motorista tiene qué moto en cada turno'
+        indexes = [
+            models.Index(fields=['moto','activa']),
+            models.Index(fields=['motorista','activa']),
+        ]
+        constraints = [
+            models.CheckConstraint(
+                check=(models.Q(kilometraje_fin__isnull=True) | models.Q(kilometraje_fin__gte=models.F('kilometraje_inicio'))),
+                name='asig_km_fin_gte_inicio_or_null'
+            ),
+            models.CheckConstraint(
+                check=(models.Q(activa=True) & models.Q(fecha_desasignacion__isnull=True)) | (models.Q(activa=False)),
+                name='asig_activa_sin_desasignacion'
+            ),
+            models.UniqueConstraint(
+                fields=['moto'],
+                condition=models.Q(activa=True),
+                name='uniq_asig_moto_activa'
+            ),
+            models.UniqueConstraint(
+                fields=['motorista'],
+                condition=models.Q(activa=True),
+                name='uniq_asig_motorista_activa'
+            ),
+        ]
 
 
 class AsignacionMotoristaFarmacia(models.Model):
@@ -40,6 +64,21 @@ class AsignacionMotoristaFarmacia(models.Model):
     class Meta:
         managed = True
         db_table = 'asignacion_motorista_farmacia'
+        indexes = [
+            models.Index(fields=['motorista','activa']),
+            models.Index(fields=['farmacia','activa']),
+        ]
+        constraints = [
+            models.CheckConstraint(
+                check=(models.Q(activa=True) & models.Q(fecha_desasignacion__isnull=True)) | (models.Q(activa=False)),
+                name='asig_mf_activa_sin_desasignacion'
+            ),
+            models.UniqueConstraint(
+                fields=['motorista','farmacia'],
+                condition=models.Q(activa=True),
+                name='uniq_asig_mf_activa'
+            ),
+        ]
 
 
 class AuditoriaGeneral(models.Model):
@@ -51,15 +90,13 @@ class AuditoriaGeneral(models.Model):
     fecha_evento = models.DateTimeField()
     datos_antiguos = models.JSONField(blank=True, null=True, db_comment='Valores ANTES del cambio (NULL para INSERT)')        
     datos_nuevos = models.JSONField(blank=True, null=True, db_comment='Valores DESPUÉS del cambio (NULL para DELETE)')        
+    prev_hash = models.CharField(max_length=64, blank=True, null=True)
+    hash_registro = models.CharField(max_length=64, blank=True, null=True, unique=True)
 
     class Meta:
         managed = True
         db_table = 'auditoria_general'    
         db_table_comment = 'Auditoría inmutable de cambios en la base de datos'     
-
-
- 
-
 
  
 
@@ -90,7 +127,7 @@ class Despacho(models.Model):
     farmacia_origen_local_id = models.CharField(max_length=20, db_comment='local_id de localfarmacia origen')
     farmacia_destino_local_id = models.CharField(max_length=20, blank=True, null=True, db_comment='local_id de localfarmacia destino (intercambios)')
     motorista = models.ForeignKey('Motorista', models.DO_NOTHING, null=True, blank=True)
-    estado = models.CharField(max_length=9)
+    estado = models.CharField(max_length=12)
     tipo_despacho = models.CharField(max_length=27)
     prioridad = models.CharField(max_length=5)
     cliente_nombre = models.CharField(max_length=100, blank=True, null=True)        
@@ -146,6 +183,24 @@ class Despacho(models.Model):
             models.Index(fields=['estado']),
             models.Index(fields=['tipo_despacho']),
             models.Index(fields=['farmacia_origen_local_id', 'fecha_registro']),
+        ]
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(estado__in=['PENDIENTE','ASIGNADO','PREPARANDO','PREPARADO','EN_CAMINO','ENTREGADO','FALLIDO','ANULADO']),
+                name='desp_estado_valido'
+            ),
+            models.CheckConstraint(
+                check=(models.Q(destino_geolocalizacion_validada=False) | (models.Q(destino_lat__isnull=False) & models.Q(destino_lng__isnull=False))),
+                name='desp_geo_valida_requiere_coord'
+            ),
+            models.CheckConstraint(
+                check=(models.Q(receta_devuelta_farmacia=False) | models.Q(fecha_devolucion_receta__isnull=False)),
+                name='desp_receta_devuelta_requiere_fecha'
+            ),
+            models.CheckConstraint(
+                check=(models.Q(estado='ANULADO') & models.Q(motivo_anulacion__isnull=False) & models.Q(fecha_anulacion__isnull=False)) | ~models.Q(estado='ANULADO'),
+                name='desp_anulado_requiere_motivo_y_fecha'
+            ),
         ]
 
 
@@ -295,9 +350,9 @@ class Motorista(models.Model):
 
 class MovimientoDespacho(models.Model):   
     id = models.BigAutoField(primary_key=True)
-    despacho = models.ForeignKey(Despacho, models.DO_NOTHING, null=True, blank=True)
-    estado_anterior = models.CharField(max_length=9, blank=True, null=True, db_comment='Estado previo')
-    estado_nuevo = models.CharField(max_length=9, db_comment='Estado después del cambio')
+    despacho = models.ForeignKey(Despacho, models.DO_NOTHING, blank=True, null=True)
+    estado_anterior = models.CharField(max_length=12, blank=True, null=True, db_comment='Estado previo')
+    estado_nuevo = models.CharField(max_length=12, db_comment='Estado después del cambio')
     fecha_movimiento = models.DateTimeField()
     usuario = models.ForeignKey('Usuario', models.DO_NOTHING, blank=True, null=True, db_comment='Quien registró el cambio (operadora por radio)')    
     motorista_lat = models.DecimalField(max_digits=10, decimal_places=7, blank=True, null=True, db_comment='GPS motorista al momento del cambio')
@@ -312,6 +367,20 @@ class MovimientoDespacho(models.Model):
             models.Index(fields=['fecha_movimiento']),
             models.Index(fields=['estado_nuevo']),
             models.Index(fields=['despacho', 'fecha_movimiento']),
+        ]
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(estado_nuevo__in=['PENDIENTE','ASIGNADO','PREPARANDO','PREPARADO','EN_CAMINO','ENTREGADO','FALLIDO','ANULADO']),
+                name='mov_estado_nuevo_valido'
+            ),
+            models.CheckConstraint(
+                check=models.Q(estado_anterior__in=['PENDIENTE','ASIGNADO','PREPARANDO','PREPARADO','EN_CAMINO','ENTREGADO','FALLIDO','ANULADO']) | models.Q(estado_anterior__isnull=True),
+                name='mov_estado_anterior_valido_o_null'
+            ),
+            models.CheckConstraint(
+                check=~models.Q(estado_anterior=models.F('estado_nuevo')),
+                name='mov_estado_no_igual'
+            ),
         ]
 
 
@@ -371,6 +440,8 @@ class Usuario(models.Model):
     fecha_creacion = models.DateTimeField()
     fecha_modificacion = models.DateTimeField()
     usuario_modificacion = models.ForeignKey('self', models.DO_NOTHING, blank=True, null=True, db_comment='ID del usuario que modificó por última vez')
+    consiente_datos_salud = models.BooleanField(default=False)
+    fecha_consentimiento_salud = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         managed = True

@@ -24,7 +24,7 @@
       </div>
     </form>
   </div>
-  <script>
+  <script nonce="{{ csp_nonce }}">
     function confirmarAnulacion() {
       var codigo = document.querySelector('input[name="codigo_despacho"]').value || '';
       var motivo = (document.querySelector('textarea[name="mensaje"]').value || '').trim();

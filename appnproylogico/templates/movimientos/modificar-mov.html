@@ -32,7 +32,7 @@
       </div>
     </form>
   </div>
-  <script>
+  <script nonce="{{ csp_nonce }}">
     function confirmarModificacion() {
       var codigo = document.querySelector('input[name="codigo_despacho"]').value || '';
       var estado = document.querySelector('select[name="estado"]').value || '';
