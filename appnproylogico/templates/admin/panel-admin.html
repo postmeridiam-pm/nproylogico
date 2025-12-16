@@ -1,3 +1,6 @@
+Tu archivo completo con los dos fixes: sin condición negada en JS y botón `btn-outline-light` con mejor contraste en tema claro.
+
+```django
 {% load static %}
 <!doctype html>
 <html lang="es" class="theme-dark">
@@ -181,7 +184,19 @@
       box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
     }
 
-    
+    /* Mejor contraste: texto gris sobre fondo blanco */
+    .theme-light .btn-outline-light {
+      border: 2px solid #6c757d;
+      color: #6c757d;
+      font-weight: 600;
+      background-color: #ffffff;
+    }
+
+    .theme-light .btn-outline-light:hover {
+      background-color: #6c757d;
+      border-color: #6c757d;
+      color: #fff;
+    }
 
     /* TEMA OSCURO */
     .theme-dark {
@@ -272,12 +287,12 @@
         <i class="bi bi-speedometer2"></i> Panel General
       </span>
       <div class="d-flex align-items-center gap-3">
-        <button id="btn-light" class="btn btn-success" type="button" title="Modo claro" aria-label="Modo claro">☀️</button>
-        <button id="btn-dark" class="btn btn-secondary" type="button" title="Modo oscuro" aria-label="Modo oscuro">🌙</button>
+        <button id="btn-light" class="btn btn-outline-success" type="button" title="Modo claro">☀️</button>
+        <button id="btn-dark" class="btn btn-outline-secondary" type="button" title="Modo oscuro">🌙</button>
         {% if user %}
           <span class="text-muted">{{ user.username }}{% if rol %} · {{ rol }}{% endif %}</span>
         {% endif %}
-        <a class="btn btn-secondary" href="{% url 'perfil' %}" title="Mi perfil" aria-label="Ir a mi perfil">
+        <a class="btn btn-outline-light" href="{% url 'perfil' %}" title="Mi perfil">
           <i class="bi bi-person"></i>
         </a>
       </div>
@@ -376,28 +391,28 @@
           </div>
           <div class="col-md-3 d-grid">
             {% if rol == 'gerente' or rol == 'admin' %}
-              <a class="btn btn-info btn-lg" href="{% url 'reporte_movimientos' %}">
+              <a class="btn btn-outline-info btn-lg" href="{% url 'reporte_movimientos' %}">
                 <i class="bi bi-graph-up"></i> Reportes
               </a>
             {% endif %}
           </div>
           <div class="col-md-3 d-grid">
             {% if rol == 'operador' %}
-              <a class="btn btn-success btn-lg" href="{% url 'panel_operadora' %}">
+              <a class="btn btn-outline-success btn-lg" href="{% url 'panel_operadora' %}">
                 <i class="bi bi-grid"></i> Operadora
               </a>
             {% endif %}
           </div>
           <div class="col-md-3 d-grid">
             {% if rol == 'supervisor' %}
-              <a class="btn btn-warning btn-lg" href="{% url 'listado_asignaciones_mf' %}">
+              <a class="btn btn-outline-warning btn-lg" href="{% url 'listado_asignaciones_mf' %}">
                 <i class="bi bi-people"></i> Supervisor
               </a>
             {% endif %}
           </div>
           <div class="col-md-3 d-grid">
             {% if rol == 'admin' %}
-              <a class="btn btn-secondary btn-lg" href="{% url 'importar_farmacias' %}">
+              <a class="btn btn-outline-secondary btn-lg" href="{% url 'importar_farmacias' %}">
                 <i class="bi bi-upload"></i> Importar Farmacias
               </a>
             {% endif %}
