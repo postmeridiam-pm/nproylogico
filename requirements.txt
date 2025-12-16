@@ -73,19 +73,13 @@ gast==0.6.0
 geographiclib==2.1
 geopy==2.4.1
 git-filter-repo==2.47.0
-<<<<<<< HEAD
-=======
 google-ai-generativelanguage==0.6.15
->>>>>>> 9ab7f34 (try5)
 google-api-core==2.28.1
 google-api-python-client==2.187.0
 google-auth==2.43.0
 google-auth-httplib2==0.2.1
-<<<<<<< HEAD
-=======
 google-genai==1.52.0
 google-generativeai==0.8.5
->>>>>>> 9ab7f34 (try5)
 google-pasta==0.2.0
 googleapis-common-protos==1.72.0
 grpcio==1.75.1
@@ -233,8 +227,5 @@ xhtml2pdf==0.2.17
 xlrd==2.0.2
 xlsxwriter==3.2.9
 yarg==0.1.10
-<<<<<<< HEAD
 zopfli==0.2.3.post1
-=======
 zopfli==0.2.3.post1
->>>>>>> 9ab7f34 (try5)
