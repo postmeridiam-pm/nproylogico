@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from .models import AsignacionMotoristaFarmacia, Region, Despacho, Localfarmacia as Farmacia, Motorista, Moto, AsignacionMotoMotorista, MovimientoDespacho as Movimiento, Usuario
+from .models import AsignacionMotoristaFarmacia, Region, Despacho, Localfarmacia as Farmacia, Motorista, Moto, AsignacionMotoMotorista, MovimientoDespacho, Usuario, AuditoriaGeneral
 from .forms import RegistroForm, MotoristaForm, MotoForm, AsignarMotoristaForm, ReporteMovimientosForm, LocalfarmaciaForm, DespachoForm, AsignacionMotoristaFarmaciaForm
 from PIL import Image
 
@@ -29,18 +29,73 @@ from django.db.models import Q
 from django.conf import settings
 import logging
 import pathlib
+import random
+# Use stdlib imghdr when available; otherwise provide a lightweight fallback using Pillow
+try:
+    import importlib
+    imghdr = importlib.import_module('imghdr')
+except Exception:
+    try:
+        from PIL import Image
+        import io
+        def _imghdr_what(file, h=None):
+            try:
+                data = h
+                if data is None and file is not None:
+                    try:
+                        data = file.read(32)
+                        file.seek(0)
+                    except Exception:
+                        data = None
+                if not data:
+                    return None
+                try:
+                    img = Image.open(io.BytesIO(data))
+                    fmt = (img.format or '').lower()
+                    if fmt == 'jpeg':
+                        return 'jpeg'
+                    if fmt == 'png':
+                        return 'png'
+                    if fmt == 'gif':
+                        return 'gif'
+                    return fmt or None
+                except Exception:
+                    return None
+            except Exception:
+                return None
+        class _ImghdrProxy:
+            @staticmethod
+            def what(file, h=None):
+                return _imghdr_what(file, h)
+        imghdr = _ImghdrProxy
+    except Exception:
+        # final fallback: dummy implementation
+        class _ImghdrDummy:
+            @staticmethod
+            def what(file, h=None):
+                return None
+        imghdr = _ImghdrDummy
 log = logging.getLogger('appnproylogico')
 
 # Common user-visible messages
 FORM_ERROR_MSG = 'Por favor corrige los errores en el formulario.'
 TRANSITION_NOT_ALLOWED = 'Transición de estado no permitida'
+ASSIGNMENT_UPDATED_MSG = 'Asignación actualizada exitosamente.'
+DESPACHO_NOT_FOUND = 'Despacho no encontrado'
 
 # Template constants
 PERFIL_TEMPLATE = 'perfil.html'
+REGISTRAR_MOV_TEMPLATE = 'movimientos/registrar-mov.html'
+
+# Key constants for imported data headers
+KEY_DIRECCION = 'Dirección'
 
 # Static data directory and frequently used data file paths
 DATA_DIR = pathlib.Path(__file__).resolve().parents[1] / 'static' / 'data'
 MOTOS_JSON = DATA_DIR / 'motos.json'
+
+# File upload content types
+PDF_CONTENT_TYPE = 'application/pdf'
 
 def _cliente_normalizado(nombre: str):
     s = (nombre or '').strip()
@@ -704,7 +759,7 @@ def detalle_farmacia(request, pk):
                         )
                     except Exception:
                         pass
-                messages.success(request, 'Asignación actualizada exitosamente.')
+                messages.success(request, ASSIGNMENT_UPDATED_MSG)
             else:
                 from django.db import transaction as _tx
                 with _tx.atomic():
@@ -879,9 +934,8 @@ def agregar_motorista(request):
                         raise ValueError('Tipo de archivo no permitido')
                     if f.size > settings.UPLOAD_MAX_SIZE_MB * 1024 * 1024:
                         raise ValueError('Archivo demasiado grande')
-                    ext = '.bin'
                     ct = getattr(f, 'content_type', '')
-                    if ct == 'application/pdf':
+                    if ct == PDF_CONTENT_TYPE:
                         head = f.read(4); f.seek(0)
                         if head != b'%PDF':
                             raise ValueError('PDF inválido')
@@ -990,7 +1044,7 @@ def detalle_motorista(request, pk):
                 existente.fecha_desasignacion = cd.get('fecha_desasignacion')
                 existente.observaciones = cd.get('observaciones')
                 existente.save()
-                messages.success(request, 'Asignación actualizada exitosamente.')
+                messages.success(request, ASSIGNMENT_UPDATED_MSG)
             else:
                 obj = form.save(commit=False)
                 try:
@@ -1125,7 +1179,7 @@ def agregar_moto(request):
             try:
                 docs = request.FILES.getlist('documentos')
                 if docs:
-                    import os, imghdr
+                    import os
                     from django.conf import settings
                     base = os.path.join(settings.MEDIA_ROOT, 'docs', 'motos', str(moto.pk))
                     os.makedirs(base, exist_ok=True)
@@ -1141,8 +1195,7 @@ def agregar_moto(request):
                             if f.size > maxsz:
                                 invalid += 1
                                 continue
-                            ext = '.bin'
-                            if ct == 'application/pdf':
+                            if ct == PDF_CONTENT_TYPE:
                                 head = f.read(4); f.seek(0)
                                 if head != b'%PDF':
                                     invalid += 1
@@ -1207,7 +1260,7 @@ def actualizar_moto(request, pk):
             try:
                 docs = request.FILES.getlist('documentos')
                 if docs:
-                    import os, imghdr
+                    import os
                     from django.conf import settings
                     base = os.path.join(settings.MEDIA_ROOT, 'docs', 'motos', str(moto.pk))
                     os.makedirs(base, exist_ok=True)
@@ -1224,7 +1277,7 @@ def actualizar_moto(request, pk):
                                 invalid += 1
                                 continue
                             ext = '.bin'
-                            if ct == 'application/pdf':
+                            if ct == PDF_CONTENT_TYPE:
                                 head = f.read(4); f.seek(0)
                                 if head != b'%PDF':
                                     invalid += 1
@@ -1505,7 +1558,7 @@ def modificar_asignacion(request, pk):
         form = AsignacionMotoristaFarmaciaForm(request.POST, instance=asignacion)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Asignación actualizada exitosamente.')
+            messages.success(request, ASSIGNMENT_UPDATED_MSG)
             return redirect('detalle_asignacion', pk=asignacion.pk)
         else:
             messages.error(request, FORM_ERROR_MSG)
@@ -1704,7 +1757,7 @@ def importar_farmacias(request):
                         for fmt in ('%H:%M:%S','%H:%M'):
                             try:
                                 return dt.strptime(s, fmt).time()
-                            except:
+                            except Exception:
                                 pass
                         return dt.strptime('09:00:00','%H:%M:%S').time()
                     hora_ap = parse_time(apertura)
@@ -1713,7 +1766,7 @@ def importar_farmacias(request):
                     if fecha_str:
                         try:
                             fecha = dt.strptime(fecha_str, '%d-%m-%y').date()
-                        except:
+                        except Exception:
                             fecha = dt.strptime(fecha_str, '%Y-%m-%d').date()
                     else:
                         fecha = dt.today().date()
@@ -1721,16 +1774,16 @@ def importar_farmacias(request):
                     lng = get('local_lng','lng','Lng')
                     try:
                         lat = float(lat) if lat else None
-                    except:
+                    except Exception:
                         lat = None
                     try:
                         lng = float(lng) if lng else None
-                    except:
+                    except Exception:
                         lng = None
                     tel_raw = get('local_telefono','telefono','Teléfono') or ''
                     import re
                     tel_clean = re.sub(r'[^0-9+]', '', tel_raw)
-                    if tel_clean == '+56' or len(re.sub(r'[^0-9]', '', tel_clean)) < 7:
+                    if tel_clean == '+56' or len(re.sub(r'\D', '', tel_clean)) < 7:
                         tel_clean = None
                     # FKs por ID si vienen en Excel
                     rid = get('fk_region','region_id','id_region')
@@ -1760,7 +1813,7 @@ def importar_farmacias(request):
                     obj = Localfarmacia(
                         local_id=lid,
                         local_nombre=get('local_nombre','nombre','Nombre') or '',
-                        local_direccion=get('local_direccion','direccion','Dirección') or '',
+                        local_direccion=get('local_direccion','direccion', KEY_DIRECCION) or '',
                         comuna_nombre=get('comuna_nombre','comuna','Comuna') or '',
                         localidad_nombre=get('localidad_nombre','localidad','Localidad') or '',
                         fk_region=fk_region,
@@ -1794,8 +1847,6 @@ def importar_farmacias(request):
 def ingestar_normalizacion(request):
     from .models import NormalizacionDespacho
     mensajes = []
-    creados = 0
-    procesados = 0
     if request.method == 'POST':
         fichero = request.FILES.get('csv_file')
         fuente = (request.POST.get('fuente') or 'excel').strip().lower()
@@ -1856,18 +1907,16 @@ def ingestar_normalizacion(request):
                         fecha_creacion=timezone.now(),
                     )
                     obj.save()
-                    creados += 1
                 except Exception as e:
                     mensajes.append(f'Fila staging con error: {e}')
             try:
                 normalize_from_normalizacion(limit=500)
-                procesados = 1
             except Exception as e:
                 mensajes.append(f'Error en normalización: {e}')
         except Exception as e:
             mensajes.append(f'Error al procesar: {e}')
     context = {'feedback': '; '.join(mensajes) if mensajes else None}
-    return render(request, 'movimientos/registrar-mov.html', context)
+    return render(request, REGISTRAR_MOV_TEMPLATE, context)
 
 
 @permiso_requerido('movimientos', 'add')
@@ -1887,8 +1936,8 @@ def registrar_movimiento(request):
         try:
             despacho = Despacho.objects.filter(codigo_despacho=codigo).first()
             if not despacho:
-                feedback = 'Despacho no encontrado'
-                log.info('Movimiento rechazado: despacho no encontrado codigo=%s ip=%s', codigo, request.META.get('REMOTE_ADDR'))
+                feedback = DESPACHO_NOT_FOUND
+                log.info('Movimiento rechazado: %s codigo=%s ip=%s', DESPACHO_NOT_FOUND, codigo, request.META.get('REMOTE_ADDR'))
             else:
                 from django.utils import timezone
                 usuario = Usuario.objects.filter(django_user_id=request.user.id).first()
@@ -1898,7 +1947,7 @@ def registrar_movimiento(request):
                 try:
                     pend = request.session.get('mov_queue', [])
                     if pend:
-                        for item in list(pend):
+                        for item in pend[:]:
                             try:
                                 d2 = Despacho.objects.filter(codigo_despacho=item.get('codigo')).first()
                                 if not d2:
@@ -1924,14 +1973,14 @@ def registrar_movimiento(request):
                     log.info('Transición inválida codigo=%s de=%s a=%s', codigo, estado_norm, nuevo)
                     messages.error(request, feedback)
                     context = {'feedback': feedback}
-                    return render(request, 'movimientos/registrar-mov.html', context)
+                    return render(request, REGISTRAR_MOV_TEMPLATE, context)
                 nuevo = (estado or '').strip().upper()
                 tipo_d = (despacho.tipo_despacho or '').strip().upper()
                 if (metodo or '').lower() == 'boton' and confirmado != 'si':
                     feedback = 'Debes confirmar la acción antes de continuar'
                     messages.error(request, feedback)
                     context = {'feedback': feedback}
-                    return render(request, 'movimientos/registrar-mov.html', context)
+                    return render(request, REGISTRAR_MOV_TEMPLATE, context)
                 if nuevo == 'ANULADO':
                     from .roles import obtener_rol_usuario
                     rol = obtener_rol_usuario(request.user)
@@ -1939,12 +1988,12 @@ def registrar_movimiento(request):
                         feedback = 'Solo operadora puede anular'
                         messages.error(request, feedback)
                         context = {'feedback': feedback}
-                        return render(request, 'movimientos/registrar-mov.html', context)
+                        return render(request, REGISTRAR_MOV_TEMPLATE, context)
                     if not mensaje or len(mensaje) < 10:
                         feedback = 'Descripción obligatoria para ANULADO'
                         messages.error(request, feedback)
                         context = {'feedback': feedback}
-                        return render(request, 'movimientos/registrar-mov.html', context)
+                        return render(request, REGISTRAR_MOV_TEMPLATE, context)
                     try:
                         from django.utils import timezone as _tz
                         now_s = int(_tz.now().timestamp())
@@ -1955,10 +2004,10 @@ def registrar_movimiento(request):
                             request.session['cancel_count'] = 0
                         else:
                             if count >= 5:
-                                feedback = 'Límite de anulaciones alcanzado (10 min)'
-                                messages.error(request, feedback)
-                                context = {'feedback': feedback}
-                                return render(request, 'movimientos/registrar-mov.html', context)
+                                    feedback = 'Límite de anulaciones alcanzado (10 min)'
+                                    messages.error(request, feedback)
+                                    context = {'feedback': feedback}
+                                    return render(request, REGISTRAR_MOV_TEMPLATE, context)
                     except Exception:
                         pass
                 ok2, _msg2 = _can_transition(estado_norm, nuevo, tipo_d, despacho.tiene_receta_retenida, despacho.receta_devuelta_farmacia)
@@ -1971,7 +2020,7 @@ def registrar_movimiento(request):
                             feedback = 'Receta retenida requiere devolución antes de PREPARADO'
                             log.info('Bloqueado PREPARADO por receta no devuelta codigo=%s', codigo)
                             context = {'feedback': feedback}
-                            return render(request, 'movimientos/registrar-mov.html', context)
+                            return render(request, REGISTRAR_MOV_TEMPLATE, context)
                     dup_skip = False
                     try:
                         ultimo = MovimientoDespacho.objects.filter(despacho=despacho).order_by('-fecha_movimiento').first()
@@ -2037,7 +2086,7 @@ def registrar_movimiento(request):
                         feedback = 'Base de datos no disponible; movimiento encolado'
                         messages.warning(request, feedback)
                         context = {'feedback': feedback}
-                        return render(request, 'movimientos/registrar-mov.html', context)
+                        return render(request, REGISTRAR_MOV_TEMPLATE, context)
         except Exception as e:
             feedback = f'Error: {e}'
             log.error('Error movimiento codigo=%s error=%s', codigo, e)
@@ -2101,7 +2150,7 @@ def export_resumen_operativo(request):
         except Exception:
             rows = []
     elif tipo == 'despachos_activos':
-        headers = ['Local','Despacho','Estado','Tipo','Prioridad','Motorista','Cliente','Dirección','Con receta','Incidencia','Fecha']
+        headers = ['Local','Despacho','Estado','Tipo','Prioridad','Motorista','Cliente', KEY_DIRECCION, 'Con receta','Incidencia','Fecha']
         fecha_arg = (request.GET.get('fecha') or timezone.now().strftime('%Y-%m-%d'))
         codigo = getattr(settings, 'REPORTE_CODIGO', 'codbd22_25')
         prefix = getattr(settings, 'REPORTE_PREFIX', 'logico')
@@ -2116,7 +2165,7 @@ def export_resumen_operativo(request):
                 with open(file, 'r', encoding='utf-8') as f:
                     rows = json.load(f) or []
                 try:
-                    rows = [[r[0], r[1], (_estado_normalizado(r[2]) if ' _estado_normalizado' else (r[2] if r else '')), r[3], r[4], r[5], r[6], r[7], r[8], r[9], r[10]] for r in rows]
+                    rows = [[r[0], r[1], _estado_normalizado(r[2]) if (r and len(r) > 2 and r[2]) else (r[2] if r else ''), r[3], r[4], r[5], r[6], r[7], r[8], r[9], r[10]] for r in rows]
                     rows = [r for r in rows if str(r[2]).strip().upper() in {'ENTREGADO','FALLIDO','PENDIENTE'}]
                 except Exception:
                     pass
@@ -2155,7 +2204,7 @@ def export_resumen_operativo(request):
             rows = []
     elif tipo == 'diario' and detalle:
         fecha_arg = (request.GET.get('fecha') or timezone.now().strftime('%Y-%m-%d'))
-        headers = ['Local','Despacho','Estado','Tipo','Prioridad','Motorista','Cliente','Dirección','Con receta','Incidencia','Fecha']
+        headers = ['Local','Despacho','Estado','Tipo','Prioridad','Motorista','Cliente', KEY_DIRECCION, 'Con receta','Incidencia','Fecha']
         filename = 'movimientos_diario'
         rows = []
         try:
@@ -2166,7 +2215,7 @@ def export_resumen_operativo(request):
                 with open(file, 'r', encoding='utf-8') as f:
                     rows = json.load(f) or []
                 try:
-                    rows = [[r[0], r[1], (_estado_normalizado(r[2]) if ' _estado_normalizado' else (r[2] if r else '')), r[3], r[4], r[5], r[6], r[7], r[8], r[9], r[10]] for r in rows]
+                    rows = [[r[0], r[1], (_estado_normalizado(r[2]) if (r and r[2]) else (r[2] if r else '')), r[3], r[4], r[5], r[6], r[7], r[8], r[9], r[10]] for r in rows]
                     rows = [r for r in rows if str(r[2]).strip().upper() in {'ENTREGADO','FALLIDO','PENDIENTE'}]
                 except Exception:
                     pass
@@ -2209,7 +2258,7 @@ def export_resumen_operativo(request):
         qs = Despacho.objects.all().order_by('fecha_registro')
         if y: qs = qs.filter(fecha_registro__year=y)
         if m: qs = qs.filter(fecha_registro__month=m)
-        headers = ['Local','Despacho','Estado','Tipo','Prioridad','Motorista','Cliente','Dirección','Con receta','Incidencia','Fecha']
+        headers = ['Local','Despacho','Estado','Tipo','Prioridad','Motorista','Cliente', KEY_DIRECCION, 'Con receta','Incidencia','Fecha']
         filename = f'movimientos_mensual_{anio or "todos"}_{mes or "todos"}'
         rows = []
         for obj in qs:
@@ -2241,7 +2290,7 @@ def export_resumen_operativo(request):
             y = int(anio) if anio else None
             qs = Despacho.objects.all().order_by('fecha_registro')
             if y: qs = qs.filter(fecha_registro__year=y)
-            headers = ['Local','Despacho','Estado','Tipo','Prioridad','Motorista','Cliente','Dirección','Con receta','Incidencia','Fecha']
+            headers = ['Local','Despacho','Estado','Tipo','Prioridad','Motorista','Cliente', KEY_DIRECCION, 'Con receta','Incidencia','Fecha']
             filename = f'movimientos_anual_{anio or "todos"}'
             rows = []
             for obj in qs:
@@ -2451,7 +2500,11 @@ def despachos_activos(request):
         if rol != 'admin':
             tel = item['cliente_telefono']
             s = str(tel or '').strip()
-            item['cliente_telefono'] = '***' if not s else ('***' + s[-3:] if len(s) > 3 else '***')
+            if not s:
+                item['cliente_telefono'] = '***'
+            else:
+                suffix = '***' if len(s) <= 3 else '***' + s[-3:]
+                item['cliente_telefono'] = suffix
         data.append(item)
 
     if q:
@@ -2554,7 +2607,13 @@ def api_despachos_activos(request):
         }
         if rol != 'admin':
             s = str(item['cliente_telefono'] or '').strip()
-            item['cliente_telefono'] = '***' if not s else ('***' + s[-3:] if len(s) > 3 else '***')
+            if not s:
+                item['cliente_telefono'] = '***'
+            else:
+                if len(s) > 3:
+                    item['cliente_telefono'] = '***' + s[-3:]
+                else:
+                    item['cliente_telefono'] = '***'
         data.append(item)
     from django.http import JsonResponse
     return JsonResponse({'items': data, 'count': len(data)})
@@ -2775,7 +2834,6 @@ def cerrar_dia_operadora(request):
                         seq += 1
                         d.save()
                     from .models import Localfarmacia
-                    farm = Localfarmacia.objects.filter(local_id=d.farmacia_origen_local_id).first()
                     estado_norm = (d.estado or '').strip().upper()
                     if estado_norm not in {'ENTREGADO','FALLIDO'}:
                         continue
@@ -2799,7 +2857,6 @@ def cerrar_dia_operadora(request):
         cierre_file = base_dir / f"cierre_{hoy.strftime('%Y-%m-%d')}.json"
         with open(cierre_file, 'w', encoding='utf-8') as f:
             json.dump(rows, f, ensure_ascii=False)
-        pass
     except Exception as e:
         pass
     return redirect('despachos_activos')
@@ -2821,7 +2878,6 @@ def generar_despachos_demo(request):
         tipos = ['DOMICILIO','REENVIO_RECETA','INTERCAMBIO','ERROR_DESPACHO']
         estados = ['PENDIENTE','ASIGNADO','EN_CAMINO','ENTREGADO','FALLIDO']
         prioridades = ['ALTA','MEDIA','BAJA']
-        created = 0
         for i in range(100):
             try:
                 f = random.choice(farms)
@@ -2867,7 +2923,6 @@ def generar_despachos_demo(request):
                     usuario_modificacion=Usuario.objects.filter(django_user_id=request.user.id).first(),
                 )
                 obj.save()
-                created += 1
             except Exception:
                 continue
         base_dir = pathlib.Path(getattr(settings, 'MEDIA_ROOT', None) or (pathlib.Path(settings.BASE_DIR) / 'media')) / 'reportes'
@@ -2896,7 +2951,6 @@ def generar_despachos_demo(request):
                 continue
         with open(cierre_file, 'w', encoding='utf-8') as f:
             json.dump(rows, f, ensure_ascii=False)
-        pass
     except Exception as e:
         pass
     return redirect('despachos_activos')
@@ -2956,7 +3010,7 @@ def receta_marcar_devuelta(request, despacho_id):
     from .models import Despacho, Usuario
     d = Despacho.objects.filter(id=despacho_id).first()
     if not d:
-        messages.error(request, 'Despacho no encontrado')
+        messages.error(request, DESPACHO_NOT_FOUND)
         return redirect('recetas_retencion_panel')
     estado_norm = (d.estado or '').strip().upper()
     if estado_norm not in {'PREPARANDO','PREPARADO','EN PROCESO','EN_PROCESO','PROCESO'}:
@@ -3340,14 +3394,6 @@ def ia_sugerencias(request):
         limit = int(request.GET.get('limit') or 200)
     except Exception:
         limit = 200
-    ai = None
-    try:
-        from appnproylogico.IA_gen import analizar_incidencia as ai
-    except Exception:
-        try:
-            from IA_gen import analizar_incidencia as ai
-        except Exception:
-            ai = None
     def _fallback(d, cierre='20:00'):
         from .models import Localfarmacia
         est = (getattr(d, 'estado', '') or 'Desconocido').upper()
@@ -3366,7 +3412,7 @@ def ia_sugerencias(request):
         if cierre_t and now_t >= cierre_t:
             sug = 'Reasignar/Reenviar' if (pri or '').upper() == 'ALTA' else 'Postergar'
         return f"Resumen: {est} · {pri} · {(getattr(d,'cliente_nombre','') or 'Cliente')}\nSugerencia: {sug}"
-    fn = ai or _fallback
+    fn = _fallback
     from .models import Despacho
     qs = Despacho.objects.all().order_by('-fecha_registro')
     if estado:
@@ -3506,7 +3552,7 @@ def motorista_despacho_estado(request, despacho_id):
     m = Motorista.objects.filter(usuario=u).first()
     d = Despacho.objects.filter(pk=despacho_id, motorista=m).first()
     if not d:
-        messages.error(request, 'Despacho no encontrado')
+        messages.error(request, DESPACHO_NOT_FOUND)
         return redirect('panel_motorista')
     nuevo = (request.POST.get('estado') or '').strip().upper()
     receta_devuelta = request.POST.get('receta_devuelta')

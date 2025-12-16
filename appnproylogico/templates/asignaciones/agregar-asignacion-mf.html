@@ -16,7 +16,7 @@
       <h1 class="h4 mb-0"><i class="bi bi-link-45deg"></i> Asignaciones Motorista–Farmacia</h1>
       <div class="d-flex gap-2">
         
-        <a class="btn btn-outline-secondary btn-pill" href="{% url 'home' %}"><i class="bi bi-arrow-left"></i> Inicio</a>
+        <a class="btn btn-secondary btn-pill" href="{% url 'home' %}"><i class="bi bi-arrow-left"></i> Inicio</a>
         <a class="btn btn-success btn-pill" href="{% url 'agregar_asignacion_mf' %}"><i class="bi bi-plus-lg"></i> Nueva</a>
       </div>
     </div>
@@ -34,12 +34,12 @@
       <div class="card-body">
         <form class="row g-3" method="get">
           <div class="col-md-8">
-            <label class="form-label">Buscar</label>
-            <input class="form-control" type="text" name="search" value="{{ search_query }}" placeholder="Buscar por motorista o farmacia">
+            <label class="form-label" for="search-asign-mf">Buscar</label>
+            <input id="search-asign-mf" class="form-control" type="text" name="search" value="{{ search_query }}" placeholder="Buscar por motorista o farmacia">
           </div>
           <div class="col-md-2">
-            <label class="form-label">Estado</label>
-            <select class="form-select" name="estado">
+            <label class="form-label" for="estado-asign-mf">Estado</label>
+            <select id="estado-asign-mf" class="form-select" name="estado">
               <option value="">Todas</option>
               <option value="activa" {% if filtro_estado == 'activa' %}selected{% endif %}>Activas</option>
               <option value="inactiva" {% if filtro_estado == 'inactiva' %}selected{% endif %}>Inactivas</option>
@@ -97,13 +97,13 @@
                 </td>
                 <td class="text-end">
                   <div class="btn-group">
-                    <a class="btn btn-sm btn-outline-info" href="{% url 'detalle_asignacion_mf' a.id %}" title="Ver detalles">
+                    <a class="btn btn-sm btn-primary" href="{% url 'detalle_asignacion_mf' a.id %}" aria-label="Ver detalles de asignación" title="Ver detalles">
                       <i class="bi bi-eye"></i>
                     </a>
-                    <a class="btn btn-sm btn-outline-warning" href="{% url 'modificar_asignacion_mf' a.id %}" title="Editar">
+                    <a class="btn btn-sm btn-secondary" href="{% url 'modificar_asignacion_mf' a.id %}" aria-label="Editar asignación" title="Editar">
                       <i class="bi bi-pencil"></i>
                     </a>
-                    <a class="btn btn-sm btn-outline-danger" href="{% url 'remover_asignacion_mf' a.id %}" title="Eliminar">
+                    <a class="btn btn-sm btn-danger" href="{% url 'remover_asignacion_mf' a.id %}" aria-label="Eliminar asignación" title="Eliminar">
                       <i class="bi bi-trash"></i>
                     </a>
                   </div>
@@ -123,7 +123,7 @@
       </div>
       <div class="card-footer d-flex justify-content-between align-items-center">
         {% if page_obj.has_previous %}
-          <a class="btn btn-outline-secondary" href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}&estado={{ filtro_estado }}">
+          <a class="btn btn-secondary" href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}&estado={{ filtro_estado }}">
             <i class="bi bi-chevron-left"></i> Anterior
           </a>
         {% else %}
@@ -131,7 +131,7 @@
         {% endif %}
         <span class="text-muted">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
         {% if page_obj.has_next %}
-          <a class="btn btn-outline-secondary" href="?page={{ page_obj.next_page_number }}&search={{ search_query }}&estado={{ filtro_estado }}">
+          <a class="btn btn-secondary" href="?page={{ page_obj.next_page_number }}&search={{ search_query }}&estado={{ filtro_estado }}">
             Siguiente <i class="bi bi-chevron-right"></i>
           </a>
         {% else %}

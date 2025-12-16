@@ -19,71 +19,117 @@
       background:#00b37e; border:none; color:#08212f; font-weight:600; padding:10px 14px;
       border-radius:8px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:6px;
     }
-    a.btn-outline {
+    a.btn-outline,
+    button.btn-outline {
       background: transparent; border: 2px solid #00b37e; color:#00b37e;
     }
-    a.btn:hover, button:hover, a.btn-outline:hover {
+    a.btn:hover, button:hover, a.btn-outline:hover, button.btn-outline:hover {
       opacity: 0.85;
     }
     .bi { font-size: 1.2em; }
   </style>
   {% if messages %}
-  <style>.msg { background:#1b2f46; padding:10px 12px; border-radius:8px; margin-bottom:8px; color:#ffcccb; }</style>
+  <style>
+    .msg { background:#1b2f46; padding:10px 12px; border-radius:8px; margin-bottom:8px; color:#ffcccb; }
+  </style>
   {% endif %}
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.min.css">
 </head>
 <body>
   <div class="wrap">
     <div class="card">
       <div class="row" style="margin-bottom:12px; align-items:center;">
         <div class="col" style="flex:0 0 auto; display:flex; gap:8px;">
-          <a href="{% url 'home' %}" class="btn btn-outline"><i class="bi bi-house"></i> Inicio</a>
-          <a href="#" class="btn btn-outline" onclick="history.back();return false;"><i class="bi bi-arrow-left"></i> Atrás</a>
+          <a href="{% url 'home' %}" class="btn btn-outline">
+            <i class="bi bi-house"></i> Inicio
+          </a>
+          <button type="button" class="btn btn-outline" onclick="history.back(); return false;">
+            <i class="bi bi-arrow-left"></i> Atrás
+          </button>
         </div>
       </div>
+
       <h1><i class="bi bi-person-badge"></i> Perfil</h1>
+
       {% if messages %}
         {% for m in messages %}
           <div class="msg">{{ m }}</div>
         {% endfor %}
       {% endif %}
+
       {% if editing %}
       <form method="post">
         {% csrf_token %}
         <div class="row">
           <div class="col">
-            <label><strong>Usuario</strong></label>
-            <input type="text" name="username" value="{{ user.username }}" required style="width:100%; padding:8px; border-radius:8px; border:1px solid #284761; background:#0d2134; color:#eaf0f6" pattern="^[A-Za-z0-9_.\-]{3,}$" />
+            <label for="id_username"><strong>Usuario</strong></label>
+            <input id="id_username"
+                   type="text"
+                   name="username"
+                   value="{{ user.username }}"
+                   required
+                   style="width:100%; padding:8px; border-radius:8px; border:1px solid #284761; background:#0d2134; color:#eaf0f6"
+                   pattern="^[A-Za-z0-9_.\-]{3,}$" />
           </div>
           <div class="col">
-            <label><strong>Teléfono</strong></label>
-            <input type="text" name="telefono" value="{{ usuario.telefono|default:'' }}" style="width:100%; padding:8px; border-radius:8px; border:1px solid #284761; background:#0d2134; color:#eaf0f6" pattern="^[0-9+\- ]{7,15}$" />
+            <label for="id_telefono"><strong>Teléfono</strong></label>
+            <input id="id_telefono"
+                   type="text"
+                   name="telefono"
+                   value="{{ usuario.telefono|default:'' }}"
+                   style="width:100%; padding:8px; border-radius:8px; border:1px solid #284761; background:#0d2134; color:#eaf0f6"
+                   pattern="^[0-9+\- ]{7,15}$" />
           </div>
           <div class="col"><strong>Rol:</strong> {{ rol }}</div>
           <div class="col"><strong>Nombre:</strong> {{ user.first_name }} {{ user.last_name }}</div>
           <div class="col"><strong>Email:</strong> {{ user.email }}</div>
         </div>
+
         <div class="row" style="margin-top:12px;">
           <div class="col" style="flex-basis:100%;">
-            <label><strong>Contraseña actual</strong></label>
-            <input type="password" name="current_password" style="width:100%; padding:8px; border-radius:8px; border:1px solid #284761; background:#0d2134; color:#eaf0f6" autocomplete="current-password" />
+            <label for="id_current_password"><strong>Contraseña actual</strong></label>
+            <input id="id_current_password"
+                   type="password"
+                   name="current_password"
+                   style="width:100%; padding:8px; border-radius:8px; border:1px solid #284761; background:#0d2134; color:#eaf0f6"
+                   autocomplete="current-password" />
           </div>
           <div class="col" style="flex-basis:100%;">
-            <label><strong>Repetir contraseña actual</strong></label>
-            <input type="password" name="current_password2" style="width:100%; padding:8px; border-radius:8px; border:1px solid #284761; background:#0d2134; color:#eaf0f6" autocomplete="current-password" />
+            <label for="id_current_password2"><strong>Repetir contraseña actual</strong></label>
+            <input id="id_current_password2"
+                   type="password"
+                   name="current_password2"
+                   style="width:100%; padding:8px; border-radius:8px; border:1px solid #284761; background:#0d2134; color:#eaf0f6"
+                   autocomplete="current-password" />
           </div>
           <div class="col" style="flex-basis:100%;">
-            <label><strong>Nueva contraseña</strong></label>
-            <input type="password" name="new_password1" style="width:100%; padding:8px; border-radius:8px; border:1px solid #284761; background:#0d2134; color:#eaf0f6" autocomplete="new-password" />
+            <label for="id_new_password1"><strong>Nueva contraseña</strong></label>
+            <input id="id_new_password1"
+                   type="password"
+                   name="new_password1"
+                   style="width:100%; padding:8px; border-radius:8px; border:1px solid #284761; background:#0d2134; color:#eaf0f6"
+                   autocomplete="new-password" />
           </div>
           <div class="col" style="flex-basis:100%;">
-            <label><strong>Confirmar nueva contraseña</strong></label>
-            <input type="password" name="new_password2" style="width:100%; padding:8px; border-radius:8px; border:1px solid #284761; background:#0d2134; color:#eaf0f6" autocomplete="new-password" />
+            <label for="id_new_password2"><strong>Confirmar nueva contraseña</strong></label>
+            <input id="id_new_password2"
+                   type="password"
+                   name="new_password2"
+                   style="width:100%; padding:8px; border-radius:8px; border:1px solid #284761; background:#0d2134; color:#eaf0f6"
+                   autocomplete="new-password" />
           </div>
         </div>
+
         <div class="actions">
-          <a href="{% url 'perfil' %}" class="btn btn-outline"><i class="bi bi-x"></i> Cancelar</a>
-          <button type="submit"><i class="bi bi-check"></i> Guardar</button>
+          <a href="{% url 'perfil' %}" class="btn btn-outline">
+            <i class="bi bi-x"></i> Cancelar
+          </a>
+          <button type="submit">
+            <i class="bi bi-check"></i> Guardar
+          </button>
         </div>
+
         <div style="margin-top:8px; color:#b8c6d9; font-size:12px;">
           La nueva contraseña debe tener al menos 8 caracteres e incluir: una letra mayúscula, una letra minúscula, un número y un carácter especial.
         </div>
@@ -96,11 +142,12 @@
         <div class="col"><strong>Email:</strong> {{ user.email }}</div>
       </div>
       <div class="actions">
-        <a href="{% url 'editar_perfil' %}" class="btn"><i class="bi bi-pencil"></i> Editar</a>
+        <a href="{% url 'editar_perfil' %}" class="btn">
+          <i class="bi bi-pencil"></i> Editar
+        </a>
       </div>
       {% endif %}
     </div>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.js"></script>
 </body>
 </html>

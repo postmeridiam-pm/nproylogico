@@ -805,7 +805,7 @@
                 if(errs.length){
                   ev.preventDefault();
               setErrors(errs);
-              window.scrollTo({top: 0, behavior: 'smooth'});
+              globalThis.scrollTo({top: 0, behavior: 'smooth'});
             } else {
               setBusy(true);
               const btn = form.querySelector('button[type="submit"]');

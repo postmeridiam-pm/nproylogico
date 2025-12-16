@@ -30,71 +30,131 @@
       <div class="brand">Logística Farmacéutica · Registro</div>
       <h1>Crea tu cuenta</h1>
       <p class="sub">Documento nacional chileno (DNI/Cédula/RUT), Pasaporte, Documento extranjero (DNI/Visa) o Visa de trabajo.</p>
+
       {% for message in messages %}
         <div class="msg">{{ message }}</div>
       {% endfor %}
+
       <form method="post" novalidate enctype="multipart/form-data">
         {% csrf_token %}
 
         {% if form.non_field_errors %}
-        <ul class="errorlist">{% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}</ul>
+        <ul class="errorlist">
+          {% for e in form.non_field_errors %}
+            <li>{{ e }}</li>
+          {% endfor %}
+        </ul>
         {% endif %}
 
-        <label for="id_username">Usuario</label>
+        <label for="{{ form.username.id_for_label }}">Usuario</label>
         {{ form.username }}
-        {% if form.username.errors %}<ul class="errorlist">{% for e in form.username.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        {% if form.username.errors %}
+        <ul class="errorlist">
+          {% for e in form.username.errors %}<li>{{ e }}</li>{% endfor %}
+        </ul>
+        {% endif %}
 
-        <label for="id_email">Email</label>
+        <label for="{{ form.email.id_for_label }}">Email</label>
         {{ form.email }}
-        {% if form.email.errors %}<ul class="errorlist">{% for e in form.email.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        {% if form.email.errors %}
+        <ul class="errorlist">
+          {% for e in form.email.errors %}<li>{{ e }}</li>{% endfor %}
+        </ul>
+        {% endif %}
 
-        <label for="id_first_name">Nombre</label>
+        <label for="{{ form.first_name.id_for_label }}">Nombre</label>
         {{ form.first_name }}
-        {% if form.first_name.errors %}<ul class="errorlist">{% for e in form.first_name.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        {% if form.first_name.errors %}
+        <ul class="errorlist">
+          {% for e in form.first_name.errors %}<li>{{ e }}</li>{% endfor %}
+        </ul>
+        {% endif %}
 
-        <label for="id_last_name">Apellido</label>
+        <label for="{{ form.last_name.id_for_label }}">Apellido</label>
         {{ form.last_name }}
-        {% if form.last_name.errors %}<ul class="errorlist">{% for e in form.last_name.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        {% if form.last_name.errors %}
+        <ul class="errorlist">
+          {% for e in form.last_name.errors %}<li>{{ e }}</li>{% endfor %}
+        </ul>
+        {% endif %}
 
-        <label for="id_rol">Rol</label>
+        <label for="{{ form.rol.id_for_label }}">Rol</label>
         {{ form.rol }}
-        {% if form.rol.errors %}<ul class="errorlist">{% for e in form.rol.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        {% if form.rol.errors %}
+        <ul class="errorlist">
+          {% for e in form.rol.errors %}<li>{{ e }}</li>{% endfor %}
+        </ul>
+        {% endif %}
         <small>El rol asigna permisos mediante grupos de Django.</small>
 
-        <label for="id_tipo_documento">Tipo de documento</label>
+        <label for="{{ form.tipo_documento.id_for_label }}">Tipo de documento</label>
         {{ form.tipo_documento }}
-        {% if form.tipo_documento.errors %}<ul class="errorlist">{% for e in form.tipo_documento.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        {% if form.tipo_documento.errors %}
+        <ul class="errorlist">
+          {% for e in form.tipo_documento.errors %}<li>{{ e }}</li>{% endfor %}
+        </ul>
+        {% endif %}
 
-        <label for="id_documento_identidad">DNI / documento</label>
+        <label for="{{ form.documento_identidad.id_for_label }}">DNI / documento</label>
         {{ form.documento_identidad }}
         <small id="doc-help">Chile: DNI/Cédula/RUT (12.345.678-5). Extranjeros: alfanumérico 5–20 caracteres.</small>
-        {% if form.documento_identidad.errors %}<ul class="errorlist">{% for e in form.documento_identidad.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        {% if form.documento_identidad.errors %}
+        <ul class="errorlist">
+          {% for e in form.documento_identidad.errors %}<li>{{ e }}</li>{% endfor %}
+        </ul>
+        {% endif %}
 
-        <label for="id_telefono">Teléfono</label>
+        <label for="{{ form.telefono.id_for_label }}">Teléfono</label>
         {{ form.telefono }}
         <small>7–15 dígitos, puede incluir + y guiones.</small>
-        {% if form.telefono.errors %}<ul class="errorlist">{% for e in form.telefono.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        {% if form.telefono.errors %}
+        <ul class="errorlist">
+          {% for e in form.telefono.errors %}<li>{{ e }}</li>{% endfor %}
+        </ul>
+        {% endif %}
 
-        <label for="id_password1">Contraseña</label>
+        <label for="{{ form.password1.id_for_label }}">Contraseña</label>
         {{ form.password1 }}
-        {% if form.password1.errors %}<ul class="errorlist">{% for e in form.password1.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        {% if form.password1.errors %}
+        <ul class="errorlist">
+          {% for e in form.password1.errors %}<li>{{ e }}</li>{% endfor %}
+        </ul>
+        {% endif %}
 
-        <label for="id_password2">Confirmación de contraseña</label>
+        <label for="{{ form.password2.id_for_label }}">Confirmación de contraseña</label>
         {{ form.password2 }}
-        {% if form.password2.errors %}<ul class="errorlist">{% for e in form.password2.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        {% if form.password2.errors %}
+        <ul class="errorlist">
+          {% for e in form.password2.errors %}<li>{{ e }}</li>{% endfor %}
+        </ul>
+        {% endif %}
 
-        <label>
+        <label for="{{ form.consiente_datos_salud.id_for_label }}">
           {{ form.consiente_datos_salud }} Acepto el tratamiento de mis datos de salud
         </label>
-        {% if form.consiente_datos_salud.errors %}<ul class="errorlist">{% for e in form.consiente_datos_salud.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        {% if form.consiente_datos_salud.errors %}
+        <ul class="errorlist">
+          {% for e in form.consiente_datos_salud.errors %}<li>{{ e }}</li>{% endfor %}
+        </ul>
+        {% endif %}
 
-        <div class="actions">
+        <label for="id_documento_archivo">
+          Archivo documento (ambas caras en un solo archivo)
+        </label>
+        <input id="id_documento_archivo"
+               type="file"
+               name="documento_archivo"
+               accept=".pdf,image/*" />
+        <small>Se admite PDF o imagen; máximo 10MB.</small>
+
+          <div class="actions">
           <button type="submit">Crear cuenta</button>
-          <a href="/login/">Iniciar sesión</a>
+          <a href="{% url 'login' %}">Iniciar sesión</a>
         </div>
       </form>
     </div>
   </div>
+
   <script>
     (function(){
       var tipo = document.getElementById('id_tipo_documento');
@@ -127,6 +187,3 @@
   </script>
 </body>
 </html>
-        <label>Archivo documento (ambas caras en un solo archivo)</label>
-        <input type="file" name="documento_archivo" accept=".pdf,image/*" />
-        <small>Se admite PDF o imagen; máximo 10MB.</small>

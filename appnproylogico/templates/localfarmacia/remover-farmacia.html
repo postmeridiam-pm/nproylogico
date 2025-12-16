@@ -302,10 +302,10 @@
   <nav class="navbar-custom">
     <div class="container-fluid">
       <div class="d-flex align-items-center gap-2">
-        <a class="btn-nav" href="{% url 'home' %}" title="Inicio">
+        <a class="btn-nav" href="{% url 'home' %}" title="Inicio" aria-label="Inicio">
           <i class="bi bi-house-door"></i>
         </a>
-        <a class="btn-nav" href="{% url 'listado_farmacias' %}" title="Volver al listado">
+        <a class="btn-nav" href="{% url 'listado_farmacias' %}" title="Volver al listado" aria-label="Volver al listado">
           <i class="bi bi-arrow-left"></i>
         </a>
         <span class="navbar-brand">
@@ -313,10 +313,10 @@
         </span>
       </div>
       <div class="theme-toggle">
-        <button id="btn-light" class="theme-btn active" type="button" title="Modo claro">
+        <button id="btn-light" class="theme-btn active" type="button" title="Modo claro" aria-label="Modo claro">
           <i class="bi bi-sun-fill"></i>
         </button>
-        <button id="btn-dark" class="theme-btn" type="button" title="Modo oscuro">
+        <button id="btn-dark" class="theme-btn" type="button" title="Modo oscuro" aria-label="Modo oscuro">
           <i class="bi bi-moon-stars-fill"></i>
         </button>
       </div>

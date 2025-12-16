@@ -603,7 +603,7 @@
     diaFin.addEventListener('change', actualizarFuncionamientoDia);
 
     // Cargar valores iniciales si existen
-    window.addEventListener('DOMContentLoaded', function() {
+    globalThis.addEventListener('DOMContentLoaded', function() {
       const funcionamientoDiaValue = funcionamientoDia.value.trim();
       
       if (funcionamientoDiaValue === '24/7') {

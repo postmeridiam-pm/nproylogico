@@ -494,12 +494,15 @@
       <div class="search-toolbar">
         <form class="row g-2" method="get" id="form-farmacias">
           <div class="col-md-3 col-lg-3">
-            <input class="form-control" type="text" name="search" list="dl-farmacias" value="{{ search_query }}" placeholder="Buscar por nombre, dirección o comuna">
+            <label for="search" class="visually-hidden">Buscar</label>
+            <input id="search" class="form-control" type="text" name="search" list="dl-farmacias" value="{{ search_query }}" placeholder="Buscar por nombre, dirección o comuna" aria-label="Buscar por nombre, dirección o comuna">
             <datalist id="dl-farmacias"></datalist>
           </div>
           <div class="col-md-3 col-lg-3">
-            <input class="form-control mb-1" type="text" id="f-region-q" placeholder="Filtrar región" value="">
-            <select class="form-select" name="region" id="f-region">
+            <label for="f-region-q" class="visually-hidden">Filtrar región (texto)</label>
+            <input class="form-control mb-1" type="text" id="f-region-q" placeholder="Filtrar región" value="" aria-label="Filtrar región por texto">
+            <label for="f-region" class="visually-hidden">Región</label>
+            <select class="form-select" name="region" id="f-region" aria-label="Seleccionar región">
               <option value="">Región</option>
               {% for r in regiones %}
                 <option value="{{ r.id }}" {% if r.id|stringformat:'s' == region_id %}selected{% endif %}>{{ r.nombre }}</option>
@@ -507,8 +510,10 @@
             </select>
           </div>
           <div class="col-md-3 col-lg-3">
-            <input class="form-control mb-1" type="text" id="f-comuna-q" placeholder="Filtrar comuna" value="" {% if not region_id %}disabled{% endif %}>
-            <select class="form-select" name="comuna" id="f-comuna" {% if not region_id %}disabled{% endif %}>
+            <label for="f-comuna-q" class="visually-hidden">Filtrar comuna (texto)</label>
+            <input class="form-control mb-1" type="text" id="f-comuna-q" placeholder="Filtrar comuna" value="" {% if not region_id %}disabled{% endif %} aria-label="Filtrar comuna por texto">
+            <label for="f-comuna" class="visually-hidden">Comuna</label>
+            <select class="form-select" name="comuna" id="f-comuna" {% if not region_id %}disabled{% endif %} aria-label="Seleccionar comuna">
               <option value="">Comuna</option>
               {% for c in comunas %}
                 <option value="{{ c.id }}" {% if c.id|stringformat:'s' == comuna_id %}selected{% endif %}>{{ c.nombre }}</option>
@@ -516,8 +521,10 @@
             </select>
           </div>
           <div class="col-md-3 col-lg-3">
-            <input class="form-control mb-1" type="text" id="f-localidad-q" placeholder="Filtrar localidad" value="" {% if not comuna_id %}disabled{% endif %}>
-            <select class="form-select" name="localidad" id="f-localidad" {% if not comuna_id %}disabled{% endif %}>
+            <label for="f-localidad-q" class="visually-hidden">Filtrar localidad (texto)</label>
+            <input class="form-control mb-1" type="text" id="f-localidad-q" placeholder="Filtrar localidad" value="" {% if not comuna_id %}disabled{% endif %} aria-label="Filtrar localidad por texto">
+            <label for="f-localidad" class="visually-hidden">Localidad</label>
+            <select class="form-select" name="localidad" id="f-localidad" {% if not comuna_id %}disabled{% endif %} aria-label="Seleccionar localidad">
               <option value="">Localidad</option>
               {% for l in localidades %}
                 <option value="{{ l.id }}" {% if l.id|stringformat:'s' == localidad_id %}selected{% endif %}>{{ l.nombre }}</option>
@@ -526,7 +533,7 @@
           </div>
           <div class="col-md-3 col-lg-3">
             <div class="dropdown w-100">
-              <button class="btn btn-outline-light w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <button class="btn btn-outline-secondary w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi bi-sliders"></i> Búsqueda avanzada
               </button>
               <div class="dropdown-menu p-3 w-100" style="max-width:420px">
@@ -568,7 +575,8 @@
             <input type="hidden" name="estado" id="estado-f" value="{{ estado }}">
           </div>
           <div class="col-md-3 col-lg-3">
-            <select class="form-select" name="orden">
+            <label for="orden" class="visually-hidden">Ordenar por</label>
+            <select id="orden" class="form-select" name="orden" aria-label="Ordenar por">
               <option value="">Ordenar por…</option>
               <option value="local_nombre" {% if orden == 'local_nombre' %}selected{% endif %}>Nombre</option>
               <option value="comuna_nombre" {% if orden == 'comuna_nombre' %}selected{% endif %}>Comuna</option>
@@ -577,7 +585,8 @@
             </select>
           </div>
           <div class="col-md-2 col-lg-2">
-            <select class="form-select" name="dir">
+            <label for="dir" class="visually-hidden">Dirección de orden</label>
+            <select id="dir" class="form-select" name="dir" aria-label="Dirección de orden">
               <option value="asc" {% if dir == 'asc' %}selected{% endif %}>Ascendente</option>
               <option value="desc" {% if dir == 'desc' %}selected{% endif %}>Descendente</option>
             </select>

@@ -529,9 +529,9 @@
                 <td>{{ d.descripcion_productos|default:'-' }}</td>
                 <td>
                   {% if d.origen and d.destino_lat and d.destino_lng and d.origen.local_lat and d.origen.local_lng %}
-                    <a class="btn btn-outline-primary btn-sm" target="_blank" href="https://www.google.com/maps/dir/?api=1&origin={{ d.origen.local_lat }},{{ d.origen.local_lng }}&destination={{ d.destino_lat }},{{ d.destino_lng }}">Ver ruta</a>
+                    <a class="btn btn-primary btn-sm" target="_blank" href="https://www.google.com/maps/dir/?api=1&origin={{ d.origen.local_lat }},{{ d.origen.local_lng }}&destination={{ d.destino_lat }},{{ d.destino_lng }}">Ver ruta</a>
                   {% else %}
-                    <a class="btn btn-outline-secondary btn-sm" target="_blank" href="https://www.google.com/maps/dir/?api=1&origin={{ d.origen.local_direccion|default:d.farmacia_origen_local_id|urlencode }}&destination={{ d.destino_direccion|urlencode }}">Mapa</a>
+                    <a class="btn btn-secondary btn-sm" target="_blank" href="https://www.google.com/maps/dir/?api=1&origin={{ d.origen.local_direccion|default:d.farmacia_origen_local_id|urlencode }}&destination={{ d.destino_direccion|urlencode }}">Mapa</a>
                   {% endif %}
                 </td>
               </tr>

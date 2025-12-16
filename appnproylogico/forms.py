@@ -10,8 +10,7 @@ from .models import (
     Despacho,
     AsignacionMotoristaFarmacia,
     Usuario,
-    Rol,
-    Region,
+    Rol
 )
 
 
@@ -136,6 +135,14 @@ class RegistroForm(UserCreationForm):
         if not v:
             raise forms.ValidationError("Debe aceptar el tratamiento de datos de salud")
         return v
+    
+    def clean_password1(self):
+        p1 = (self.cleaned_data.get("password1") or "")
+        import re
+        if (len(p1) < 8 or not re.search(r"[A-Z]", p1) or not re.search(r"[a-z]", p1) or 
+            not re.search(r"\d", p1) or not re.search(r"[^A-Za-z0-9]", p1)):
+            raise forms.ValidationError("La contraseña debe tener 8+ caracteres, incluir mayúscula, minúscula, número y símbolo")
+        return p1
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -374,7 +381,7 @@ class MotoForm(forms.ModelForm):
         p = (self.cleaned_data.get('patente') or '').strip().upper()
         import re
         # Formatos chilenos comunes: AA1234, ABCD12
-        ok = bool(re.match(r'^[A-Z]{2}[0-9]{4}$', p) or re.match(r'^[A-Z]{4}[0-9]{2}$', p))
+        ok = bool(re.match(r'^[A-Z]{2}\d{4}$', p) or re.match(r'^[A-Z]{4}\d{2}$', p))
         if not ok:
             raise forms.ValidationError('Patente inválida. Formato esperado AA1234 o ABCD12')
         return p

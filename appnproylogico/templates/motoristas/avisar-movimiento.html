@@ -80,7 +80,7 @@
       document.querySelectorAll('[data-msg]').forEach(b=>{
         b.onclick=function(){
           const ta=document.querySelector('textarea[name="mensaje"]');
-          if(ta){ ta.value=this.getAttribute('data-msg'); }
+          if(ta){ ta.value=this.dataset.msg; }
         };
       });
     })();

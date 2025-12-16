@@ -23,9 +23,7 @@
       --border-light: #e0e0e0;
     }
 
-    /* ============================================ */
-    /* TEMA CLARO - TODO EN BLANCO LIMPIO */
-    /* ============================================ */
+    /* TEMA CLARO */
     .theme-light {
       background-color: #ffffff !important;
       color: var(--text-dark);
@@ -67,7 +65,6 @@
       background-color: #ffffff !important;
     }
 
-    /* Texto visible en cards de estadísticas */
     .theme-light .card .text-muted {
       color: #6c757d !important;
       font-weight: 600;
@@ -79,7 +76,6 @@
       font-weight: 700;
     }
 
-    /* Iconos con colores visibles */
     .theme-light .card .bi-hospital {
       color: var(--primary-green) !important;
       opacity: 0.8;
@@ -185,21 +181,9 @@
       box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
     }
 
-    .theme-light .btn-outline-light {
-      border: 2px solid rgba(255,255,255,0.5);
-      color: #fff;
-      font-weight: 600;
-    }
+    
 
-    .theme-light .btn-outline-light:hover {
-      background-color: rgba(255,255,255,0.2);
-      border-color: #fff;
-      color: #fff;
-    }
-
-    /* ============================================ */
-    /* TEMA OSCURO - ORIGINAL SIN CAMBIOS */
-    /* ============================================ */
+    /* TEMA OSCURO */
     .theme-dark {
       background-color: #0b1430;
       color: #fff;
@@ -246,7 +230,7 @@
       transform: scale(1.1);
     }
 
-    /* ESTILOS GENERALES */
+    /* GENERALES */
     .btn-lg {
       padding: 0.75rem 1rem;
       font-size: 1rem;
@@ -271,12 +255,10 @@
       .navbar-brand {
         font-size: 1rem;
       }
-      
       .btn-lg {
         font-size: 0.9rem;
         padding: 0.6rem 0.8rem;
       }
-      
       .display-6 {
         font-size: 1.5rem;
       }
@@ -290,12 +272,12 @@
         <i class="bi bi-speedometer2"></i> Panel General
       </span>
       <div class="d-flex align-items-center gap-3">
-        <button id="btn-light" class="btn btn-outline-success" type="button" title="Modo claro">☀️</button>
-        <button id="btn-dark" class="btn btn-outline-secondary" type="button" title="Modo oscuro">🌙</button>
+        <button id="btn-light" class="btn btn-success" type="button" title="Modo claro" aria-label="Modo claro">☀️</button>
+        <button id="btn-dark" class="btn btn-secondary" type="button" title="Modo oscuro" aria-label="Modo oscuro">🌙</button>
         {% if user %}
           <span class="text-muted">{{ user.username }}{% if rol %} · {{ rol }}{% endif %}</span>
         {% endif %}
-        <a class="btn btn-outline-light" href="{% url 'perfil' %}" title="Mi perfil">
+        <a class="btn btn-secondary" href="{% url 'perfil' %}" title="Mi perfil" aria-label="Ir a mi perfil">
           <i class="bi bi-person"></i>
         </a>
       </div>
@@ -307,7 +289,7 @@
       <i class="bi bi-emoji-smile"></i> 
       Bienvenido/a a la plataforma, <strong>{{ user.first_name|default:user.username }}</strong>.
     </div>
-    
+
     {% if total_farmacias is not None %}
     <div class="row g-3 mb-4">
       <div class="col-md-3">
@@ -347,7 +329,7 @@
         </div>
       </div>
     </div>
-    
+
     {% if total_farmacias|default:0 == 0 and total_motoristas|default:0 == 0 and total_motos|default:0 == 0 and asignaciones_activas|default:0 == 0 %}
     <div class="alert alert-warning">
       <i class="bi bi-exclamation-triangle"></i> 
@@ -379,11 +361,11 @@
             {% endif %}
           </div>
           {% if rol != 'operador' %}
-            <div class="col-md-3 d-grid">
-              <a class="btn btn-primary btn-lg" href="{% url 'listado_motos' %}">
-                <i class="bi bi-bicycle"></i> Motos
-              </a>
-            </div>
+          <div class="col-md-3 d-grid">
+            <a class="btn btn-primary btn-lg" href="{% url 'listado_motos' %}">
+              <i class="bi bi-bicycle"></i> Motos
+            </a>
+          </div>
           {% endif %}
           <div class="col-md-3 d-grid">
             {% if rol != 'operador' %}
@@ -394,28 +376,28 @@
           </div>
           <div class="col-md-3 d-grid">
             {% if rol == 'gerente' or rol == 'admin' %}
-              <a class="btn btn-outline-info btn-lg" href="{% url 'reporte_movimientos' %}">
+              <a class="btn btn-info btn-lg" href="{% url 'reporte_movimientos' %}">
                 <i class="bi bi-graph-up"></i> Reportes
               </a>
             {% endif %}
           </div>
           <div class="col-md-3 d-grid">
             {% if rol == 'operador' %}
-              <a class="btn btn-outline-success btn-lg" href="{% url 'panel_operadora' %}">
+              <a class="btn btn-success btn-lg" href="{% url 'panel_operadora' %}">
                 <i class="bi bi-grid"></i> Operadora
               </a>
             {% endif %}
           </div>
           <div class="col-md-3 d-grid">
             {% if rol == 'supervisor' %}
-              <a class="btn btn-outline-warning btn-lg" href="{% url 'listado_asignaciones_mf' %}">
+              <a class="btn btn-warning btn-lg" href="{% url 'listado_asignaciones_mf' %}">
                 <i class="bi bi-people"></i> Supervisor
               </a>
             {% endif %}
           </div>
           <div class="col-md-3 d-grid">
             {% if rol == 'admin' %}
-              <a class="btn btn-outline-secondary btn-lg" href="{% url 'importar_farmacias' %}">
+              <a class="btn btn-secondary btn-lg" href="{% url 'importar_farmacias' %}">
                 <i class="bi bi-upload"></i> Importar Farmacias
               </a>
             {% endif %}
@@ -441,26 +423,28 @@
     (function(){
       const root = document.documentElement;
       const saved = localStorage.getItem('general_theme');
-      
-      // Si NO hay nada guardado, usar 'dark' por defecto
-      if (!saved) {
+
+      if (saved === 'dark') {
+        root.classList.remove('theme-light');
+        root.classList.add('theme-dark');
+      } else if (saved === 'light') {
+        root.classList.remove('theme-dark');
+        root.classList.add('theme-light');
+      } else {
+        root.classList.remove('theme-light');
         root.classList.add('theme-dark');
         localStorage.setItem('general_theme', 'dark');
-      } else {
-        // Si hay algo guardado, usarlo
-        root.classList.remove('theme-dark','theme-light');
-        root.classList.add(saved === 'dark' ? 'theme-dark' : 'theme-light');
       }
-      
+
       document.getElementById('btn-light').onclick = function(){
-        root.classList.remove('theme-dark'); 
-        root.classList.add('theme-light'); 
+        root.classList.remove('theme-dark');
+        root.classList.add('theme-light');
         localStorage.setItem('general_theme','light');
       };
-      
+
       document.getElementById('btn-dark').onclick = function(){
-        root.classList.remove('theme-light'); 
-        root.classList.add('theme-dark'); 
+        root.classList.remove('theme-light');
+        root.classList.add('theme-dark');
         localStorage.setItem('general_theme','dark');
       };
     })();

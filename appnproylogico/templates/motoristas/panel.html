@@ -172,13 +172,13 @@
     if(modal && form){
       modal.addEventListener('show.bs.modal', function(ev){
         var btn = ev.relatedTarget;
-        var id = btn && btn.getAttribute('data-id');
+        var id = btn && btn.dataset.id;
         if(id){
           form.setAttribute('action', '{% url 'motorista_despacho_estado' 0 %}'.replace('/0/', '/' + id + '/'));
         }
       });
     }
-    if (window.bootstrap) {
+    if (globalThis.bootstrap) {
       document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el){
         new bootstrap.Tooltip(el);
       });

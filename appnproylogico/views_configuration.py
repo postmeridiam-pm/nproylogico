@@ -40,7 +40,7 @@ def configuracion(request):
         'total_modulos': len(modulos_accesibles),
     }
     
-    return render(request, 'auth/modificar-contrasenia.html', context)
+    return render(request, PANEL_ADMIN_TEMPLATE, context)
 
 
 @login_required(login_url='login')
@@ -67,6 +67,29 @@ def mis_permisos(request):
 def gestionar_usuarios(request):
     """Gestionar usuarios y roles (solo admin)"""
     usuarios = User.objects.all().order_by('-date_joined')
+    if request.method == 'POST':
+        email = (request.POST.get('email') or '').strip().lower()
+        username = (request.POST.get('username') or '').strip()
+        p1 = (request.POST.get('password1') or '')
+        p2 = (request.POST.get('password2') or '')
+        import re
+        if not email or '@' not in email:
+            messages.error(request, 'Correo electrónico inválido')
+        elif User.objects.filter(email=email).exists():
+            messages.error(request, 'Este correo ya está registrado')
+        elif not username or len(username) < 3:
+            messages.error(request, 'El nombre de usuario debe tener al menos 3 caracteres')
+        elif User.objects.filter(username=username).exists():
+            messages.error(request, 'Ese nombre de usuario ya está en uso')
+        elif p1 != p2:
+            messages.error(request, 'Las contraseñas no coinciden')
+        elif (len(p1) < 8 or not re.search(r"[A-Z]", p1) or not re.search(r"[a-z]", p1) or 
+              not re.search(r"\d", p1) or not re.search(r"[^A-Za-z0-9]", p1)):
+            messages.error(request, 'La contraseña debe tener 8+ caracteres, incluir mayúscula, minúscula, número y símbolo')
+        else:
+            u = User.objects.create_user(username=username, email=email, password=p1)
+            messages.success(request, f'Usuario "{u.username}" creado exitosamente')
+            return redirect('gestionar_usuarios')
     
     context = {
         'usuarios': usuarios,

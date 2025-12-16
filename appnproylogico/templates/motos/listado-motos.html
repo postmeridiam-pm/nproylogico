@@ -481,21 +481,22 @@
           <div class="col-md-7">
             <div class="search-wrapper">
               <i class="bi bi-search"></i>
-              <input class="form-control" type="text" name="search" list="dl-motos" 
+              <label for="search-motos" class="visually-hidden">Buscar motos</label>
+              <input class="form-control" type="text" name="search" id="search-motos" list="dl-motos" 
                      value="{{ search_query }}" placeholder="Buscar por patente, marca o modelo...">
               <datalist id="dl-motos"></datalist>
             </div>
           </div>
           <div class="col-md-3">
-            <div class="dropdown w-100">
-              <button class="btn btn-outline-secondary w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-sliders"></i> Búsqueda avanzada
-              </button>
-              <div class="dropdown-menu p-3 w-100" style="max-width:420px">
-                <div class="mb-2">
-                  <label class="form-label">Texto libre</label>
+              <div class="dropdown w-100">
+                <button class="btn btn-secondary w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="bi bi-sliders"></i> Búsqueda avanzada
+                </button>
+                <div class="dropdown-menu p-3 w-100" style="max-width:420px">
+                  <div class="mb-2">
+                  <label class="form-label" for="adv-text-mo">Texto libre</label>
                   <input type="text" class="form-control" id="adv-text-mo" placeholder="Escribe para buscar">
-                </div>
+                  </div>
                 <div class="mb-2">
                   <div class="form-check">
                     <input class="form-check-input" type="radio" name="estado_opt_mo" id="estado_activa_mo" value="activa" {% if estado == 'activa' %}checked{% endif %}>
@@ -745,8 +746,8 @@
           card.addEventListener('click', function(e){
             const target = e.target.closest('a');
             if (target) return;
-            const href = this.getAttribute('data-href');
-            if (href) window.location.href = href;
+            const href = this.dataset.href;
+            if (href) globalThis.location.href = href;
           });
         });
       })();
@@ -813,8 +814,8 @@
           adv.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); if (form) form.submit(); }});
         }
         if (applyBtn){ applyBtn.onclick = function(){ if (adv && inp) inp.value = adv.value; if (form) form.submit(); }; }
-        if (window.bootstrap){
-          document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el){
+        if (globalThis.bootstrap){
+          document.querySelectorAll('[data-bs-toggle=\"tooltip\"]').forEach(function(el){
             new bootstrap.Tooltip(el);
           });
         }

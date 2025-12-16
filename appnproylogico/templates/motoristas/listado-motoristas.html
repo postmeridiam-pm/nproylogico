@@ -406,7 +406,7 @@
     <div class="help-banner">
       <div class="d-flex justify-content-between align-items-center">
         <div>Consejo: usa "Asignar moto" para vincular rápidamente y "Ver asignaciones" para revisar su estado.</div>
-        <button id="hide-help-mot" class="btn btn-sm btn-outline-secondary">No mostrar</button>
+        <button id="hide-help-mot" class="btn btn-sm btn-secondary">No mostrar</button>
       </div>
     </div>
 
@@ -417,21 +417,22 @@
       </ol>
     </nav>
 
-    <form class="row g-2 toolbar" method="get" id="form-motoristas">
-      <div class="col-md-6">
-        <input class="form-control" type="text" name="search" list="dl-motoristas" value="{{ search_query }}" placeholder="Buscar por nombre, licencia o teléfono">
-        <datalist id="dl-motoristas"></datalist>
-      </div>
+  <form class="row g-2 toolbar" method="get" id="form-motoristas">
+    <div class="col-md-6">
+      <label for="search-motoristas" class="visually-hidden">Buscar motoristas</label>
+      <input class="form-control" type="text" name="search" id="search-motoristas" list="dl-motoristas" value="{{ search_query }}" placeholder="Buscar por nombre, licencia o teléfono">
+      <datalist id="dl-motoristas"></datalist>
+    </div>
       <div class="col-md-4">
-        <div class="dropdown w-100">
-          <button class="btn btn-outline-secondary w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="bi bi-sliders"></i> Búsqueda avanzada
-          </button>
-          <div class="dropdown-menu p-3 w-100" style="max-width:420px">
-            <div class="mb-2">
-              <label class="form-label">Texto libre</label>
+          <div class="dropdown w-100">
+            <button class="btn btn-secondary w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-sliders"></i> Búsqueda avanzada
+            </button>
+            <div class="dropdown-menu p-3 w-100" style="max-width:420px">
+              <div class="mb-2">
+              <label class="form-label" for="adv-text-mot">Texto libre</label>
               <input type="text" class="form-control" id="adv-text-mot" placeholder="Escribe para buscar">
-            </div>
+              </div>
             <div class="mb-2">
               <div class="form-check">
                 <input class="form-check-input" type="radio" name="estado_opt_mot" id="estado_activos_mot" value="activos" {% if estado == 'activos' %}checked{% endif %}>
@@ -529,9 +530,9 @@
                       </div>
                       <div class="mt-1">
                         {% if mot.latest_despacho.origen and mot.latest_despacho.destino_lat and mot.latest_despacho.destino_lng and mot.latest_despacho.origen.local_lat and mot.latest_despacho.origen.local_lng %}
-                          <a class="btn btn-outline-primary btn-sm" target="_blank" href="https://www.google.com/maps/dir/?api=1&origin={{ mot.latest_despacho.origen.local_lat }},{{ mot.latest_despacho.origen.local_lng }}&destination={{ mot.latest_despacho.destino_lat }},{{ mot.latest_despacho.destino_lng }}">Ruta</a>
+                          <a class="btn btn-primary btn-sm" target="_blank" href="https://www.google.com/maps/dir/?api=1&origin={{ mot.latest_despacho.origen.local_lat }},{{ mot.latest_despacho.origen.local_lng }}&destination={{ mot.latest_despacho.destino_lat }},{{ mot.latest_despacho.destino_lng }}">Ruta</a>
                         {% else %}
-                          <a class="btn btn-outline-secondary btn-sm" target="_blank" href="https://www.google.com/maps/dir/?api=1&origin={{ mot.latest_despacho.origen.local_direccion|default:mot.latest_despacho.farmacia_origen_local_id|urlencode }}&destination={{ mot.latest_despacho.destino_direccion|urlencode }}">Mapa</a>
+                          <a class="btn btn-secondary btn-sm" target="_blank" href="https://www.google.com/maps/dir/?api=1&origin={{ mot.latest_despacho.origen.local_direccion|default:mot.latest_despacho.farmacia_origen_local_id|urlencode }}&destination={{ mot.latest_despacho.destino_direccion|urlencode }}">Mapa</a>
                         {% endif %}
                       </div>
                     </div>
@@ -541,16 +542,16 @@
                 </td>
                 <td class="text-end">
                   <div class="btn-group">
-                    <a class="btn btn-sm btn-outline-primary" href="{% url 'agregar_asignacion_mf' %}?motorista={{ mot.id }}" title="Asignar a farmacia">
+                    <a class="btn btn-sm btn-primary" href="{% url 'agregar_asignacion_mf' %}?motorista={{ mot.id }}" title="Asignar a farmacia">
                       <i class="bi bi-link-45deg"></i>
                     </a>
-                    <a class="btn btn-sm btn-outline-secondary" href="{% url 'listado_asignaciones' %}?search={{ mot.usuario.nombre }}" title="Ver asignaciones">
+                    <a class="btn btn-sm btn-secondary" href="{% url 'listado_asignaciones' %}?search={{ mot.usuario.nombre }}" title="Ver asignaciones">
                       <i class="bi bi-diagram-3"></i>
                     </a>
-                    <a class="btn btn-sm btn-outline-info" href="{% url 'detalle_motorista' mot.id %}" title="Ver detalle">
+                    <a class="btn btn-sm btn-info" href="{% url 'detalle_motorista' mot.id %}" title="Ver detalle">
                       <i class="bi bi-eye"></i>
                     </a>
-                    <a class="btn btn-sm btn-outline-success" href="{% url 'agregar_moto' %}?motorista={{ mot.id }}" title="Registrar moto personal">
+                    <a class="btn btn-sm btn-success" href="{% url 'agregar_moto' %}?motorista={{ mot.id }}" title="Registrar moto personal">
                       <i class="bi bi-motorcycle"></i>
                     </a>
                     
@@ -596,9 +597,9 @@
           </table>
         </div>
       </div>
-  <div class="card-footer d-flex justify-content-between align-items-center">
+      <div class="card-footer d-flex justify-content-between align-items-center">
         {% if page_obj.has_previous %}
-          <a class="btn btn-outline-secondary" href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}&estado={{ estado }}">
+          <a class="btn btn-secondary" href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}&estado={{ estado }}">
             <i class="bi bi-chevron-left"></i> Anterior
           </a>
         {% else %}
@@ -606,7 +607,7 @@
         {% endif %}
         <span class="text-secondary">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
         {% if page_obj.has_next %}
-          <a class="btn btn-outline-secondary" href="?page={{ page_obj.next_page_number }}&search={{ search_query }}&estado={{ estado }}">
+          <a class="btn btn-secondary" href="?page={{ page_obj.next_page_number }}&search={{ search_query }}&estado={{ estado }}">
             Siguiente <i class="bi bi-chevron-right"></i>
           </a>
         {% else %}
@@ -637,7 +638,7 @@
       const modalEl = document.getElementById('detailModal');
       const frame = document.getElementById('detailFrame');
       if (modalEl && frame){
-        document.querySelectorAll('a.btn-outline-info').forEach(function(a){
+        document.querySelectorAll('a.btn-info').forEach(function(a){
           a.addEventListener('click', function(ev){
             const href = this.getAttribute('href');
             if (!href) return;

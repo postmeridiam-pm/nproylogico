@@ -703,8 +703,8 @@
           const rq = document.querySelector('#form-desp-list select[name="requiere"]').value.trim();
           const rows = document.querySelectorAll('tbody tr[data-receta]');
           rows.forEach(r => {
-            const okRc = !rc || (r.getAttribute('data-receta')||'') === rc;
-            const okRq = !rq || (r.getAttribute('data-requiere')||'') === rq;
+            const okRc = !rc || (r.dataset.receta||'') === rc;
+            const okRq = !rq || (r.dataset.requiere||'') === rq;
             r.style.display = (okRc && okRq) ? '' : 'none';
           });
         };
@@ -717,8 +717,8 @@
       function applyChips(){
         const rows = document.querySelectorAll('tbody tr[data-receta]');
         rows.forEach(r=>{
-          const hasRet = (r.getAttribute('data-receta')||'')==='si';
-          const hasReq = (r.getAttribute('data-requiere')||'')==='si';
+          const hasRet = (r.dataset.receta||'')==='si';
+          const hasReq = (r.dataset.requiere||'')==='si';
           const ok = (!chipR.classList.contains('active') || hasRet) && (!chipQ.classList.contains('active') || hasReq);
           r.style.display = ok ? '' : 'none';
         });

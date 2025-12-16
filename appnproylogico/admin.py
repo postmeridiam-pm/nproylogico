@@ -118,11 +118,6 @@ admin.site.site_title = "LOGICO Admin"
 admin.site.index_title = "Panel de control"
 
 
-#python manage.py shell
-#from appnproylogico.models import localFarmacia
-#from appnproylogico.geolocalizar import *
-#farmacia = localFarmacia.objects.get(id=1)
-
 @admin.register(AsignacionMotoMotorista)
 class AsignacionMotoMotoristaAdmin(admin.ModelAdmin):
     list_display = ("id", "motorista", "moto", "fecha_asignacion", "activa")

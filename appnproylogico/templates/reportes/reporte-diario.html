@@ -430,16 +430,17 @@
         <form class="row g-2" method="get" id="form-diario">
           <input type="hidden" name="tipo_reporte" value="{{ request.GET.tipo_reporte|default:'diario' }}">
           <div class="col-md-3">
-            <label class="form-label">Fecha</label>
+            <label class="form-label" for="id_fecha">Fecha</label>
             {{ form.fecha }}
           </div>
           <div class="col-md-3">
-            <label class="form-label">Farmacia</label>
+            <label class="form-label" for="id_farmacia">Farmacia</label>
+            <label for="rep-farmacia-q" class="visually-hidden">Filtrar farmacia</label>
             <input type="text" class="form-control mb-1" id="rep-farmacia-q" placeholder="Filtrar farmacia…">
             {{ form.farmacia }}
           </div>
           <div class="col-md-3">
-            <label class="form-label">Ordenar por</label>
+            <label class="form-label" for="orden">Ordenar por</label>
             <select class="form-select" id="orden">
               <option value="">Sin orden</option>
               <option value="local_az">Local (A-Z)</option>
@@ -454,7 +455,7 @@
               <button class="btn btn-primary flex-fill" type="submit">
                 <i class="bi bi-funnel"></i> Filtrar
               </button>
-              <a class="btn btn-outline-secondary flex-fill" href="{% url 'reporte_movimientos' %}?tipo_reporte={{ request.GET.tipo_reporte|default:'diario' }}">
+              <a class="btn btn-secondary flex-fill" href="{% url 'reporte_movimientos' %}?tipo_reporte={{ request.GET.tipo_reporte|default:'diario' }}">
                 <i class="bi bi-x-circle"></i> Limpiar
               </a>
             </div>
@@ -473,7 +474,7 @@
     <div class="help-banner">
       <div class="d-flex justify-content-between align-items-center">
         <div>Consejo: Puedes filtrar para encontrar movimientos específicos.</div>
-        <button id="hide-help-rep" class="btn btn-sm btn-outline-secondary">No mostrar</button>
+        <button id="hide-help-rep" class="btn btn-sm btn-secondary">No mostrar</button>
       </div>
     </div>
 
@@ -531,7 +532,7 @@
       {% if page_obj %}
       <div class="card-footer d-flex justify-content-between align-items-center">
         {% if page_obj.has_previous %}
-          <a class="btn btn-outline-secondary" href="?page={{ page_obj.previous_page_number }}&tipo_reporte={{ request.GET.tipo_reporte|default:'diario' }}">
+          <a class="btn btn-secondary" href="?page={{ page_obj.previous_page_number }}&tipo_reporte={{ request.GET.tipo_reporte|default:'diario' }}">
             <i class="bi bi-chevron-left"></i> Anterior
           </a>
         {% else %}
@@ -539,7 +540,7 @@
         {% endif %}
         <span class="text-secondary">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
         {% if page_obj.has_next %}
-          <a class="btn btn-outline-secondary" href="?page={{ page_obj.next_page_number }}&tipo_reporte={{ request.GET.tipo_reporte|default:'diario' }}">
+          <a class="btn btn-secondary" href="?page={{ page_obj.next_page_number }}&tipo_reporte={{ request.GET.tipo_reporte|default:'diario' }}">
             Siguiente <i class="bi bi-chevron-right"></i>
           </a>
         {% else %}
@@ -562,8 +563,8 @@
         
         if (!val) return;
         
-        const getDate = r => (r.getAttribute('data-date') || '');
-        const getLocal = r => (r.getAttribute('data-local') || '');
+        const getDate = r => (r.dataset.date || '');
+        const getLocal = r => (r.dataset.local || '');
         
         rows.sort((a, b) => {
           if (val === 'local_az') return getLocal(a).localeCompare(getLocal(b));

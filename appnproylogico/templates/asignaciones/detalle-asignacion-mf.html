@@ -336,7 +336,7 @@
           </a>
           <form class="d-inline" method="post" action="{% url 'remover_asignacion_mf' asignacion.id %}">
             {% csrf_token %}
-            <button class="btn btn-outline-danger" type="submit">
+            <button class="btn btn-danger" type="submit">
               <i class="bi bi-{% if asignacion.activa %}x-circle{% else %}check-circle{% endif %}"></i>
               {% if asignacion.activa %}Desactivar{% else %}Activar{% endif %}
             </button>

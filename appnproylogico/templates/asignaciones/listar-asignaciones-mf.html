@@ -37,17 +37,21 @@
       </div>
     {% endif %}
     <form class="row g-2 mb-3" method="get" id="form-asign-mf">
-      <div class="col-md-5"><input class="form-control placeholder-white" type="text" name="search" value="{{ search_query }}" placeholder="Buscar motorista, farmacia, observaciones"></div>
+      <div class="col-md-5">
+        <label for="search-asign-mf" class="visually-hidden">Buscar asignaciones</label>
+        <input id="search-asign-mf" class="form-control placeholder-white" type="text" name="search" value="{{ search_query }}" placeholder="Buscar motorista, farmacia, observaciones">
+      </div>
       <div class="col-md-3">
-        <select class="form-select" name="estado">
+        <label for="estado-asign-mf" class="visually-hidden">Estado</label>
+        <select id="estado-asign-mf" class="form-select" name="estado">
           <option value="">Todas</option>
           <option value="activa" {% if filtro_estado == 'activa' %}selected{% endif %}>Activas</option>
           <option value="inactiva" {% if filtro_estado == 'inactiva' %}selected{% endif %}>Inactivas</option>
         </select>
       </div>
       <div class="col-md-2 d-flex align-items-end gap-2">
-        <button class="btn btn-outline-primary w-100" type="submit">Filtrar</button>
-        <button class="btn btn-outline-secondary" type="button" id="btn-filter-local-mf"><i class="bi bi-funnel-fill"></i></button>
+        <button class="btn btn-primary w-100" type="submit">Filtrar</button>
+        <button class="btn btn-secondary" type="button" id="btn-filter-local-mf" aria-label="Filtrar localmente"><i class="bi bi-funnel-fill"></i></button>
       </div>
     </form>
     <div class="table-responsive">
@@ -61,8 +65,8 @@
             <td>{{ a.fecha_asignacion }}</td>
             <td>{% if a.activa %}<span class="badge bg-success">Activa</span>{% else %}<span class="badge bg-danger">Inactiva</span>{% endif %}</td>
             <td class="text-end">
-              <a class="btn btn-sm btn-outline-primary" href="{% url 'detalle_asignacion_mf' a.id %}"><i class="bi bi-eye"></i></a>
-              <a class="btn btn-sm btn-outline-secondary" href="{% url 'modificar_asignacion_mf' a.id %}"><i class="bi bi-pencil"></i></a>
+              <a class="btn btn-sm btn-primary" href="{% url 'detalle_asignacion_mf' a.id %}" aria-label="Ver detalle"><i class="bi bi-eye"></i></a>
+              <a class="btn btn-sm btn-secondary" href="{% url 'modificar_asignacion_mf' a.id %}" aria-label="Editar asignación"><i class="bi bi-pencil"></i></a>
             </td>
           </tr>
           {% empty %}
@@ -74,7 +78,7 @@
             <td>{% if s.activa %}<span class="badge bg-success">Activa</span>{% else %}<span class="badge bg-danger">Inactiva</span>{% endif %}</td>
             <td class="text-end">
               <div class="btn-group">
-                <a class="btn btn-sm btn-outline-primary" href="{% url 'despachos_activos' %}" title="Ver movimientos">
+                <a class="btn btn-sm btn-primary" href="{% url 'despachos_activos' %}" title="Ver movimientos">
                   <i class="bi bi-activity"></i> Ver movimientos
                 </a>
               </div>
@@ -90,10 +94,10 @@
       <div>Mostrando página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</div>
       <div class="btn-group">
         {% if page_obj.has_previous %}
-          <a class="btn btn-outline-secondary" href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}&estado={{ filtro_estado }}">Anterior</a>
+          <a class="btn btn-secondary" href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}&estado={{ filtro_estado }}">Anterior</a>
         {% endif %}
         {% if page_obj.has_next %}
-          <a class="btn btn-outline-secondary" href="?page={{ page_obj.next_page_number }}&search={{ search_query }}&estado={{ filtro_estado }}">Siguiente</a>
+          <a class="btn btn-secondary" href="?page={{ page_obj.next_page_number }}&search={{ search_query }}&estado={{ filtro_estado }}">Siguiente</a>
         {% endif %}
       </div>
     </div>
@@ -108,8 +112,8 @@
           const est = document.querySelector('#form-asign-mf select[name="estado"]').value.trim();
           const rows = document.querySelectorAll('tbody tr[data-motorista]');
           rows.forEach(r => {
-            const okQ = !q || (r.getAttribute('data-motorista')||'').toLowerCase().includes(q) || (r.getAttribute('data-farmacia')||'').toLowerCase().includes(q);
-            const okE = !est || (r.getAttribute('data-estado')||'') === est;
+            const okQ = !q || (r.dataset.motorista||'').toLowerCase().includes(q) || (r.dataset.farmacia||'').toLowerCase().includes(q);
+            const okE = !est || (r.dataset.estado||'') === est;
             r.style.display = (okQ && okE) ? '' : 'none';
           });
         };

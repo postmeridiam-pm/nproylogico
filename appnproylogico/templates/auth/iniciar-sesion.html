@@ -18,7 +18,9 @@
     .brand { display:flex; align-items:center; gap:8px; margin-bottom:12px; color:#9cd2ff; font-weight:600; }
   </style>
   {% if messages %}
-  <style>.msg{background:#1b2f46;padding:10px 12px;border-radius:8px;margin-bottom:8px;color:#ffcccb;}</style>
+  <style>
+    .msg {background:#1b2f46;padding:10px 12px;border-radius:8px;margin-bottom:8px;color:#ffcccb;}
+  </style>
   {% endif %}
 </head>
 <body>
@@ -27,21 +29,26 @@
       <div class="brand">Logística Farmacéutica · Acceso</div>
       <h1>Inicia sesión</h1>
       <p class="sub">Operadores, supervisores y motoristas autorizados.</p>
+
       {% for message in messages %}
         <div class="msg">{{ message }}</div>
       {% endfor %}
+
       <form method="post">
         {% csrf_token %}
-        <label>Usuario</label>
+
+        <label for="{{ form.username.id_for_label }}">Usuario</label>
         {{ form.username }}
-        <label>Contraseña</label>
+
+        <label for="{{ form.password.id_for_label }}">Contraseña</label>
         {{ form.password }}
+
         <div class="actions">
           <button type="submit">Entrar</button>
-          <a href="/registro/">Crear cuenta</a>
+          <a href="{% url 'registro' %}">Crear cuenta</a>
         </div>
       </form>
     </div>
   </div>
-  </body>
+</body>
 </html>
