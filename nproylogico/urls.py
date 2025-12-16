@@ -88,6 +88,7 @@ urlpatterns = [
     path('asignaciones/<int:pk>/', views.detalle_asignacion, name='detalle_asignacion'),
     path('asignaciones/<int:pk>/modificar/', views.modificar_asignacion, name='modificar_asignacion'),
     path('asignaciones/<int:pk>/remover/', views.remover_asignacion, name='remover_asignacion'),
+    path('asignaciones/moto-motorista/agregar/', views.agregar_asignacion_moto_motorista, name='agregar_asignacion_moto_motorista'),
 
     # API de autocompletado
     path('api/farmacias/', api_views.FarmaciaList.as_view(), name='api_farmacias'),
@@ -129,9 +130,12 @@ urlpatterns = [
     path('supervisor/asignaciones-mf/agregar/', views_configuration.agregar_asignacion_mf, name='agregar_asignacion_mf'),
     path('supervisor/asignaciones-mf/<int:pk>/', views_configuration.detalle_asignacion_mf, name='detalle_asignacion_mf'),
     path('supervisor/asignaciones-mf/<int:pk>/modificar/', views_configuration.modificar_asignacion_mf, name='modificar_asignacion_mf'),
-    path('supervisor/asignaciones-mf/<int:pk>/remover/', views_configuration.remover_asignacion_mf, name='remover_asignacion_mf')
+    path('supervisor/asignaciones-mf/<int:pk>/remover/', views_configuration.remover_asignacion_mf, name='remover_asignacion_mf'),
+    path('healthz/', views.healthz, name='healthz')
     
 ]
+
+handler403 = 'appnproylogico.views_auth.acceso_denegado'
 
 
 if settings.DEBUG:

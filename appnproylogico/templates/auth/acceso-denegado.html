@@ -8,6 +8,13 @@
 <body>
   <h1>Acceso denegado</h1>
   <p>No tienes permisos para acceder.</p>
+  {% if messages %}
+  <ul>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
   <a href="/">Volver</a>
 </body>
 </html>

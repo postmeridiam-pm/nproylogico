@@ -7,18 +7,39 @@
 <body>
   <div class="container py-4">
     <h1 class="h4 mb-3">Anular despacho</h1>
-    <form method="post" action="{% url 'registrar_movimiento' %}">
+    <form method="post" action="{% url 'registrar_movimiento' %}" onsubmit="return confirmarAnulacion()">
       {% csrf_token %}
       <input type="hidden" name="metodo" value="boton">
+      <input type="hidden" name="confirmado" id="confirmado" value="no">
       <input type="hidden" name="estado" value="ANULADO">
       <div class="mb-2"><label class="form-label">Código despacho</label><input class="form-control" name="codigo_despacho" required></div>
       <div class="mb-2"><label class="form-label">Motivo</label><textarea class="form-control" name="mensaje" rows="3" placeholder="Ej.: Error de pedido, cliente canceló, duplicado..." required></textarea></div>
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="confirmCheck" required>
+        <label class="form-check-label" for="confirmCheck">Confirmo que deseo anular el despacho</label>
+      </div>
       <div class="d-flex gap-2">
         <a class="btn btn-outline-secondary" href="{% url 'despachos_activos' %}">Volver</a>
         <button class="btn btn-danger" type="submit">Anular</button>
       </div>
     </form>
   </div>
+  <script>
+    function confirmarAnulacion() {
+      var codigo = document.querySelector('input[name="codigo_despacho"]').value || '';
+      var motivo = (document.querySelector('textarea[name="mensaje"]').value || '').trim();
+      if (motivo.length < 10) {
+        alert('Indica un motivo de al menos 10 caracteres');
+        return false;
+      }
+      var ok = confirm('¿Confirmas anular el despacho ' + codigo + '? Esta acción queda registrada.');
+      if (ok) {
+        document.getElementById('confirmado').value = 'si';
+        return true;
+      }
+      return false;
+    }
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

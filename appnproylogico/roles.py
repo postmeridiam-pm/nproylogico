@@ -42,9 +42,6 @@ def obtener_permisos_usuario(user):
     if rol == 'operador':
         return {
             'farmacias': {'view'},
-            'motoristas': {'view'},
-            'motos': {'view'},
-            'asignaciones': {'view'},
             'movimientos': {'view', 'add'},
             'despachos': {'view', 'add', 'change'},
         }
@@ -52,9 +49,7 @@ def obtener_permisos_usuario(user):
         return {
             'farmacias': {'view'},
             'motoristas': {'view', 'change'},
-            'motos': {'view'},
-            'asignaciones': {'view', 'change'},
-            'movimientos': {'view', 'add'},
+            'asignaciones': {'view', 'add', 'change'},
             'despachos': {'view', 'change'},
         }
     if rol == 'gerente':
@@ -65,7 +60,6 @@ def obtener_permisos_usuario(user):
             'motoristas': {'view'},
             'motos': {'view', 'add'},
             'asignaciones': {'view'},
-            'movimientos': {'view'},
             'despachos': {'view'},
         }
     return {k: set() for k in MODULOS.keys()}

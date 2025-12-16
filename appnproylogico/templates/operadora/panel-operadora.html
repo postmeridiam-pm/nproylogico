@@ -45,6 +45,8 @@
             <input type="date" name="fecha" class="form-control form-control-sm" value="{% now 'Y-m-d' %}">
             <button class="btn btn-sm btn-outline-primary" type="submit"><i class="bi bi-file-earmark-pdf"></i> Descargar PDF</button>
         </form>
+        <a class="btn btn-sm btn-outline-warning" href="{% url 'movimiento_modificar' %}"><i class="bi bi-pencil-square"></i> Modificar estado</a>
+        <a class="btn btn-sm btn-outline-danger" href="{% url 'movimiento_anular' %}"><i class="bi bi-x-octagon"></i> Anular despacho</a>
       </div>
       </div>
     </div>

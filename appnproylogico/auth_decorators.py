@@ -1,5 +1,5 @@
 from functools import wraps
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .roles import obtener_permisos_usuario, obtener_rol_usuario
@@ -18,16 +18,16 @@ def permiso_requerido(modulo, accion):
             token = request.COOKIES.get('access_token')
             if not _verify_oauth(token, request.user, request.method):
                 messages.error(request, 'Acceso denegado')
-                return redirect('acceso_denegado')
+                return render(request, 'auth/acceso-denegado.html', status=403)
             if not request.user.is_active:
                 messages.error(request, 'Cuenta inactiva')
-                return redirect('acceso_denegado')
+                return render(request, 'auth/acceso-denegado.html', status=403)
             permisos = obtener_permisos_usuario(request.user)
             acciones = permisos.get(modulo) or set()
             if accion in acciones or 'all' in acciones:
                 return view_func(request, *args, **kwargs)
             messages.error(request, 'Acceso denegado')
-            return redirect('acceso_denegado')
+            return render(request, 'auth/acceso-denegado.html', status=403)
         return _wrapped_view
     return decorator
 
@@ -42,14 +42,14 @@ def rol_requerido(rol):
             token = request.COOKIES.get('access_token')
             if not _verify_oauth(token, request.user, request.method):
                 messages.error(request, 'Acceso denegado')
-                return redirect('acceso_denegado')
+                return render(request, 'auth/acceso-denegado.html', status=403)
             if not request.user.is_active:
                 messages.error(request, 'Cuenta inactiva')
-                return redirect('acceso_denegado')
+                return render(request, 'auth/acceso-denegado.html', status=403)
             if obtener_rol_usuario(request.user) == rol:
                 return view_func(request, *args, **kwargs)
             messages.error(request, 'Acceso denegado')
-            return redirect('acceso_denegado')
+            return render(request, 'auth/acceso-denegado.html', status=403)
         return _wrapped_view
     return decorator
 
@@ -61,7 +61,7 @@ def solo_admin(view_func):
         if request.user.is_superuser or request.user.is_staff:
             return view_func(request, *args, **kwargs)
         messages.error(request, 'Acceso denegado')
-        return redirect('acceso_denegado')
+        return render(request, 'auth/acceso-denegado.html', status=403)
     return _wrapped_view
 
 

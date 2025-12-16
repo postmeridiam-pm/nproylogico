@@ -296,7 +296,9 @@ def asignaciones_motorista_farmacia(request):
     # Autopoblar si hay muy pocas
     try:
         total_actual = AsignacionMotoristaFarmacia.objects.count()
-        if total_actual < 50:
+        from django.conf import settings as _settings
+        allow_auto = (_settings.DEBUG and (request.GET.get('autopoblar') == '1'))
+        if allow_auto and total_actual < 50:
             from django.utils import timezone as tz
             motoristas = list(Motorista.objects.all().order_by('id')[:200])
             farmacias = list(Localfarmacia.objects.all().order_by('local_id'))
@@ -304,7 +306,7 @@ def asignaciones_motorista_farmacia(request):
                 farmacias = []
             created = 0
             idx_f = 0
-            for m in motoristas[:50]:
+            for m in motoristas[:10]:
                 try:
                     f = farmacias[idx_f % max(1, len(farmacias))] if farmacias else None
                     if not f:

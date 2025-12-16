@@ -666,12 +666,16 @@
                     <a class="btn btn-sm btn-outline-info" href="{% url 'detalle_farmacia' f.id %}" title="Ver detalles">
                       <i class="bi bi-eye"></i>
                     </a>
-                    <a class="btn btn-sm btn-outline-warning" href="{% url 'actualizar_farmacia' f.id %}" title="Editar">
-                      <i class="bi bi-pencil"></i>
-                    </a>
-                    <a class="btn btn-sm btn-outline-danger" href="{% url 'remover_farmacia' f.id %}" title="Eliminar">
-                      <i class="bi bi-trash"></i>
-                    </a>
+                    {% if rol != 'motorista' %}
+                      <a class="btn btn-sm btn-outline-warning" href="{% url 'actualizar_farmacia' f.id %}" title="Editar">
+                        <i class="bi bi-pencil"></i>
+                      </a>
+                    {% endif %}
+                    {% if rol == 'admin' %}
+                      <a class="btn btn-sm btn-outline-danger" href="{% url 'remover_farmacia' f.id %}" title="Eliminar">
+                        <i class="bi bi-trash"></i>
+                      </a>
+                    {% endif %}
                   </div>
                 </td>
               </tr>
@@ -706,8 +710,10 @@
                 </td>
                 <td class="text-end">
                   <div class="btn-group">
-                    <a class="btn btn-sm btn-outline-primary" href="{% url 'agregar_farmacia' %}"><i class="bi bi-plus-lg"></i> Agregar</a>
-                    <a class="btn btn-sm btn-outline-secondary" href="{% url 'importar_farmacias' %}"><i class="bi bi-upload"></i> Importar</a>
+                    {% if rol == 'admin' %}
+                      <a class="btn btn-sm btn-outline-primary" href="{% url 'agregar_farmacia' %}"><i class="bi bi-plus-lg"></i> Agregar</a>
+                      <a class="btn btn-sm btn-outline-secondary" href="{% url 'importar_farmacias' %}"><i class="bi bi-upload"></i> Importar</a>
+                    {% endif %}
                   </div>
                 </td>
               </tr>

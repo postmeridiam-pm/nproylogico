@@ -566,12 +566,16 @@
         </div>
 
         <div class="farmacia-card-actions">
-          <a href="{% url 'actualizar_farmacia' farmacia.id %}" class="btn-card-action btn-edit">
-            <i class="bi bi-pencil"></i> Editar
-          </a>
-          <a href="{% url 'remover_farmacia' farmacia.id %}" class="btn-card-action btn-delete">
-            <i class="bi bi-trash"></i> Eliminar
-          </a>
+          {% if rol != 'motorista' %}
+            <a href="{% url 'actualizar_farmacia' farmacia.id %}" class="btn-card-action btn-edit">
+              <i class="bi bi-pencil"></i> Editar
+            </a>
+          {% endif %}
+          {% if rol == 'admin' %}
+            <a href="{% url 'remover_farmacia' farmacia.id %}" class="btn-card-action btn-delete">
+              <i class="bi bi-trash"></i> Eliminar
+            </a>
+          {% endif %}
         </div>
       </div>
 

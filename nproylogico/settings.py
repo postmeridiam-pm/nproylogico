@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_extensions',
     'axes',
-    'debug_toolbar',
     'cachalot',
     'django_mysql',
     'corsheaders',
@@ -60,7 +59,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'appnproylogico.middleware.security_headers.SecurityHeadersMiddleware',
     'axes.middleware.AxesMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'nproylogico.urls'
@@ -95,10 +93,22 @@ DATABASES = {
         'DATABASE': os.getenv('MARIADB_DATABASE'),
         'HOST': os.getenv('DB_HOST'),
         'PORT': os.getenv('DB_PORT'),
+        'CONN_MAX_AGE': 60,
+        'ATOMIC_REQUESTS': True,
         'OPTIONS': {
             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
             "charset": "utf8mb4",
+            "read_timeout": 5,
+            "write_timeout": 5,
+            "connect_timeout": 5,
         }
+    }
+}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'nproylogico-cache',
     }
 }
 
@@ -110,9 +120,12 @@ SECURE_HSTS_PRELOAD = os.getenv('SECURE_HSTS_PRELOAD', 'false').lower() == 'true
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE', 'false').lower() == 'true'
 CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE', 'false').lower() == 'true'
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = True
 CSRF_TRUSTED_ORIGINS = [o for o in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if o]
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 REFERRER_POLICY = os.getenv('REFERRER_POLICY', 'same-origin')
+CSP_POLICY = os.getenv('CSP_POLICY', "default-src 'self'; base-uri 'self'; frame-ancestors 'none'; object-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' data: https://cdn.jsdelivr.net; connect-src 'self'")
 
 # django-axes configuration (basic hardening)
 AXES_ENABLED = True
@@ -205,7 +218,8 @@ ARGON2_MEMORY_COST = 102400
 ARGON2_PARALLELISM = 8
 SESSION_COOKIE_AGE = 7200
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+SESSION_SAVE_EVERY_REQUEST = True
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'login'
@@ -271,6 +285,10 @@ OAUTH2_PROVIDER = {
 DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TOOLBAR_CALLBACK': lambda request: False, 
 }
+
+if DEBUG:
+    INSTALLED_APPS.append('debug_toolbar')
+    MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 
 
 

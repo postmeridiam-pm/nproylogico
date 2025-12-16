@@ -474,6 +474,7 @@ def listado_farmacias(request):
         'fecha_dia': fecha_dia,
         'fecha_mes': fecha_mes,
         'fecha_anio': fecha_anio,
+        'rol': rol,
     }
 
     return render(request, 'localfarmacia/listar-farmacias.html', context)
@@ -671,19 +672,50 @@ def detalle_farmacia(request, pk):
             except Exception:
                 existente = None
             if existente:
-                existente.activa = cd.get('activa', True)
-                existente.fecha_desasignacion = cd.get('fecha_desasignacion')
-                existente.observaciones = cd.get('observaciones')
-                existente.save()
+                from django.db import transaction as _tx
+                with _tx.atomic():
+                    prev = {'activa': existente.activa, 'fecha_desasignacion': existente.fecha_desasignacion, 'observaciones': existente.observaciones}
+                    existente.activa = cd.get('activa', True)
+                    existente.fecha_desasignacion = cd.get('fecha_desasignacion')
+                    existente.observaciones = cd.get('observaciones')
+                    existente.save()
+                    try:
+                        from .models import AuditoriaGeneral, Usuario as _Usuario
+                        AuditoriaGeneral.objects.create(
+                            nombre_tabla='asignacion_motorista_farmacia',
+                            id_registro_afectado=str(existente.pk),
+                            tipo_operacion='UPDATE',
+                            usuario=_Usuario.objects.filter(django_user_id=request.user.id).first(),
+                            fecha_evento=timezone.now(),
+                            datos_antiguos=prev,
+                            datos_nuevos={'activa': existente.activa, 'fecha_desasignacion': existente.fecha_desasignacion, 'observaciones': existente.observaciones}
+                        )
+                    except Exception:
+                        pass
                 messages.success(request, 'Asignación actualizada exitosamente.')
             else:
-                obj = form.save(commit=False)
-                try:
-                    from django.utils import timezone as _tz
-                    obj.fecha_asignacion = _tz.now()
-                except Exception:
-                    pass
-                obj.save()
+                from django.db import transaction as _tx
+                with _tx.atomic():
+                    obj = form.save(commit=False)
+                    try:
+                        from django.utils import timezone as _tz
+                        obj.fecha_asignacion = _tz.now()
+                    except Exception:
+                        pass
+                    obj.save()
+                    try:
+                        from .models import AuditoriaGeneral, Usuario as _Usuario
+                        AuditoriaGeneral.objects.create(
+                            nombre_tabla='asignacion_motorista_farmacia',
+                            id_registro_afectado=str(obj.pk),
+                            tipo_operacion='INSERT',
+                            usuario=_Usuario.objects.filter(django_user_id=request.user.id).first(),
+                            fecha_evento=timezone.now(),
+                            datos_antiguos=None,
+                            datos_nuevos={'motorista': obj.motorista_id, 'farmacia': getattr(obj.farmacia, 'local_id', None), 'activa': obj.activa}
+                        )
+                    except Exception:
+                        pass
                 messages.success(request, 'Motorista asignado a la farmacia exitosamente.')
             return redirect('listado_farmacias')
         else:
@@ -908,7 +940,7 @@ def remover_motorista(request, pk):
     return render(request, 'motoristas/remover-motorista.html', {'motorista': motorista})
 
 
-@login_required(login_url='admin:login')
+@login_required(login_url='login')
 @ratelimit(key='user', rate='10/m', method='POST', block=True)
 def detalle_motorista(request, pk):
     """Ver detalles de un motorista"""
@@ -1476,9 +1508,30 @@ def remover_asignacion(request, pk):
     from .models import AsignacionMotoristaFarmacia
     asignacion = get_object_or_404(AsignacionMotoristaFarmacia, pk=pk)
     if request.method == 'POST':
+        from .roles import obtener_rol_usuario
+        rol = obtener_rol_usuario(request.user)
+        if rol not in ('supervisor','admin'):
+            messages.error(request, 'Solo supervisor/admin puede modificar asignaciones')
+            return redirect('detalle_asignacion', pk=asignacion.pk)
         try:
-            asignacion.activa = 1 if asignacion.activa == 0 else 0
-            asignacion.save()
+            from django.db import transaction as _tx
+            with _tx.atomic():
+                prev = {'activa': asignacion.activa}
+                asignacion.activa = 1 if asignacion.activa == 0 else 0
+                asignacion.save()
+                try:
+                    from .models import AuditoriaGeneral, Usuario as _Usuario
+                    AuditoriaGeneral.objects.create(
+                        nombre_tabla='asignacion_motorista_farmacia',
+                        id_registro_afectado=str(asignacion.pk),
+                        tipo_operacion='UPDATE',
+                        usuario=_Usuario.objects.filter(django_user_id=request.user.id).first(),
+                        fecha_evento=timezone.now(),
+                        datos_antiguos=prev,
+                        datos_nuevos={'activa': asignacion.activa}
+                    )
+                except Exception:
+                    pass
             estado = "activada" if asignacion.activa == 1 else "desactivada"
             messages.success(request, f'Asignación {estado} exitosamente.')
         except Exception as e:
@@ -1817,6 +1870,7 @@ def registrar_movimiento(request):
         tipo_mov = (request.POST.get('tipo_movimiento','') or '').strip().lower()
         codigo = request.POST.get('codigo_despacho','').strip()
         estado = request.POST.get('estado','').strip()
+        confirmado = (request.POST.get('confirmado','') or '').strip().lower()
         mensaje = request.POST.get('mensaje','').strip()
         try:
             despacho = Despacho.objects.filter(codigo_despacho=codigo).first()
@@ -1829,6 +1883,29 @@ def registrar_movimiento(request):
                 estado_norm = (despacho.estado or '').strip().upper()
                 nuevo = (estado or '').strip().upper()
                 tipo_d = (despacho.tipo_despacho or '').strip().upper()
+                try:
+                    pend = request.session.get('mov_queue', [])
+                    if pend:
+                        for item in list(pend):
+                            try:
+                                d2 = Despacho.objects.filter(codigo_despacho=item.get('codigo')).first()
+                                if not d2:
+                                    continue
+                                u2 = Usuario.objects.filter(django_user_id=request.user.id).first()
+                                MovimientoDespacho.objects.create(
+                                    despacho=d2,
+                                    estado_anterior=item.get('estado_anterior'),
+                                    estado_nuevo=item.get('estado_nuevo'),
+                                    fecha_movimiento=item.get('fecha_movimiento') or timezone.now(),
+                                    usuario=u2,
+                                    observacion=item.get('observacion','')
+                                )
+                                pend.remove(item)
+                            except Exception:
+                                continue
+                        request.session['mov_queue'] = pend
+                except Exception:
+                    pass
                 mapa = {
                     'PENDIENTE': {'ASIGNADO','ANULADO'},
                     'ASIGNADO': {'PREPARANDO','ANULADO'},
@@ -1852,6 +1929,40 @@ def registrar_movimiento(request):
                         return render(request, 'movimientos/registrar-mov.html', context)
                 nuevo = (estado or '').strip().upper()
                 tipo_d = (despacho.tipo_despacho or '').strip().upper()
+                if (metodo or '').lower() == 'boton' and confirmado != 'si':
+                    feedback = 'Debes confirmar la acción antes de continuar'
+                    messages.error(request, feedback)
+                    context = {'feedback': feedback}
+                    return render(request, 'movimientos/registrar-mov.html', context)
+                if nuevo == 'ANULADO':
+                    from .roles import obtener_rol_usuario
+                    rol = obtener_rol_usuario(request.user)
+                    if rol != 'operador':
+                        feedback = 'Solo operadora puede anular'
+                        messages.error(request, feedback)
+                        context = {'feedback': feedback}
+                        return render(request, 'movimientos/registrar-mov.html', context)
+                    if not mensaje or len(mensaje) < 10:
+                        feedback = 'Descripción obligatoria para ANULADO'
+                        messages.error(request, feedback)
+                        context = {'feedback': feedback}
+                        return render(request, 'movimientos/registrar-mov.html', context)
+                    try:
+                        from django.utils import timezone as _tz
+                        now_s = int(_tz.now().timestamp())
+                        window_start = int(request.session.get('cancel_window_start') or 0)
+                        count = int(request.session.get('cancel_count') or 0)
+                        if not window_start or now_s - window_start > 600:
+                            request.session['cancel_window_start'] = now_s
+                            request.session['cancel_count'] = 0
+                        else:
+                            if count >= 5:
+                                feedback = 'Límite de anulaciones alcanzado (10 min)'
+                                messages.error(request, feedback)
+                                context = {'feedback': feedback}
+                                return render(request, 'movimientos/registrar-mov.html', context)
+                    except Exception:
+                        pass
                 mapa = {
                     'PENDIENTE': {'ASIGNADO','ANULADO'},
                     'ASIGNADO': {'PREPARANDO','ANULADO'},
@@ -1879,42 +1990,63 @@ def registrar_movimiento(request):
                                 dup_skip = True
                     except Exception:
                         dup_skip = False
-                    if not dup_skip:
-                        MovimientoDespacho.objects.create(
-                            despacho=despacho,
-                            estado_anterior=despacho.estado,
-                            estado_nuevo=nuevo,
-                            fecha_movimiento=timezone.now(),
-                            usuario=usuario,
-                            observacion=(f'modo={metodo}; tipo={tipo_mov or ""}; ' + (mensaje or '')).strip()
-                        )
-                    despacho.estado = nuevo
-                despacho.usuario_modificacion = usuario
-                despacho.fecha_modificacion = timezone.now()
-                despacho.save()
-                # Auditoría movimiento
-                try:
-                    from .models import AuditoriaGeneral
-                    AuditoriaGeneral.objects.create(
-                        nombre_tabla='movimiento_despacho',
-                        id_registro_afectado=str(despacho.id),
-                        tipo_operacion='MOV',
-                        usuario=usuario,
-                        fecha_evento=timezone.now(),
-                        datos_antiguos={'estado': estado_norm},
-                        datos_nuevos={'estado': estado, 'mensaje': mensaje}
-                    )
-                except Exception:
-                    pass
-                feedback = feedback or 'Movimiento registrado'
-                log.info('Movimiento registrado codigo=%s estado=%s usuario=%s ip=%s', codigo, (nuevo or estado), request.user.username, request.META.get('REMOTE_ADDR'))
-                messages.success(request, feedback)
-                ref = request.META.get('HTTP_REFERER') or None
-                if ref:
-                    from django.shortcuts import redirect
-                    return redirect(ref)
-                from django.urls import reverse
-                return redirect(reverse('despachos_activos'))
+                    try:
+                        if not dup_skip:
+                            MovimientoDespacho.objects.create(
+                                despacho=despacho,
+                                estado_anterior=despacho.estado,
+                                estado_nuevo=nuevo,
+                                fecha_movimiento=timezone.now(),
+                                usuario=usuario,
+                                observacion=(f'modo={metodo}; tipo={tipo_mov or ""}; ' + (mensaje or '')).strip()
+                            )
+                        despacho.estado = nuevo
+                        despacho.usuario_modificacion = usuario
+                        despacho.fecha_modificacion = timezone.now()
+                        despacho.save()
+                        try:
+                            from .models import AuditoriaGeneral
+                            AuditoriaGeneral.objects.create(
+                                nombre_tabla='movimiento_despacho',
+                                id_registro_afectado=str(despacho.id),
+                                tipo_operacion='MOV',
+                                usuario=usuario,
+                                fecha_evento=timezone.now(),
+                                datos_antiguos={'estado': estado_norm},
+                                datos_nuevos={'estado': estado, 'mensaje': mensaje}
+                            )
+                            if nuevo == 'ANULADO':
+                                try:
+                                    from django.utils import timezone as _tz
+                                    request.session['cancel_count'] = int(request.session.get('cancel_count') or 0) + 1
+                                    request.session['cancel_window_start'] = request.session.get('cancel_window_start') or int(_tz.now().timestamp())
+                                except Exception:
+                                    pass
+                        except Exception:
+                            pass
+                        feedback = feedback or 'Movimiento registrado'
+                        log.info('Movimiento registrado codigo=%s estado=%s usuario=%s ip=%s', codigo, (nuevo or estado), request.user.username, request.META.get('REMOTE_ADDR'))
+                        messages.success(request, feedback)
+                        ref = request.META.get('HTTP_REFERER') or None
+                        if ref:
+                            from django.shortcuts import redirect
+                            return redirect(ref)
+                        from django.urls import reverse
+                        return redirect(reverse('despachos_activos'))
+                    except Exception:
+                        q = request.session.get('mov_queue', [])
+                        q.append({
+                            'codigo': codigo,
+                            'estado_anterior': despacho.estado,
+                            'estado_nuevo': nuevo,
+                            'fecha_movimiento': timezone.now().isoformat(),
+                            'observacion': (f'modo={metodo}; tipo={tipo_mov or ""}; ' + (mensaje or '')).strip(),
+                        })
+                        request.session['mov_queue'] = q
+                        feedback = 'Base de datos no disponible; movimiento encolado'
+                        messages.warning(request, feedback)
+                        context = {'feedback': feedback}
+                        return render(request, 'movimientos/registrar-mov.html', context)
         except Exception as e:
             feedback = f'Error: {e}'
             log.error('Error movimiento codigo=%s error=%s', codigo, e)
@@ -2467,15 +2599,67 @@ def consulta_rapida(request):
     return render(request, 'reportes/consulta-rapida.html', {'results': results, 'local': local, 'motorista': motorista, 'cliente': cliente})
 
 
-@permiso_requerido('movimientos', 'view')
+@rol_requerido('operador')
 def movimiento_anular(request):
     return render(request, 'movimientos/anular-mov.html')
 
 
-@permiso_requerido('movimientos', 'view')
+@rol_requerido('operador')
 def movimiento_modificar(request):
     return render(request, 'movimientos/modificar-mov.html')
 
+@permiso_requerido('asignaciones', 'add')
+def agregar_asignacion_moto_motorista(request):
+    """Crea una asignación Moto–Motorista (empresa asigna moto a motorista)."""
+    form = None
+    if request.method == 'POST':
+        form = AsignarMotoristaForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            moto = cd.get('moto')
+            motorista = cd.get('motorista')
+            try:
+                activo_moto = AsignacionMotoMotorista.objects.filter(moto=moto, activa=1).first()
+                if activo_moto:
+                    messages.error(request, 'La moto ya está asignada y activa.')
+                    return render(request, 'asignaciones/agregar-asignacion-moto-motorista.html', {'form': form, 'titulo': 'Asignar Moto a Motorista'})
+                activo_mot = AsignacionMotoMotorista.objects.filter(motorista=motorista, activa=1).first()
+                if activo_mot:
+                    messages.error(request, 'El motorista ya tiene una moto activa.')
+                    return render(request, 'asignaciones/agregar-asignacion-moto-motorista.html', {'form': form, 'titulo': 'Asignar Moto a Motorista'})
+            except Exception:
+                pass
+            obj = form.save(commit=False)
+            try:
+                from django.utils import timezone as _tz
+                obj.fecha_asignacion = obj.fecha_asignacion or _tz.now()
+                obj.kilometraje_inicio = obj.kilometraje_inicio or int(getattr(moto, 'kilometraje_actual', 0) or 0)
+                obj.activa = bool(cd.get('activa', True))
+            except Exception:
+                pass
+            obj.save()
+            messages.success(request, 'Moto asignada al motorista exitosamente.')
+            return redirect('detalle_moto', pk=moto.pk)
+        else:
+            messages.error(request, 'Corrige los errores del formulario.')
+    else:
+        initial = {}
+        try:
+            mid = int(request.GET.get('motorista') or '0')
+            if mid:
+                initial['motorista'] = mid
+        except Exception:
+            pass
+        try:
+            mpat = (request.GET.get('moto_patente') or '').strip().upper()
+            if mpat:
+                mo = Moto.objects.filter(patente=mpat).first()
+                if mo:
+                    initial['moto'] = mo.pk
+        except Exception:
+            pass
+        form = AsignarMotoristaForm(initial=initial)
+    return render(request, 'asignaciones/agregar-asignacion-moto-motorista.html', {'form': form, 'titulo': 'Asignar Moto a Motorista'})
 
 @permiso_requerido('movimientos', 'view')
 def movimiento_directo(request):
@@ -3280,14 +3464,15 @@ def panel_motorista(request):
         mo = Moto.objects.filter(activo=True).first()
         if mo:
             from django.utils import timezone as _tz
-            asign_moto = AsignacionMotoMotorista.objects.create(
-                motorista=m,
-                moto=mo,
-                fecha_asignacion=_tz.now(),
-                kilometraje_inicio=int(getattr(mo, 'kilometraje_actual', 0) or 0),
-                activa=1,
-                observaciones='Asignación automática para demostración',
-            )
+            if not AsignacionMotoMotorista.objects.filter(moto=mo, activa=1).exists():
+                asign_moto = AsignacionMotoMotorista.objects.create(
+                    motorista=m,
+                    moto=mo,
+                    fecha_asignacion=_tz.now(),
+                    kilometraje_inicio=int(getattr(mo, 'kilometraje_actual', 0) or 0),
+                    activa=1,
+                    observaciones='Asignación automática para demostración',
+                )
     qs = Despacho.objects.filter(motorista=m).order_by('-fecha_registro')[:50]
     if not qs:
         from django.utils import timezone as _tz
@@ -3394,3 +3579,28 @@ def motorista_despacho_estado(request, despacho_id):
             return JsonResponse({'ok': False, 'error': str(e)}, status=400)
         messages.error(request, f'Error: {e}')
     return redirect('panel_motorista')
+
+def healthz(request):
+    from django.http import JsonResponse
+    from django.core.cache import cache
+    from django.db import connection
+    status = {}
+    try:
+        connection.ensure_connection()
+        status['database'] = 'ok'
+    except Exception as e:
+        status['database'] = f'error:{e}'
+    try:
+        cache.set('healthz', '1', 5)
+        v = cache.get('healthz')
+        status['cache'] = 'ok' if v == '1' else 'error'
+    except Exception as e:
+        status['cache'] = f'error:{e}'
+    try:
+        request.session['healthz'] = '1'
+        v = request.session.get('healthz')
+        status['session'] = 'ok' if v == '1' else 'error'
+    except Exception as e:
+        status['session'] = f'error:{e}'
+    overall = all(val == 'ok' for val in status.values())
+    return JsonResponse({'status': 'ok' if overall else 'error', **status}, status=200 if overall else 503)

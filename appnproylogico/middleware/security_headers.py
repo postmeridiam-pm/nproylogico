@@ -1,21 +1,13 @@
 from django.utils.deprecation import MiddlewareMixin
+from django.conf import settings
 
 class SecurityHeadersMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
-        response['Referrer-Policy'] = 'strict-origin-when-cross-origin'
-        response['Permissions-Policy'] = 'geolocation=(self), microphone=(), camera=()'
-        csp = []
-        csp.append("default-src 'self' https: data:")
-        csp.append("img-src 'self' data: https:")
-        csp.append("script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.jsdelivr.net/npm")
-        csp.append("style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.jsdelivr.net/npm")
-        csp.append("object-src 'none'")
-        csp.append("base-uri 'self'")
-        csp.append("form-action 'self'")
-        csp.append("frame-ancestors 'self'")
-        csp.append("frame-src 'self'")
-        csp.append("connect-src 'self'")
-        csp.append("font-src 'self' https://cdn.jsdelivr.net")
-        response['Content-Security-Policy'] = '; '.join(csp)
-        response['X-Content-Type-Options'] = 'nosniff'
+        response.headers.setdefault('X-Content-Type-Options', 'nosniff')
+        response.headers.setdefault('Referrer-Policy', getattr(settings, 'REFERRER_POLICY', 'same-origin'))
+        response.headers.setdefault('Permissions-Policy', "geolocation=(), microphone=(), camera=()")
+        csp = getattr(settings, 'CSP_POLICY', "default-src 'self'; base-uri 'self'; frame-ancestors 'none'; object-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' data: https://cdn.jsdelivr.net; connect-src 'self'")
+        response.headers.setdefault('Content-Security-Policy', csp)
+        if not settings.DEBUG:
+            response.headers.setdefault('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload')
         return response

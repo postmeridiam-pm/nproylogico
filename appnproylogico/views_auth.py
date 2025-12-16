@@ -113,7 +113,7 @@ def logout_view(request):
     return resp
 
 
-def acceso_denegado(request):
+def acceso_denegado(request, exception=None):
     """Página de acceso denegado"""
     return render(request, 'auth/acceso-denegado.html', status=403)
 

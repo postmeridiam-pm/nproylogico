@@ -365,44 +365,60 @@
             </a>
           </div>
           <div class="col-md-3 d-grid">
-            <a class="btn btn-outline-success btn-lg" href="{% url 'panel_motorista' %}">
-              <i class="bi bi-person-badge"></i> Panel Motorista
-            </a>
+            {% if rol == 'motorista' %}
+              <a class="btn btn-outline-success btn-lg" href="{% url 'panel_motorista' %}">
+                <i class="bi bi-person-badge"></i> Panel Motorista
+              </a>
+            {% endif %}
           </div>
           <div class="col-md-3 d-grid">
-            <a class="btn btn-primary btn-lg" href="{% url 'listado_motoristas' %}">
-              <i class="bi bi-people"></i> Motoristas
-            </a>
+            {% if rol != 'operador' %}
+              <a class="btn btn-primary btn-lg" href="{% url 'listado_motoristas' %}">
+                <i class="bi bi-people"></i> Motoristas
+              </a>
+            {% endif %}
+          </div>
+          {% if rol != 'operador' %}
+            <div class="col-md-3 d-grid">
+              <a class="btn btn-primary btn-lg" href="{% url 'listado_motos' %}">
+                <i class="bi bi-bicycle"></i> Motos
+              </a>
+            </div>
+          {% endif %}
+          <div class="col-md-3 d-grid">
+            {% if rol != 'operador' %}
+              <a class="btn btn-primary btn-lg" href="{% url 'listado_asignaciones' %}">
+                <i class="bi bi-link-45deg"></i> Asignaciones
+              </a>
+            {% endif %}
           </div>
           <div class="col-md-3 d-grid">
-            <a class="btn btn-primary btn-lg" href="{% url 'listado_motos' %}">
-              <i class="bi bi-bicycle"></i> Motos
-            </a>
+            {% if rol == 'gerente' or rol == 'admin' %}
+              <a class="btn btn-outline-info btn-lg" href="{% url 'reporte_movimientos' %}">
+                <i class="bi bi-graph-up"></i> Reportes
+              </a>
+            {% endif %}
           </div>
           <div class="col-md-3 d-grid">
-            <a class="btn btn-primary btn-lg" href="{% url 'listado_asignaciones' %}">
-              <i class="bi bi-link-45deg"></i> Asignaciones
-            </a>
+            {% if rol == 'operador' %}
+              <a class="btn btn-outline-success btn-lg" href="{% url 'panel_operadora' %}">
+                <i class="bi bi-grid"></i> Operadora
+              </a>
+            {% endif %}
           </div>
           <div class="col-md-3 d-grid">
-            <a class="btn btn-outline-info btn-lg" href="{% url 'reporte_movimientos' %}">
-              <i class="bi bi-graph-up"></i> Reportes
-            </a>
+            {% if rol == 'supervisor' %}
+              <a class="btn btn-outline-warning btn-lg" href="{% url 'listado_asignaciones_mf' %}">
+                <i class="bi bi-people"></i> Supervisor
+              </a>
+            {% endif %}
           </div>
           <div class="col-md-3 d-grid">
-            <a class="btn btn-outline-success btn-lg" href="{% url 'panel_operadora' %}">
-              <i class="bi bi-grid"></i> Operadora
-            </a>
-          </div>
-          <div class="col-md-3 d-grid">
-            <a class="btn btn-outline-warning btn-lg" href="{% url 'listado_asignaciones_mf' %}">
-              <i class="bi bi-people"></i> Supervisor
-            </a>
-          </div>
-          <div class="col-md-3 d-grid">
-            <a class="btn btn-outline-secondary btn-lg" href="{% url 'importar_farmacias' %}">
-              <i class="bi bi-upload"></i> Importar Farmacias
-            </a>
+            {% if rol == 'admin' %}
+              <a class="btn btn-outline-secondary btn-lg" href="{% url 'importar_farmacias' %}">
+                <i class="bi bi-upload"></i> Importar Farmacias
+              </a>
+            {% endif %}
           </div>
         </div>
       </div>
