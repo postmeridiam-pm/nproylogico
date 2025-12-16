@@ -397,7 +397,7 @@ Tu archivo completo con los dos fixes: sin condición negada en JS y botón `btn
             {% endif %}
           </div>
           <div class="col-md-3 d-grid">
-            {% if rol == 'operador' %}
+            {% if rol == 'operador' or rol == 'admin' or rol == 'gerente' or rol == 'supervisor' %}
               <a class="btn btn-outline-success btn-lg" href="{% url 'panel_operadora' %}">
                 <i class="bi bi-grid"></i> Operadora
               </a>

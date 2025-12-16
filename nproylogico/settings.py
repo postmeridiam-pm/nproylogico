@@ -53,6 +53,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -128,7 +129,8 @@ SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE', 'false').lower() == '
 CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE', 'false').lower() == 'true'
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
-CSRF_TRUSTED_ORIGINS = [o for o in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if o]
+_CSRF_ENV = [o for o in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if o]
+CSRF_TRUSTED_ORIGINS = _CSRF_ENV if _CSRF_ENV else ['https://*.onrender.com']
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 REFERRER_POLICY = os.getenv('REFERRER_POLICY', 'same-origin')
 CSP_POLICY = os.getenv('CSP_POLICY', "default-src 'self'; base-uri 'self'; frame-ancestors 'none'; object-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' data: https://cdn.jsdelivr.net; connect-src 'self'")
@@ -198,6 +200,9 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     (BASE_DIR.parent / 'nproylogico' / 'static').resolve(),
 ]
+STATIC_ROOT = (BASE_DIR / 'staticfiles').resolve()
+if not DEBUG:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media uploads
 MEDIA_URL = '/media/'
@@ -206,7 +211,7 @@ UPLOAD_MAX_SIZE_MB = int(os.getenv('UPLOAD_MAX_SIZE_MB', '10'))
 UPLOAD_ALLOWED_CONTENT_TYPES = (
     os.getenv('UPLOAD_ALLOWED_CONTENT_TYPES', 'application/pdf,image/jpeg,image/png').split(',')
 )
-PDF_PASSWORD = os.getenv('PDF_PASSWORD', 'l0gic0*')
+PDF_PASSWORD = os.getenv('PDF_PASSWORD', 'logic0')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

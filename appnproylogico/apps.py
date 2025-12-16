@@ -11,6 +11,8 @@ class AppnproylogicoConfig(AppConfig):
             args = set(sys.argv or [])
             if any(a in args for a in {'makemigrations','migrate','collectstatic','test'}):
                 return
+            if os.getenv('RENDER', '0') == '1' or os.getenv('PORT'):
+                return
             if os.getenv('DISABLE_READY_DB', '0') == '1':
                 return
             from . import signals
