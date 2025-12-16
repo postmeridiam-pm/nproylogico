@@ -1,5 +1,5 @@
 from django.apps import AppConfig
-import sys
+import sys, os
 
 
 class AppnproylogicoConfig(AppConfig):
@@ -10,6 +10,8 @@ class AppnproylogicoConfig(AppConfig):
         try:
             args = set(sys.argv or [])
             if any(a in args for a in {'makemigrations','migrate','collectstatic','test'}):
+                return
+            if os.getenv('DISABLE_READY_DB', '0') == '1':
                 return
             from . import signals
             from django.core.management import call_command
