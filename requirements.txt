@@ -33,10 +33,7 @@ distro==1.9.0
 dj-database-url==2.2.0
 dj-rest-auth==7.0.1
 Django==5.2.8
-<<<<<<< HEAD
-=======
 django-admin-bootstrapped==2.5.7
->>>>>>> 9ab7f34 (try5)
 django-allauth==65.13.0
 django-axes==8.0.0
 django-bootstrap3==25.2
