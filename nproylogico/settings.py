@@ -26,7 +26,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
-SECRET_KEY = os.getenv('SECRET_KEY', 'change-me')
+SECRET_KEY = os.getenv('SECRET_KEY')
+if not SECRET_KEY:
+    raise RuntimeError("The SECRET_KEY environment variable is not set; generate a secure key and set SECRET_KEY in the environment.")
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
 
 
@@ -128,7 +130,7 @@ CSP_POLICY = os.getenv('CSP_POLICY', "default-src 'self'; base-uri 'self'; frame
 
 # django-axes configuration (basic hardening)
 AXES_ENABLED = True
-AXES_FAILURE_LIMIT = int(os.getenv('AXES_FAILURE_LIMIT', '10'))
+AXES_FAILURE_LIMIT = int(os.getenv('AXES_FAILURE_LIMIT', '4'))
 AXES_COOLOFF_TIME = int(os.getenv('AXES_COOLOFF_TIME_MINUTES', '15'))
 AXES_LOCKOUT_PARAMETERS = ['username', 'ip_address']
 
@@ -215,7 +217,7 @@ PASSWORD_HASHERS = [
 ARGON2_TIME_COST = 2
 ARGON2_MEMORY_COST = 102400
 ARGON2_PARALLELISM = 8
-SESSION_COOKIE_AGE = 1200
+SESSION_COOKIE_AGE = 900
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 SESSION_SAVE_EVERY_REQUEST = True

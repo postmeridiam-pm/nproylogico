@@ -28,7 +28,19 @@ from django.db import models
 from django.db.models import Q
 from django.conf import settings
 import logging
+import pathlib
 log = logging.getLogger('appnproylogico')
+
+# Common user-visible messages
+FORM_ERROR_MSG = 'Por favor corrige los errores en el formulario.'
+TRANSITION_NOT_ALLOWED = 'Transición de estado no permitida'
+
+# Template constants
+PERFIL_TEMPLATE = 'perfil.html'
+
+# Static data directory and frequently used data file paths
+DATA_DIR = pathlib.Path(__file__).resolve().parents[1] / 'static' / 'data'
+MOTOS_JSON = DATA_DIR / 'motos.json'
 
 def _cliente_normalizado(nombre: str):
     s = (nombre or '').strip()
@@ -56,8 +68,8 @@ def _estado_normalizado(s: str):
 def _ingestar_motos_json():
     try:
         from .models import Moto
-        import json, pathlib, random
-        base = pathlib.Path(__file__).resolve().parents[1] / 'static' / 'data' / 'motos.json'
+        import json, random
+        base = MOTOS_JSON
         if not base.exists():
             return 0
         with open(base, 'r', encoding='utf-8') as f:
@@ -171,7 +183,7 @@ def _can_transition(estado_actual: str, nuevo: str, tipo_despacho: str, receta_r
         mapa['ASIGNADO'] = mapa['ASIGNADO'] | {'EN_CAMINO'}
     permitidos = mapa.get(ea, set())
     if nv not in permitidos:
-        return False, 'Transición de estado no permitida'
+        return False, TRANSITION_NOT_ALLOWED
     if td == 'REENVIO_RECETA' and nv == 'PREPARADO':
         if not (receta_retenida and receta_devuelta):
             return False, 'Receta retenida requiere devolución antes de PREPARADO'
@@ -211,8 +223,8 @@ def home(request):
             to_db = Moto.objects.count()
             to_json = 0
             try:
-                import json, pathlib
-                p = pathlib.Path(__file__).resolve().parents[1] / 'static' / 'data' / 'motos.json'
+                import json
+                p = MOTOS_JSON
                 with open(p, 'r', encoding='utf-8') as f:
                     to_json = len(json.load(f) or [])
             except Exception:
@@ -253,7 +265,7 @@ def registro(request):
             messages.success(request, f'Usuario "{usuario.username}" creado exitosamente. Ya puedes iniciar sesión.')
             return redirect('admin:login')
         else:
-            messages.error(request, 'Por favor corrige los errores en el formulario.')
+            messages.error(request, FORM_ERROR_MSG)
     else:
         form = RegistroForm()
 
@@ -264,7 +276,7 @@ def registro(request):
 def perfil(request):
     """Ver perfil de usuario (solo lectura)"""
     rol = obtener_rol_usuario(request.user)
-    return render(request, 'perfil.html', {'user': request.user, 'rol': rol})
+    return render(request, PERFIL_TEMPLATE, {'user': request.user, 'rol': rol})
 
 
 @login_required(login_url='admin:login')
@@ -287,12 +299,12 @@ def editar_perfil(request):
         new_pwd2 = (request.POST.get('new_password2', '') or '').strip()
         if not nuevo_username or len(nuevo_username) < 3:
             messages.error(request, 'El nombre de usuario debe tener al menos 3 caracteres.')
-            return render(request, 'perfil.html', {'user': user, 'rol': rol, 'usuario': usuario, 'editing': True})
+            return render(request, PERFIL_TEMPLATE, {'user': user, 'rol': rol, 'usuario': usuario, 'editing': True})
         try:
             from django.contrib.auth.models import User as DjangoUser
             if DjangoUser.objects.filter(username=nuevo_username).exclude(pk=user.pk).exists():
                 messages.error(request, 'Ese nombre de usuario ya está en uso.')
-                return render(request, 'perfil.html', {'user': user, 'rol': rol, 'usuario': usuario, 'editing': True})
+                return render(request, PERFIL_TEMPLATE, {'user': user, 'rol': rol, 'usuario': usuario, 'editing': True})
         except Exception:
             pass
         user.username = nuevo_username
@@ -303,32 +315,32 @@ def editar_perfil(request):
                 tel_ok = False
                 messages.error(request, 'Teléfono inválido (7–15 dígitos).')
         if not tel_ok:
-            return render(request, 'perfil.html', {'user': user, 'rol': rol, 'usuario': usuario, 'editing': True})
+            return render(request, PERFIL_TEMPLATE, {'user': user, 'rol': rol, 'usuario': usuario, 'editing': True})
         if new_pwd1 or new_pwd2:
             if not current_pwd or not current_pwd2:
                 messages.error(request, 'Debes ingresar tu contraseña actual.')
-                return render(request, 'perfil.html', {'user': user, 'rol': rol, 'usuario': usuario, 'editing': True})
+                return render(request, PERFIL_TEMPLATE, {'user': user, 'rol': rol, 'usuario': usuario, 'editing': True})
             if current_pwd != current_pwd2:
                 messages.error(request, 'La contraseña actual no coincide en ambos campos.')
-                return render(request, 'perfil.html', {'user': user, 'rol': rol, 'usuario': usuario, 'editing': True})
+                return render(request, PERFIL_TEMPLATE, {'user': user, 'rol': rol, 'usuario': usuario, 'editing': True})
             if not user.check_password(current_pwd):
                 messages.error(request, 'La contraseña actual no es correcta.')
-                return render(request, 'perfil.html', {'user': user, 'rol': rol, 'usuario': usuario, 'editing': True})
+                return render(request, PERFIL_TEMPLATE, {'user': user, 'rol': rol, 'usuario': usuario, 'editing': True})
             import re
             if len(new_pwd1) < 8:
                 messages.error(request, 'La nueva contraseña debe tener al menos 8 caracteres.')
-                return render(request, 'perfil.html', {'user': user, 'rol': rol, 'usuario': usuario, 'editing': True})
-            if not re.search(r"[A-Z]", new_pwd1) or not re.search(r"[a-z]", new_pwd1) or not re.search(r"[0-9]", new_pwd1) or not re.search(r"[^A-Za-z0-9]", new_pwd1):
+                return render(request, PERFIL_TEMPLATE, {'user': user, 'rol': rol, 'usuario': usuario, 'editing': True})
+            if not re.search(r"[A-Z]", new_pwd1) or not re.search(r"[a-z]", new_pwd1) or not re.search(r"\d", new_pwd1) or not re.search(r"[^A-Za-z0-9]", new_pwd1):
                 messages.error(request, 'La nueva contraseña debe incluir mayúscula, minúscula, número y caracter especial.')
-                return render(request, 'perfil.html', {'user': user, 'rol': rol, 'usuario': usuario, 'editing': True})
+                return render(request, PERFIL_TEMPLATE, {'user': user, 'rol': rol, 'usuario': usuario, 'editing': True})
             if new_pwd1 != new_pwd2:
                 messages.error(request, 'Las nuevas contraseñas no coinciden.')
-                return render(request, 'perfil.html', {'user': user, 'rol': rol, 'usuario': usuario, 'editing': True})
+                return render(request, PERFIL_TEMPLATE, {'user': user, 'rol': rol, 'usuario': usuario, 'editing': True})
         try:
             user.save()
         except Exception:
             messages.error(request, 'No se pudo actualizar el usuario.')
-            return render(request, 'perfil.html', {'user': user, 'rol': rol, 'usuario': usuario, 'editing': True})
+            return render(request, PERFIL_TEMPLATE, {'user': user, 'rol': rol, 'usuario': usuario, 'editing': True})
         if new_pwd1 and new_pwd1 == new_pwd2:
             try:
                 user.set_password(new_pwd1)
@@ -338,7 +350,7 @@ def editar_perfil(request):
                 messages.success(request, 'Contraseña actualizada correctamente.')
             except Exception:
                 messages.error(request, 'No se pudo cambiar la contraseña.')
-                return render(request, 'perfil.html', {'user': user, 'rol': rol, 'usuario': usuario, 'editing': True})
+                return render(request, PERFIL_TEMPLATE, {'user': user, 'rol': rol, 'usuario': usuario, 'editing': True})
         try:
             if usuario:
                 usuario.telefono = nuevo_tel or None
@@ -350,7 +362,7 @@ def editar_perfil(request):
             pass
         messages.success(request, 'Perfil actualizado exitosamente.')
         return redirect('perfil')
-    return render(request, 'perfil.html', {'user': user, 'rol': rol, 'usuario': usuario, 'editing': True})
+    return render(request, PERFIL_TEMPLATE, {'user': user, 'rol': rol, 'usuario': usuario, 'editing': True})
 
 
 # ===== FARMACIA =====
@@ -572,7 +584,7 @@ def agregar_farmacia(request):
             messages.success(request, f'Farmacia "{farmacia.local_nombre}" creada exitosamente.')
             return redirect('detalle_farmacia', pk=farmacia.id)
         else:
-            messages.error(request, 'Por favor corrige los errores en el formulario.')
+            messages.error(request, FORM_ERROR_MSG)
     else:
         form = LocalfarmaciaForm()
 
@@ -590,7 +602,7 @@ def actualizar_farmacia(request, pk):
             messages.success(request, 'Farmacia actualizada exitosamente.')
             return redirect('detalle_farmacia', pk=farmacia.id)
         else:
-            messages.error(request, 'Por favor corrige los errores en el formulario.')
+            messages.error(request, FORM_ERROR_MSG)
     else:
         form = LocalfarmaciaForm(instance=farmacia)
 
@@ -890,7 +902,7 @@ def agregar_motorista(request):
             messages.success(request, f'Motorista "{motorista.usuario.nombre}" creado exitosamente.')
             return redirect('detalle_motorista', pk=motorista.pk)
         else:
-            messages.error(request, 'Por favor corrige los errores en el formulario.')
+            messages.error(request, FORM_ERROR_MSG)
     else:
         form = MotoristaForm()
 
@@ -916,7 +928,7 @@ def actualizar_motorista(request, pk):
             messages.success(request, 'Motorista actualizado exitosamente.')
             return redirect('detalle_motorista', pk=motorista.pk)
         else:
-            messages.error(request, 'Por favor corrige los errores en el formulario.')
+            messages.error(request, FORM_ERROR_MSG)
     else:
         form = MotoristaForm(instance=motorista)
 
@@ -1079,8 +1091,8 @@ def listado_motos(request):
     samples = []
     if motos.count() == 0:
         try:
-            import json, pathlib
-            data_path = pathlib.Path(__file__).resolve().parent.parent / 'static' / 'data' / 'motos.json'
+            import json
+            data_path = MOTOS_JSON
             with open(data_path, 'r', encoding='utf-8') as f:
                 samples = json.load(f)
         except Exception:
@@ -1157,7 +1169,7 @@ def agregar_moto(request):
             messages.success(request, f'Moto "{moto.patente}" creada exitosamente.')
             return redirect('detalle_moto', pk=moto.pk)
         else:
-            messages.error(request, 'Por favor corrige los errores en el formulario.')
+            messages.error(request, FORM_ERROR_MSG)
     else:
         initial = {}
         try:
@@ -1239,7 +1251,7 @@ def actualizar_moto(request, pk):
             messages.success(request, 'Moto actualizada exitosamente.')
             return redirect('detalle_moto', pk=moto.pk)
         else:
-            messages.error(request, 'Por favor corrige los errores en el formulario.')
+            messages.error(request, FORM_ERROR_MSG)
     else:
         form = MotoForm(instance=moto)
 
@@ -1464,7 +1476,7 @@ def agregar_asignacion(request):
             messages.success(request, 'Asignación creada exitosamente.')
             return redirect('detalle_asignacion', pk=obj.pk)
         else:
-            messages.error(request, 'Por favor corrige los errores en el formulario.')
+            messages.error(request, FORM_ERROR_MSG)
             return render(request, 'asignaciones/agregar-asignacion-mf.html', {'form': form})
     else:
         initial = {}
@@ -1496,7 +1508,7 @@ def modificar_asignacion(request, pk):
             messages.success(request, 'Asignación actualizada exitosamente.')
             return redirect('detalle_asignacion', pk=asignacion.pk)
         else:
-            messages.error(request, 'Por favor corrige los errores en el formulario.')
+            messages.error(request, FORM_ERROR_MSG)
     else:
         form = AsignacionMotoristaFarmaciaForm(instance=asignacion)
     return render(request, 'asignaciones/editar-asignacion-mf.html', {'form': form, 'asignacion': asignacion})
@@ -1908,7 +1920,7 @@ def registrar_movimiento(request):
                     pass
                 ok, msg = _can_transition(estado_norm, nuevo, tipo_d, despacho.tiene_receta_retenida, despacho.receta_devuelta_farmacia)
                 if not ok:
-                    feedback = msg or 'Transición de estado no permitida'
+                    feedback = msg or TRANSITION_NOT_ALLOWED
                     log.info('Transición inválida codigo=%s de=%s a=%s', codigo, estado_norm, nuevo)
                     messages.error(request, feedback)
                     context = {'feedback': feedback}
@@ -1951,7 +1963,7 @@ def registrar_movimiento(request):
                         pass
                 ok2, _msg2 = _can_transition(estado_norm, nuevo, tipo_d, despacho.tiene_receta_retenida, despacho.receta_devuelta_farmacia)
                 if not ok2:
-                    feedback = 'Transición de estado no permitida'
+                    feedback = TRANSITION_NOT_ALLOWED
                     log.info('Transición inválida codigo=%s de=%s a=%s', codigo, estado_norm, nuevo)
                 else:
                     if nuevo == 'PREPARADO' and tipo_d == 'REENVIO_RECETA':

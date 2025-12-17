@@ -16,6 +16,10 @@ from datetime import timedelta
 from django.core.management import call_command
 import os, io, datetime as dt
 
+# Reusable template path constant to avoid duplicated string literals
+PANEL_ADMIN_TEMPLATE = 'admin/panel-admin.html'
+EDITAR_ASIGNACION_TEMPLATE = 'asignaciones/editar-asignacion-mf.html'
+
 
 @login_required(login_url='login')
 def configuracion(request):
@@ -56,7 +60,7 @@ def mis_permisos(request):
         'permisos': permisos_formateados,
     }
     
-    return render(request, 'admin/panel-admin.html', context)
+    return render(request, PANEL_ADMIN_TEMPLATE, context)
 
 
 @solo_admin
@@ -84,7 +88,7 @@ def asignar_rol(request, user_id):
         
         # Asignar nuevo grupo
         if rol and rol != 'admin':
-            grupo, created = Group.objects.get_or_create(name=rol)
+            grupo, _ = Group.objects.get_or_create(name=rol)
             usuario.groups.add(grupo)
             usuario.is_staff = False
             usuario.is_superuser = False
@@ -134,7 +138,7 @@ def cambiar_contrasena(request):
         'form': form,
     }
     
-    return render(request, 'admin/panel-admin.html', context)
+    return render(request, PANEL_ADMIN_TEMPLATE, context)
 
 
 @login_required(login_url='login')
@@ -166,7 +170,7 @@ def preferencias(request):
         'preferencias': preferencias,
     }
 
-    return render(request, 'admin/panel-admin.html', context)
+    return render(request, PANEL_ADMIN_TEMPLATE, context)
 
 
 @rol_requerido('supervisor')
@@ -189,7 +193,6 @@ def panel_supervisor(request):
         import json, pathlib
         data_path = pathlib.Path(__file__).resolve().parent.parent / 'static' / 'data'
         if total_farmacias == 0 or total_motos < 56 or total_motoristas == 0 or total_asignaciones == 0:
-            pass
             try:
                 from .models import Localfarmacia, Moto
                 total_farmacias = Localfarmacia.objects.count()
@@ -232,13 +235,7 @@ def panel_supervisor(request):
         from .models import Despacho
         estado = 'FALLIDO'
         qs = Despacho.objects.filter(estado=estado).order_by('-fecha_registro')[:10]
-        try:
-            from appnproylogico.IA_gen import analizar_incidencia as ia
-        except Exception:
-            try:
-                from IA_gen import analizar_incidencia as ia
-            except Exception:
-                ia = None
+
         def _fallback(d):
             from django.utils import timezone as tz
             from .models import Localfarmacia
@@ -254,7 +251,7 @@ def panel_supervisor(request):
             return f"Resumen: {est} · {pri} · {(d.cliente_nombre or '')}\nSugerencia: {sug}"
         rows = []
         for d in qs:
-            fn = ia or _fallback
+            fn = _fallback
             out = fn(d, horario_cierre=getattr(djset, 'HORARIO_CIERRE_DEFAULT', '20:00'))
             rows.append({
                 'codigo': d.codigo_despacho or d.id,
@@ -304,7 +301,6 @@ def asignaciones_motorista_farmacia(request):
             farmacias = list(Localfarmacia.objects.all().order_by('local_id'))
             if not farmacias:
                 farmacias = []
-            created = 0
             idx_f = 0
             for m in motoristas[:10]:
                 try:
@@ -322,7 +318,6 @@ def asignaciones_motorista_farmacia(request):
                         activa=1,
                         observaciones='Auto-generada'
                     )
-                    created += 1
                     idx_f += 1
                 except Exception:
                     continue
@@ -402,7 +397,7 @@ def agregar_asignacion_mf(request):
             return redirect('detalle_asignacion_mf', pk=obj.id)
         else:
             messages.error(request, 'Corrige los errores del formulario')
-            return render(request, 'asignaciones/editar-asignacion-mf.html', {'form': form, 'asignacion': None})
+            return render(request, EDITAR_ASIGNACION_TEMPLATE, {'form': form, 'asignacion': None})
     else:
         initial = {}
         mot = request.GET.get('motorista')
@@ -418,7 +413,7 @@ def agregar_asignacion_mf(request):
         except Exception:
             pass
         form = AsignacionMotoristaFarmaciaForm(initial=initial)
-        return render(request, 'asignaciones/editar-asignacion-mf.html', {'form': form, 'asignacion': None})
+        return render(request, EDITAR_ASIGNACION_TEMPLATE, {'form': form, 'asignacion': None})
 
 
 @rol_requerido('supervisor')
@@ -440,7 +435,7 @@ def modificar_asignacion_mf(request, pk):
             messages.error(request, 'Corrige los errores')
     else:
         form = AsignacionMotoristaFarmaciaForm(instance=a)
-    return render(request, 'asignaciones/editar-asignacion-mf.html', {'form': form, 'asignacion': a})
+    return render(request, EDITAR_ASIGNACION_TEMPLATE, {'form': form, 'asignacion': a})
 
 
 @rol_requerido('supervisor')

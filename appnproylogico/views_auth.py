@@ -14,34 +14,55 @@ import os
 from django.utils import timezone
 from datetime import timedelta
 
+SCOPE_READ_WRITE = 'read write'
+
 
 def login_view(request):
     """Vista de inicio de sesión personalizado"""
     if request.user.is_authenticated:
         return redirect('home')
-    
+
+    def _make_success_response(usuario):
+        login(request, usuario)
+        try:
+            request.session['login_fail_count'] = 0
+        except Exception:
+            pass
+        rol = obtener_rol_usuario(usuario)
+        app = _ensure_password_app()
+        expires = timezone.now() + timedelta(seconds=settings.OAUTH2_PROVIDER['ACCESS_TOKEN_EXPIRE_SECONDS'])
+        access = AccessToken.objects.create(user=usuario, application=app, token=_b64url(os.urandom(24)), expires=expires, scope=SCOPE_READ_WRITE)
+        refresh = RefreshToken.objects.create(user=usuario, application=app, token=_b64url(os.urandom(24)), access_token=access)
+        resp = redirect('home')
+        secure_flag = (not settings.DEBUG) or request.is_secure()
+        samesite = 'Strict' if secure_flag else 'Lax'
+        resp.set_cookie('access_token', access.token, max_age=settings.OAUTH2_PROVIDER['ACCESS_TOKEN_EXPIRE_SECONDS'], secure=secure_flag, httponly=True, samesite=samesite)
+        resp.set_cookie('refresh_token', refresh.token, max_age=settings.OAUTH2_PROVIDER['REFRESH_TOKEN_EXPIRE_SECONDS'], secure=secure_flag, httponly=True, samesite=samesite)
+        messages.success(request, f'¡Bienvenido {usuario.username}! (Rol: {rol})')
+        return resp
+
+    def _handle_failure():
+        try:
+            c = int(request.session.get('login_fail_count') or 0) + 1
+            request.session['login_fail_count'] = c
+        except Exception:
+            c = 1
+        if c >= int(getattr(settings, 'AXES_FAILURE_LIMIT', 4)):
+            mins = int(getattr(settings, 'AXES_COOLOFF_TIME', 15))
+            messages.error(request, f'Cuenta bloqueada por {mins} minutos por intentos fallidos.')
+        else:
+            messages.error(request, 'Usuario o contraseña incorrectos.')
+
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             usuario = form.get_user()
-            login(request, usuario)
-            rol = obtener_rol_usuario(usuario)
-            app = _ensure_password_app()
-            expires = timezone.now() + timedelta(seconds=settings.OAUTH2_PROVIDER['ACCESS_TOKEN_EXPIRE_SECONDS'])
-            access = AccessToken.objects.create(user=usuario, application=app, token=_b64url(os.urandom(24)), expires=expires, scope='read write')
-            refresh = RefreshToken.objects.create(user=usuario, application=app, token=_b64url(os.urandom(24)), access_token=access)
-            resp = redirect('home')
-            secure_flag = (not settings.DEBUG) or request.is_secure()
-            samesite = 'Strict' if secure_flag else 'Lax'
-            resp.set_cookie('access_token', access.token, max_age=settings.OAUTH2_PROVIDER['ACCESS_TOKEN_EXPIRE_SECONDS'], secure=secure_flag, httponly=True, samesite=samesite)
-            resp.set_cookie('refresh_token', refresh.token, max_age=settings.OAUTH2_PROVIDER['REFRESH_TOKEN_EXPIRE_SECONDS'], secure=secure_flag, httponly=True, samesite=samesite)
-            messages.success(request, f'¡Bienvenido {usuario.username}! (Rol: {rol})')
-            return resp
+            return _make_success_response(usuario)
         else:
-            messages.error(request, 'Usuario o contraseña incorrectos.')
+            _handle_failure()
     else:
         form = AuthenticationForm()
-    
+
     return render(request, 'auth/iniciar-sesion.html', {'form': form})
 
 
@@ -62,7 +83,6 @@ def registro_view(request):
                         raise ValueError('Tipo de archivo no permitido')
                     if docf.size > settings.UPLOAD_MAX_SIZE_MB * 1024 * 1024:
                         raise ValueError('Archivo demasiado grande')
-                    import os, imghdr
                     tipo = form.cleaned_data.get('tipo_documento') or 'DOC'
                     base = os.path.join(settings.MEDIA_ROOT, 'docs', 'users', str(usuario.id))
                     os.makedirs(base, exist_ok=True)
@@ -75,8 +95,15 @@ def registro_view(request):
                         if head != b'%PDF':
                             raise ValueError('PDF inválido')
                     else:
-                        sniff = imghdr.what(None, h=docf.read(32))
+                        head = docf.read(32)
                         docf.seek(0)
+                        # detect JPEG or PNG by signature bytes to avoid imghdr dependency
+                        if head.startswith(b'\xff\xd8'):
+                            sniff = 'jpeg'
+                        elif head.startswith(b'\x89PNG\r\n\x1a\n'):
+                            sniff = 'png'
+                        else:
+                            sniff = None
                         if sniff not in ('jpeg','png'):
                             raise ValueError('Imagen inválida')
                         ext = '.jpg' if sniff == 'jpeg' else '.png'
@@ -104,7 +131,6 @@ def registro_view(request):
 @login_required(login_url='login')
 def logout_view(request):
     """Vista para cerrar sesión"""
-    nombre_usuario = request.user.username
     logout(request)
     messages.success(request, 'Cerraste tu sesión. Gracias por usar la plataforma.')
     resp = redirect('login')
@@ -160,7 +186,7 @@ def oauth_password_token(request):
         return render(request, 'auth/iniciar-sesion.html', {'form': AuthenticationForm(request, data=request.POST)})
     app = _ensure_password_app()
     expires = timezone.now() + timedelta(seconds=settings.OAUTH2_PROVIDER['ACCESS_TOKEN_EXPIRE_SECONDS'])
-    access = AccessToken.objects.create(user=user, application=app, token=_b64url(os.urandom(24)), expires=expires, scope='read write')
+    access = AccessToken.objects.create(user=user, application=app, token=_b64url(os.urandom(24)), expires=expires, scope=SCOPE_READ_WRITE)
     refresh = RefreshToken.objects.create(user=user, application=app, token=_b64url(os.urandom(24)), access_token=access)
     resp = redirect('home')
     secure_flag = (not settings.DEBUG) or request.is_secure()
@@ -184,7 +210,7 @@ def oauth_refresh_token(request):
             application=app,
             token=os.urandom(24).hex(),
             expires=timezone.now() + timedelta(seconds=settings.OAUTH2_PROVIDER['ACCESS_TOKEN_EXPIRE_SECONDS']),
-            scope='read write'
+            scope=SCOPE_READ_WRITE
         )
         resp = redirect('home')
         secure_flag = (not settings.DEBUG) or request.is_secure()

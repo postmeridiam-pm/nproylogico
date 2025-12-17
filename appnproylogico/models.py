@@ -235,6 +235,21 @@ class Localfarmacia(models.Model):
         managed = True
         db_table = 'localfarmacia'        
         db_table_comment = 'Farmacias Cruz Verde. Geolocalización activa para inserción directa.'
+        indexes = []
+        constraints = [
+            models.CheckConstraint(
+                check=(models.Q(local_lat__isnull=True) | (models.Q(local_lat__gte=-90) & models.Q(local_lat__lte=90))),
+                name='farm_lat_rango'
+            ),
+            models.CheckConstraint(
+                check=(models.Q(local_lng__isnull=True) | (models.Q(local_lng__gte=-180) & models.Q(local_lng__lte=180))),
+                name='farm_lng_rango'
+            ),
+            models.CheckConstraint(
+                check=(models.Q(geolocalizacion_validada=False) | (models.Q(local_lat__isnull=False) & models.Q(local_lng__isnull=False))),
+                name='farm_geo_valida_requiere_coord'
+            ),
+        ]
 
     def __str__(self):
         try:
@@ -295,6 +310,20 @@ class Moto(models.Model):
         managed = True
         db_table = 'moto'
         db_table_comment = 'Motos con documentación legal chilena completa'
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(propietario_tipo__in=['EMPRESA','MOTORISTA']) | models.Q(propietario_tipo__isnull=True),
+                name='moto_propietario_tipo_valido'
+            ),
+            models.CheckConstraint(
+                check=models.Q(estado__in=['OPERATIVO','OCUPADO','EN_TALLER','FUERA_DE_SERVICIO','EN_MANTENIMIENTO']),
+                name='moto_estado_valido'
+            ),
+            models.CheckConstraint(
+                check=models.Q(tipo_combustible__in=['BENCINA','DIESEL','GNC','GLP','ELECTRICO','HIBRIDO']),
+                name='moto_combustible_valido'
+            ),
+        ]
 
     def __str__(self):
         try:
