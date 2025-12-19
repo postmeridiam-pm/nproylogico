@@ -292,6 +292,12 @@ class MotoristaForm(forms.ModelForm):
                         "pattern": r"^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{2,}$",
                         "title": "Solo letras y espacios, mínimo 2 caracteres"
                     })
+            if "comuna_nombre" in self.fields:
+                self.fields["comuna_nombre"].label = "Comuna"
+            if "provincia_nombre" in self.fields:
+                self.fields["provincia_nombre"].label = "Provincia"
+            if "region_nombre" in self.fields:
+                self.fields["region_nombre"].label = "Región"
         except Exception:
             pass
     def clean(self):

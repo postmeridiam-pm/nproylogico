@@ -1,6 +1,4 @@
-Tu archivo completo con los dos fixes: sin condición negada en JS y botón `btn-outline-light` con mejor contraste en tema claro.
 
-```django
 {% load static %}
 <!doctype html>
 <html lang="es" class="theme-dark">
@@ -294,6 +292,9 @@ Tu archivo completo con los dos fixes: sin condición negada en JS y botón `btn
         {% endif %}
         <a class="btn btn-outline-light" href="{% url 'perfil' %}" title="Mi perfil">
           <i class="bi bi-person"></i>
+        </a>
+        <a class="btn btn-danger" href="{% url 'logout' %}" title="Cerrar sesión">
+          <i class="bi bi-box-arrow-right"></i> Cerrar sesión
         </a>
       </div>
     </div>

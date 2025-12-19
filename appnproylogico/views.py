@@ -953,7 +953,11 @@ def agregar_motorista(request):
                 _save(perm_file, 'permiso_circulacion')
             except Exception:
                 pass
-            messages.success(request, f'Motorista "{motorista.usuario.nombre}" creado exitosamente.')
+            try:
+                nombre = f"{(motorista.nombres or '').strip()} {(motorista.apellido_paterno or '').strip()} {(motorista.apellido_materno or '').strip()}".strip()
+            except Exception:
+                nombre = "Nuevo motorista"
+            messages.success(request, f'Motorista \"{nombre}\" creado exitosamente.')
             return redirect('detalle_motorista', pk=motorista.pk)
         else:
             messages.error(request, FORM_ERROR_MSG)
@@ -2471,6 +2475,56 @@ def despachos_activos(request):
     tipo = (request.GET.get('tipo') or '').strip().upper()
     receta = (request.GET.get('receta') or '').strip().lower()
     incidencia = (request.GET.get('incidencia') or '').strip().lower()
+    fecha_arg = (request.GET.get('fecha') or '').strip()
+    fecha_sel = None
+    if fecha_arg:
+        try:
+            from datetime import datetime
+            fecha_sel = datetime.strptime(fecha_arg, '%Y-%m-%d').date()
+        except Exception:
+            fecha_sel = None
+    if estado in {'ENTREGADO','FALLIDO','PENDIENTE'}:
+        from django.utils import timezone as _tz
+        from .models import Despacho, Localfarmacia, AsignacionMotoMotorista
+        dia = fecha_sel or _tz.now().date()
+        qs = Despacho.objects.filter(fecha_registro__date=dia, estado=estado).order_by('fecha_registro')
+        rows = []
+        for obj in qs:
+            try:
+                farm = Localfarmacia.objects.filter(local_id=obj.farmacia_origen_local_id).first()
+                u = getattr(obj.motorista, 'usuario', None)
+                moto_pat = AsignacionMotoMotorista.objects.filter(motorista=obj.motorista, activa=True).values_list('moto__patente', flat=True).first()
+                coords = None
+                try:
+                    if obj.destino_lat is not None and obj.destino_lng is not None:
+                        coords = f"{obj.destino_lat},{obj.destino_lng}"
+                except Exception:
+                    coords = None
+                rows.append([
+                    obj.id,
+                    obj.codigo_despacho,
+                    obj.estado,
+                    obj.tipo_despacho,
+                    obj.prioridad,
+                    getattr(farm, 'local_nombre', None),
+                    ((getattr(u,'nombre','') or '') + ' ' + (getattr(u,'apellido','') or '')).strip(),
+                    moto_pat or None,
+                    obj.cliente_nombre,
+                    obj.cliente_telefono,
+                    obj.destino_direccion,
+                    bool(obj.tiene_receta_retenida),
+                    bool(obj.requiere_aprobacion_operadora),
+                    bool(obj.aprobado_por_operadora),
+                    obj.fecha_registro,
+                    obj.fecha_asignacion,
+                    obj.fecha_salida_farmacia,
+                    None,
+                    bool(obj.hubo_incidencia),
+                    obj.tipo_incidencia,
+                    coords,
+                ])
+            except Exception:
+                continue
 
     data = []
     for r in rows:
@@ -2859,7 +2913,11 @@ def cerrar_dia_operadora(request):
             json.dump(rows, f, ensure_ascii=False)
     except Exception as e:
         pass
-    return redirect('despachos_activos')
+    from django.urls import reverse
+    try:
+        return redirect(f"{reverse('despachos_activos')}?estado=ENTREGADO&fecha={hoy.strftime('%Y-%m-%d')}")
+    except Exception:
+        return redirect('despachos_activos')
 
 @permiso_requerido('movimientos', 'add')
 def generar_despachos_demo(request):
